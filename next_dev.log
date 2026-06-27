@@ -14,3 +14,12 @@
  GET /donors/d1 200 in 1279ms (next.js: 1214ms, application-code: 65ms)
  GET /churches 200 in 702ms (next.js: 665ms, application-code: 38ms)
  GET /budget 200 in 614ms (next.js: 552ms, application-code: 62ms)
+⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 770ms
+⚠ `eslint` configuration in next.config.ts is no longer supported. See more info here: https://nextjs.org/docs/app/api-reference/cli/next#next-lint-options
+⚠ Invalid next.config.ts options detected:
+⚠     Unrecognized key(s) in object: 'eslint'
+⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
