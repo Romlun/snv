@@ -9,7 +9,6 @@ import { Database } from "@/types/database";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Church = Database['public']['Tables']['churches']['Row'];
-type Donor = Database['public']['Tables']['donors']['Row'];
 type DonorStage = Database['public']['Tables']['donors']['Row']['stage'];
 type RelationshipStatus = Database['public']['Tables']['donors']['Row']['relationship_status'];
 

@@ -49,7 +49,8 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
       const { data: { user } } = await supabase.auth.getUser();
       const { data: profile } = await supabase.from('profiles').select('org_id').eq('id', user?.id).single();
 
-      const org_id = profile?.org_id || '00000000-0000-0000-0000-000000000000';
+      if (!profile?.org_id) throw new Error('Organization ID missing');
+      const org_id = profile.org_id;
 
       const { error: logError } = await supabase.from('contact_logs').insert({
         org_id,
