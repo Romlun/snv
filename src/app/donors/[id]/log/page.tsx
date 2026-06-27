@@ -1,4 +1,5 @@
 "use client";
+
 import { use, useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -6,9 +7,16 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Database } from "@/types/database";
 
-
-
 type Donor = Database['public']['Tables']['donors']['Row'];
+type ContactType = Database['public']['Tables']['contact_logs']['Row']['type'];
+
+interface InteractionFormData {
+  type: ContactType;
+  notes: string;
+  outcome: string;
+  next_step: string;
+  next_follow_up_date: string;
+}
 
 export default function LogInteractionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -17,8 +25,8 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
   const [loading, setLoading] = useState(false);
   const [donor, setDonor] = useState<Donor | null>(null);
 
-  const [formData, setFormData] = useState({
-    type: "call" as "call" | "email" | "text" | "meeting" | "church visit" | "event",
+  const [formData, setFormData] = useState<InteractionFormData>({
+    type: "call",
     notes: "",
     outcome: "",
     next_step: "",
@@ -41,8 +49,10 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
       const { data: { user } } = await supabase.auth.getUser();
       const { data: profile } = await supabase.from('profiles').select('org_id').eq('id', user?.id).single();
 
+      const org_id = profile?.org_id || '00000000-0000-0000-0000-000000000000';
+
       const { error: logError } = await supabase.from('contact_logs').insert({
-        org_id: profile?.org_id || '00000000-0000-0000-0000-000000000000',
+        org_id,
         donor_id: id,
         staff_id: user?.id,
         type: formData.type,
@@ -66,7 +76,7 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
 
       if (formData.next_step && formData.next_follow_up_date) {
         await supabase.from('tasks').insert({
-          org_id: profile?.org_id || '00000000-0000-0000-0000-000000000000',
+          org_id,
           title: `Follow up: ${formData.next_step}`,
           description: `Automatically created from interaction with ${donor?.name}. Notes: ${formData.notes}`,
           assigned_to: user?.id,
@@ -103,13 +113,14 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
             <select
               className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
               value={formData.type}
-              onChange={e => setFormData({ ...formData, type: e.target.value as "call" | "email" | "text" | "meeting" | "church visit" | "event" })}
+              onChange={e => setFormData({ ...formData, type: e.target.value as ContactType })}
             >
               <option value="call">Call</option>
               <option value="email">Email</option>
               <option value="text">Text</option>
               <option value="meeting">Meeting</option>
               <option value="event">Event</option>
+              <option value="church visit">Church Visit</option>
             </select>
           </div>
           <div className="space-y-2">
@@ -119,7 +130,7 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
               className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-24"
               placeholder="What was discussed?"
               value={formData.notes}
-              onChange={e => setFormData({ ...formData, notes: e.target.value as "call" | "email" | "text" | "meeting" | "church visit" | "event"})}
+              onChange={e => setFormData({ ...formData, notes: e.target.value })}
             />
           </div>
           <div className="space-y-2">
@@ -128,7 +139,7 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
               className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="What was the result?"
               value={formData.outcome}
-              onChange={e => setFormData({ ...formData, outcome: e.target.value as "call" | "email" | "text" | "meeting" | "church visit" | "event"})}
+              onChange={e => setFormData({ ...formData, outcome: e.target.value })}
             />
           </div>
           <div className="pt-4 border-t dark:border-zinc-800 space-y-4">
@@ -139,7 +150,7 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
                 className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., Send information pack"
                 value={formData.next_step}
-                onChange={e => setFormData({ ...formData, next_step: e.target.value as "call" | "email" | "text" | "meeting" | "church visit" | "event"})}
+                onChange={e => setFormData({ ...formData, next_step: e.target.value })}
               />
             </div>
             <div className="space-y-2">
@@ -148,7 +159,7 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
                 type="date"
                 className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.next_follow_up_date}
-                onChange={e => setFormData({ ...formData, next_follow_up_date: e.target.value as "call" | "email" | "text" | "meeting" | "church visit" | "event"})}
+                onChange={e => setFormData({ ...formData, next_follow_up_date: e.target.value })}
               />
             </div>
           </div>

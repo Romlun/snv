@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -9,6 +9,7 @@ import { Database } from "@/types/database";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Church = Database['public']['Tables']['churches']['Row'];
+type Donor = Database['public']['Tables']['donors']['Row'];
 type DonorStage = Database['public']['Tables']['donors']['Row']['stage'];
 type RelationshipStatus = Database['public']['Tables']['donors']['Row']['relationship_status'];
 
@@ -23,10 +24,12 @@ interface FormData {
   notes: string;
 }
 
-export default function NewDonorPage() {
+export default function EditDonorPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [staff, setStaff] = useState<Profile[]>([]);
   const [churches, setChurches] = useState<Church[]>([]);
 
@@ -43,61 +46,79 @@ export default function NewDonorPage() {
 
   useEffect(() => {
     async function fetchData() {
-      const { data: staffData } = await supabase.from('profiles').select('*');
-      const { data: churchData } = await supabase.from('churches').select('*');
-      setStaff(staffData || []);
-      setChurches(churchData || []);
+      try {
+        const { data: staffData } = await supabase.from('profiles').select('*');
+        const { data: churchData } = await supabase.from('churches').select('*');
+        setStaff(staffData || []);
+        setChurches(churchData || []);
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setFormData(prev => ({ ...prev, assigned_staff_id: user.id }));
+        const { data: donor } = await supabase.from('donors').select('*').eq('id', id).single();
+        if (donor) {
+          setFormData({
+            name: donor.name,
+            email: donor.email || "",
+            phone: donor.phone || "",
+            stage: donor.stage,
+            relationship_status: donor.relationship_status,
+            assigned_staff_id: donor.assigned_staff_id || "",
+            church_id: donor.church_id || "",
+            notes: donor.notes || "",
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setFetching(false);
       }
     }
     fetchData();
-  }, [supabase]);
+  }, [id, supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { data: profile } = await supabase.from('profiles').select('org_id').eq('id', user.id).single();
-
-      const { error } = await supabase.from('donors').insert({
+      const { error } = await supabase.from('donors').update({
         name: formData.name,
         email: formData.email || null,
         phone: formData.phone || null,
         stage: formData.stage,
         relationship_status: formData.relationship_status,
         notes: formData.notes || null,
-        org_id: profile?.org_id || '00000000-0000-0000-0000-000000000000',
         assigned_staff_id: formData.assigned_staff_id || null,
         church_id: formData.church_id || null,
-      });
+      }).eq('id', id);
 
       if (error) throw error;
-      router.push("/donors");
+      router.push(`/donors/${id}`);
       router.refresh();
     } catch (err) {
       console.error(err);
-      alert("Error creating donor");
+      alert("Error updating donor");
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetching) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+        <p className="mt-4 text-zinc-500">Loading donor data...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <Link href="/donors" className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50">
+      <Link href={`/donors/${id}`} className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50">
         <ArrowLeft className="h-4 w-4" />
-        Back to Donors
+        Back to Donor
       </Link>
 
       <div className="bg-white border rounded-xl p-8 dark:bg-zinc-900 dark:border-zinc-800">
-        <h1 className="text-2xl font-bold mb-6">Add New Donor</h1>
+        <h1 className="text-2xl font-bold mb-6">Edit Donor</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -181,7 +202,7 @@ export default function NewDonorPage() {
             disabled={loading}
             className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center"
           >
-            {loading ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : "Create Donor"}
+            {loading ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : "Save Changes"}
           </button>
         </form>
       </div>

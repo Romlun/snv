@@ -206,3 +206,32 @@ CREATE POLICY "Users can view their own organization" ON organizations FOR SELEC
 
 -- Policy helper: user belongs to the org
 -- Using a function or direct check in each policy.
+
+-- More RLS policies
+CREATE POLICY "Users can insert profiles" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "Users can view their own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can update their own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+
+CREATE POLICY "Users can view donors in their org" ON donors FOR SELECT USING (org_id IN (SELECT org_id FROM profiles WHERE id = auth.uid()));
+CREATE POLICY "Users can insert donors in their org" ON donors FOR INSERT WITH CHECK (org_id IN (SELECT org_id FROM profiles WHERE id = auth.uid()));
+CREATE POLICY "Users can update donors in their org" ON donors FOR UPDATE USING (org_id IN (SELECT org_id FROM profiles WHERE id = auth.uid()));
+
+CREATE POLICY "Users can view churches in their org" ON churches FOR SELECT USING (org_id IN (SELECT org_id FROM profiles WHERE id = auth.uid()));
+CREATE POLICY "Users can view projects in their org" ON projects FOR SELECT USING (org_id IN (SELECT org_id FROM profiles WHERE id = auth.uid()));
+CREATE POLICY "Users can view tasks in their org" ON tasks FOR SELECT USING (org_id IN (SELECT org_id FROM profiles WHERE id = auth.uid()));
+CREATE POLICY "Users can view contact logs in their org" ON contact_logs FOR SELECT USING (org_id IN (SELECT org_id FROM profiles WHERE id = auth.uid()));
+
+-- Function to handle new user profiles
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name, role)
+  VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', 'Staff');
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger for new user
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
