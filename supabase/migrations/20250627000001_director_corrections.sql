@@ -61,8 +61,16 @@ STABLE AS $$ SELECT role FROM public.profiles WHERE id = auth.uid() $$;
 CREATE FUNCTION public.current_user_org() RETURNS UUID LANGUAGE sql SECURITY DEFINER
 STABLE AS $$ SELECT org_id FROM public.profiles WHERE id = auth.uid() $$;
 
-CREATE POLICY "Role restrict churches select" ON public.churches AS RESTRICTIVE FOR SELECT
-USING (current_user_role() IN ('Admin', 'Staff'));
+DROP POLICY IF EXISTS "Users can view donors in their org" ON public.donors;
+DROP POLICY IF EXISTS "Users can insert donors in their org" ON public.donors;
+DROP POLICY IF EXISTS "Users can update donors in their org" ON public.donors;
+DROP POLICY IF EXISTS "Users can view churches in their org" ON public.churches;
+DROP POLICY IF EXISTS "Users can view projects in their org" ON public.projects;
+DROP POLICY IF EXISTS "Users can view tasks in their org" ON public.tasks;
+DROP POLICY IF EXISTS "Users can view contact logs in their org" ON public.contact_logs;
+
+CREATE POLICY "Users can view churches in their org" ON public.churches FOR SELECT
+USING (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
 CREATE POLICY "Admins and staff can insert churches in their org" ON public.churches FOR INSERT
 WITH CHECK (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
 CREATE POLICY "Admins and staff can update churches in their org" ON public.churches FOR UPDATE
@@ -71,18 +79,18 @@ WITH CHECK (org_id = current_user_org() AND current_user_role() IN ('Admin', 'St
 CREATE POLICY "Admins and staff can delete churches in their org" ON public.churches FOR DELETE
 USING (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
 
-CREATE POLICY "Role restrict donors select" ON public.donors AS RESTRICTIVE FOR SELECT
-USING (current_user_role() IN ('Admin', 'Staff'));
-CREATE POLICY "Role restrict donors insert" ON public.donors AS RESTRICTIVE FOR INSERT
-WITH CHECK (current_user_role() IN ('Admin', 'Staff'));
-CREATE POLICY "Role restrict donors update" ON public.donors AS RESTRICTIVE FOR UPDATE
-USING (current_user_role() IN ('Admin', 'Staff'))
-WITH CHECK (current_user_role() IN ('Admin', 'Staff'));
+CREATE POLICY "Users can view donors in their org" ON public.donors FOR SELECT
+USING (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
+CREATE POLICY "Users can insert donors in their org" ON public.donors FOR INSERT
+WITH CHECK (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
+CREATE POLICY "Users can update donors in their org" ON public.donors FOR UPDATE
+USING (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'))
+WITH CHECK (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
 CREATE POLICY "Admins and staff can delete donors in their org" ON public.donors FOR DELETE
 USING (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
 
-CREATE POLICY "Role restrict projects select" ON public.projects AS RESTRICTIVE FOR SELECT
-USING (current_user_role() IN ('Admin', 'Staff'));
+CREATE POLICY "Users can view projects in their org" ON public.projects FOR SELECT
+USING (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
 CREATE POLICY "Admins and staff can insert projects in their org" ON public.projects FOR INSERT
 WITH CHECK (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
 CREATE POLICY "Admins and staff can update projects in their org" ON public.projects FOR UPDATE
@@ -136,10 +144,13 @@ USING (
     )
 );
 
-CREATE POLICY "Role restrict tasks select" ON public.tasks AS RESTRICTIVE FOR SELECT
+CREATE POLICY "Users can view tasks in their org" ON public.tasks FOR SELECT
 USING (
-    current_user_role() IN ('Admin', 'Staff')
-    OR (current_user_role() = 'Volunteer' AND assigned_to = auth.uid())
+    org_id = current_user_org()
+    AND (
+        current_user_role() IN ('Admin', 'Staff')
+        OR (current_user_role() = 'Volunteer' AND assigned_to = auth.uid())
+    )
 );
 CREATE POLICY "Admins and staff can insert tasks in their org" ON public.tasks FOR INSERT
 WITH CHECK (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
@@ -161,8 +172,8 @@ WITH CHECK (
 CREATE POLICY "Admins and staff can delete tasks in their org" ON public.tasks FOR DELETE
 USING (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
 
-CREATE POLICY "Role restrict contact logs select" ON public.contact_logs AS RESTRICTIVE FOR SELECT
-USING (current_user_role() IN ('Admin', 'Staff'));
+CREATE POLICY "Users can view contact logs in their org" ON public.contact_logs FOR SELECT
+USING (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
 CREATE POLICY "Admins and staff can insert contact logs in their org" ON public.contact_logs FOR INSERT
 WITH CHECK (org_id = current_user_org() AND current_user_role() IN ('Admin', 'Staff'));
 CREATE POLICY "Admins and staff can update contact logs in their org" ON public.contact_logs FOR UPDATE
