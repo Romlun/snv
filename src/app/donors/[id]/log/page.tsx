@@ -47,13 +47,9 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      const { data: profile } = await supabase.from('profiles').select('org_id').eq('id', user?.id).single();
 
-      if (!profile?.org_id) throw new Error('Organization ID missing');
-      const org_id = profile.org_id;
-
+      // 1. Create Contact Log
       const { error: logError } = await supabase.from('contact_logs').insert({
-        org_id,
         donor_id: id,
         staff_id: user?.id,
         type: formData.type,
@@ -65,6 +61,7 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
 
       if (logError) throw logError;
 
+      // 2. Update Donor's last contact and next follow-up
       const updateData: Record<string, string> = {
         last_contact_date: new Date().toISOString().split('T')[0],
       };
@@ -75,9 +72,9 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
 
       await supabase.from('donors').update(updateData).eq('id', id);
 
+      // 3. Create Task if next step is defined
       if (formData.next_step && formData.next_follow_up_date) {
         await supabase.from('tasks').insert({
-          org_id,
           title: `Follow up: ${formData.next_step}`,
           description: `Automatically created from interaction with ${donor?.name}. Notes: ${formData.notes}`,
           assigned_to: user?.id,

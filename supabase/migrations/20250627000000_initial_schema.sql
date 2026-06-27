@@ -7,6 +7,14 @@ CREATE TYPE task_status AS ENUM ('Not started', 'In progress', 'Waiting', 'Compl
 CREATE TYPE task_priority AS ENUM ('Low', 'Medium', 'High');
 CREATE TYPE user_role AS ENUM ('Admin', 'Director', 'Donor Relations', 'Church Relations', 'Staff');
 
+-- Define Default Organization ID
+-- We use a fixed UUID for "Light in the East"
+CREATE OR REPLACE FUNCTION get_default_org_id() RETURNS UUID AS $$
+BEGIN
+    RETURN '018f3a3a-3c3c-7000-a5a5-4e4e4e4e4e4e'::UUID;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
 -- 1. Organizations
 CREATE TABLE organizations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -15,10 +23,13 @@ CREATE TABLE organizations (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Seed Default Organization
+INSERT INTO organizations (id, name) VALUES (get_default_org_id(), 'Light in the East');
+
 -- 2. Profiles (Extends Auth.Users)
 CREATE TABLE profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    org_id UUID REFERENCES organizations(id),
+    org_id UUID REFERENCES organizations(id) DEFAULT get_default_org_id(),
     full_name TEXT,
     email TEXT UNIQUE NOT NULL,
     role user_role DEFAULT 'Staff',
@@ -31,7 +42,7 @@ CREATE TABLE profiles (
 CREATE TABLE staff (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
-    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE DEFAULT get_default_org_id(),
     title TEXT,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW()
@@ -40,7 +51,7 @@ CREATE TABLE staff (
 -- 4. Churches
 CREATE TABLE churches (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE DEFAULT get_default_org_id(),
     name TEXT NOT NULL,
     pastor TEXT,
     address TEXT,
@@ -60,7 +71,7 @@ CREATE TABLE churches (
 -- 5. Donors
 CREATE TABLE donors (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE DEFAULT get_default_org_id(),
     church_id UUID REFERENCES churches(id) ON DELETE SET NULL,
     name TEXT NOT NULL,
     email TEXT,
@@ -88,7 +99,7 @@ CREATE TABLE donors (
 -- 6. Projects
 CREATE TABLE projects (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE DEFAULT get_default_org_id(),
     name TEXT NOT NULL,
     description TEXT,
     goal_description TEXT,
@@ -112,7 +123,7 @@ CREATE TABLE project_staff (
 -- 7. Tasks
 CREATE TABLE tasks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE DEFAULT get_default_org_id(),
     title TEXT NOT NULL,
     description TEXT,
     assigned_to UUID REFERENCES profiles(id) ON DELETE SET NULL,
@@ -129,7 +140,7 @@ CREATE TABLE tasks (
 -- 8. Contact Logs
 CREATE TABLE contact_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE DEFAULT get_default_org_id(),
     donor_id UUID REFERENCES donors(id) ON DELETE SET NULL,
     church_id UUID REFERENCES churches(id) ON DELETE SET NULL,
     staff_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
@@ -145,7 +156,7 @@ CREATE TABLE contact_logs (
 -- 9. Resources / Inventory
 CREATE TABLE resources (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE DEFAULT get_default_org_id(),
     title TEXT NOT NULL,
     category TEXT,
     quantity_available INTEGER DEFAULT 0,
@@ -160,7 +171,7 @@ CREATE TABLE resources (
 -- Resource Transactions
 CREATE TABLE resource_transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE DEFAULT get_default_org_id(),
     resource_id UUID REFERENCES resources(id) ON DELETE CASCADE,
     donor_id UUID REFERENCES donors(id) ON DELETE SET NULL,
     church_id UUID REFERENCES churches(id) ON DELETE SET NULL,
@@ -175,7 +186,7 @@ CREATE TABLE resource_transactions (
 -- 10. Budget Entries
 CREATE TABLE budget_entries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+    org_id UUID REFERENCES organizations(id) ON DELETE CASCADE DEFAULT get_default_org_id(),
     project_id UUID REFERENCES projects(id) ON DELETE SET NULL,
     category TEXT NOT NULL, -- 'General', 'Projects', 'Events', 'Travel', 'Resources', 'Staff', 'Media'
     name TEXT NOT NULL,
@@ -200,14 +211,9 @@ ALTER TABLE resources ENABLE ROW LEVEL SECURITY;
 ALTER TABLE resource_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE budget_entries ENABLE ROW LEVEL SECURITY;
 
--- Simple multi-tenant policies (users can only see their organization's data)
--- For a real app, these should be more refined, but this is the foundation.
+-- Multi-tenant policies (users can only see their organization's data)
 CREATE POLICY "Users can view their own organization" ON organizations FOR SELECT USING (id IN (SELECT org_id FROM profiles WHERE id = auth.uid()));
 
--- Policy helper: user belongs to the org
--- Using a function or direct check in each policy.
-
--- More RLS policies
 CREATE POLICY "Users can insert profiles" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 CREATE POLICY "Users can view their own profile" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update their own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
@@ -224,10 +230,18 @@ CREATE POLICY "Users can view contact logs in their org" ON contact_logs FOR SEL
 -- Function to handle new user profiles
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
+DECLARE
+    first_user_role user_role := 'Staff';
+    default_org_id UUID := get_default_org_id();
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name, role)
-  VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', 'Staff');
-  RETURN new;
+    -- Check if this is the first user
+    IF (SELECT count(*) FROM public.profiles) = 0 THEN
+        first_user_role := 'Admin';
+    END IF;
+
+    INSERT INTO public.profiles (id, email, full_name, role, org_id)
+    VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', first_user_role, default_org_id);
+    RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

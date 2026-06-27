@@ -61,15 +61,6 @@ export default function NewDonorPage() {
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { data: profile } = await supabase.from('profiles').select('org_id').eq('id', user.id).single();
-
-      if (!profile?.org_id) {
-        throw new Error("Your user profile is missing an Organization ID. Please contact an administrator.");
-      }
-
       const { error } = await supabase.from('donors').insert({
         name: formData.name,
         email: formData.email || null,
@@ -77,7 +68,6 @@ export default function NewDonorPage() {
         stage: formData.stage,
         relationship_status: formData.relationship_status,
         notes: formData.notes || null,
-        org_id: profile.org_id,
         assigned_staff_id: formData.assigned_staff_id || null,
         church_id: formData.church_id || null,
       });
