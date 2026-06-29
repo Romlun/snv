@@ -128,6 +128,15 @@ now the authoritative type source for new module work, alongside `src/types/crm.
   from memory.
 - **P2 — PII never in chat/logs/commits.** Service-role keys, donor personal data
   never surfaced in directives, code, or this file.
+- **P3 — SECURITY DEFINER funcs: qualify types + pin search_path.** Any function
+  that runs as SECURITY DEFINER (esp. auth triggers like handle_new_user) MUST
+  schema-qualify custom types (`public.user_role`, not `user_role`) AND set
+  `search_path = public`. Without it, the func can't resolve public-schema types at
+  runtime → "Database error creating new user" on signup. (Cost us a signup-blocking
+  bug, session 2.)
+- **P4 — Smoke tests must exercise a real auth signup**, not just route/redirect
+  checks. The search_path bug passed build + route checks but broke actual user
+  creation. "It builds and redirects" is not "a user can sign up and log in."
 
 ---
 
@@ -175,13 +184,16 @@ at GATE 2 until further notice.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW:** Foundation merged + deployed. Nothing mid-flight.
-- **NEXT (awaiting operator go):** First business module = **Churches** (per the
-  agreed build order). Needs: Designer spec? (mostly exists as prototype UI) →
-  Code Agent wires churches pages to live DB (read/list/create/edit/visit log),
-  replacing mock-data, respecting RLS. Small milestone, then Quality + review.
-- **Standing process change (operator):** build by business module, not by
-  technical layer; milestones of 2–5 days, each reviewed before the next starts.
+- **NOW:** Nothing mid-flight. Foundation fully live + verified end-to-end: first
+  Admin user created via signup, logged in successfully. 3 migrations applied
+  (initial, corrections, handle_new_user search_path fix), all merged to main,
+  production READY (commit `968dbef`).
+- **NEXT (awaiting operator go):** First business module = **Churches** — wire the
+  existing churches pages to the live DB (list/create/edit + visit logs), replace
+  mock-data, respect RLS. Small milestone → Quality (incl. real auth-path test per
+  P4) → review → merge.
+- **Process change (operator):** build by business module, milestones 2–5 days,
+  each reviewed before the next.
 
 ## 13. SESSION NOTE (session 2)
 Reconciled a major surprise: the "Phase 1 foundation unbuilt" assumption from
@@ -194,4 +206,8 @@ policies that would have locked out all users incl. Admins, (2) initially missin
 gifts table + wrong role enum. Sent back, fixed, re-reviewed. Applied both migrations
 to live DB, verified, smoke-tested (build OK, auth redirect works), merged to main,
 confirmed Vercel production READY at snv-zeta.vercel.app. Aligned local + Vercel
-anon keys (both legacy eyJ). Foundation is now real and live. Next: Churches module.
+anon keys (both legacy eyJ). Then hit a signup-blocking bug: handle_new_user trigger
+threw "type user_role does not exist" (SECURITY DEFINER + no search_path). Diagnosed
+via postgres logs, fixed with migration 20250627000002 (qualify type + set
+search_path), applied, merged, redeployed. Operator created first Admin user and
+logged in successfully — foundation proven end-to-end. Banked P3 + P4. Next: Churches.
