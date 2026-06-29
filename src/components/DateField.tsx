@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CalendarDays } from "lucide-react";
+import { format, isValid, parse } from "date-fns";
+import { DayPicker } from "react-day-picker";
 
 interface Props {
   value: string;
@@ -25,11 +27,21 @@ function usToIso(us: string): string {
   return `${yr}-${mo}-${da}`;
 }
 
+function isoToLocalDate(iso: string): Date | undefined {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return undefined;
+  const date = parse(iso, "yyyy-MM-dd", new Date());
+  return isValid(date) ? date : undefined;
+}
+
+function localDateToIso(date: Date): string {
+  return format(date, "yyyy-MM-dd");
+}
+
 export default function DateField({ value, onChange, label, required }: Props) {
   const [rawText, setRawText] = useState(() => isoToUs(value));
+  const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLInputElement>(null);
-  const pickerRef = useRef<HTMLInputElement>(null);
   const lastEmitted = useRef<string>(value);
 
   useEffect(() => {
@@ -51,13 +63,24 @@ export default function DateField({ value, onChange, label, required }: Props) {
   useEffect(() => {
     function handleOutsideMouseDown(e: MouseEvent) {
       if (!wrapperRef.current?.contains(e.target as Node)) {
+        setOpen(false);
         textRef.current?.blur();
-        pickerRef.current?.blur();
       }
     }
 
     document.addEventListener("mousedown", handleOutsideMouseDown);
     return () => document.removeEventListener("mousedown", handleOutsideMouseDown);
+  }, []);
+
+  useEffect(() => {
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
   function handleText(e: React.ChangeEvent<HTMLInputElement>) {
@@ -68,14 +91,17 @@ export default function DateField({ value, onChange, label, required }: Props) {
     onChange(iso);
   }
 
-  function handlePicker(e: React.ChangeEvent<HTMLInputElement>) {
-    const iso = e.target.value;
+  function handleSelect(day: Date | undefined) {
+    if (!day) return;
+    const iso = localDateToIso(day);
     lastEmitted.current = iso;
     setRawText(isoToUs(iso));
     onChange(iso);
+    setOpen(false);
   }
 
   const incomplete = rawText !== "" && usToIso(rawText) === "";
+  const selectedDate = isoToLocalDate(value);
 
   return (
     <div ref={wrapperRef} className="space-y-2">
@@ -95,21 +121,43 @@ export default function DateField({ value, onChange, label, required }: Props) {
         />
         <button
           type="button"
-          onClick={() => pickerRef.current?.showPicker?.()}
+          onClick={() => setOpen(value => !value)}
           className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
           aria-label="Open date picker"
+          aria-expanded={open}
         >
           <CalendarDays className="h-4 w-4" />
         </button>
-        <input
-          ref={pickerRef}
-          type="date"
-          value={value}
-          onChange={handlePicker}
-          tabIndex={-1}
-          aria-hidden="true"
-          className="absolute inset-0 opacity-0 pointer-events-none"
-        />
+        {open && (
+          <div className="absolute right-0 top-full z-50 mt-2 rounded-lg border bg-white p-3 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+            <DayPicker
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleSelect}
+              defaultMonth={selectedDate}
+              classNames={{
+                root: "text-sm text-zinc-900 dark:text-zinc-100",
+                months: "flex",
+                month: "space-y-3",
+                month_caption: "flex items-center justify-center px-8",
+                caption_label: "text-sm font-semibold",
+                nav: "absolute inset-x-3 top-3 flex items-center justify-between",
+                button_previous: "inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800",
+                button_next: "inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800",
+                month_grid: "border-collapse",
+                weekdays: "text-zinc-500",
+                weekday: "h-8 w-8 text-center text-xs font-medium",
+                week: "",
+                day: "h-8 w-8 p-0 text-center",
+                day_button: "h-8 w-8 rounded-md text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800",
+                today: "font-bold text-blue-600 dark:text-blue-400",
+                selected: "bg-blue-600 text-white hover:bg-blue-600 dark:bg-blue-600 dark:text-white",
+                outside: "text-zinc-300 dark:text-zinc-700",
+                disabled: "opacity-40",
+              }}
+            />
+          </div>
+        )}
       </div>
       {incomplete && (
         <p className="text-xs text-amber-600 mt-1">Enter date as MM/DD/YYYY</p>
