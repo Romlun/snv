@@ -185,15 +185,22 @@ at GATE 2 until further notice.
 
 ## 12. IN-FLIGHT WORK
 - **NOW:** Nothing mid-flight.
-- **DONE this session:** Security hardening (migration 0003: function search_path +
-  execute grants — security advisor actionable warnings cleared). **Churches module**
-  built on live DB (list, detail, create, edit, visit-log) — operator tested all 5
-  flows on production, all pass. Merged, deployed READY (commit `9de75c0`).
-- **MODULE BUILD ORDER (operator):** ✅Donors ✅Churches → **Projects (NEXT)** →
-  Tasks → Budget → Inventory → Dashboard (live metrics) → User Management (Admin
+- **DONE (session 3):** Projects module (live DB: list, detail, create, edit,
+  funding progress) — tested, merged (`c7b4cba`). Then two improvements, tested +
+  merged (`ae639b3`): (1) DATE INPUT FIX — native date fields now accept keyboard
+  editing across donors/churches/projects (was rejecting typed dates as invalid).
+  (2) PROJECT "ADD FUNDS" — adds a gift record linked to the project; project
+  `current_funding` is now AUTO-SUMMED from linked gifts via DB trigger
+  (migration 0004, `recalculate_project_current_funding`). donor_id on gifts made
+  nullable so funds can be added without a donor. Trigger verified live (insert→sum
+  up, delete→sum down).
+- **IMPORTANT — current_funding is now DERIVED.** It's recalculated from gifts by
+  trigger. Manual edits to it on the project form will be overwritten by the gift
+  sum. (Possible future cleanup: make the field read-only on the edit form.)
+- **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects → **Tasks (NEXT)** →
+  Budget → Inventory → Dashboard (live metrics) → User Management (Admin
   creates/invites users + role-based UI) → Gift entry + Engagement Score →
-  Reporting → AI features. Build by module, 2–5 day milestones, each tested before
-  the next.
+  Reporting → AI features. Build by module, test each before the next.
 - **DEFERRED polish:** Operator notes there are UI/UX improvements to make, but we
   agreed to defer them until all modules exist, then do a consistent polish pass.
   (Specific items TBD — operator will name them later.)
