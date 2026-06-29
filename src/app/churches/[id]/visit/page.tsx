@@ -2,6 +2,7 @@
 
 import { use, useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import DateField from "@/components/DateField";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -156,15 +157,11 @@ export default function LogChurchVisitPage({ params }: { params: Promise<{ id: s
                 onChange={e => setFormData({ ...formData, next_step: e.target.value })}
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-500">Follow-up Date</label>
-              <input
-                type="date"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.next_follow_up_date}
-                onChange={e => setFormData({ ...formData, next_follow_up_date: e.target.value })}
-              />
-            </div>
+            <DateField
+              label="Follow-up Date"
+              value={formData.next_follow_up_date}
+              onChange={val => setFormData({ ...formData, next_follow_up_date: val })}
+            />
           </div>
           <button
             type="submit"

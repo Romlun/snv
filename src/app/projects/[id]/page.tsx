@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import DateField from "@/components/DateField";
 import {
   ArrowLeft,
   Calendar,
@@ -331,15 +332,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 ))}
               </select>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Gift Date</label>
-              <input
-                type="date"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={fundForm.gift_date}
-                onChange={e => setFundForm({ ...fundForm, gift_date: e.target.value })}
-              />
-            </div>
+            <DateField
+              label="Gift Date"
+              value={fundForm.gift_date}
+              onChange={val => setFundForm({ ...fundForm, gift_date: val })}
+            />
             <div className="space-y-2">
               <label className="text-sm font-medium">Method</label>
               <input

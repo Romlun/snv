@@ -2,6 +2,7 @@
 
 import { use, useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import DateField from "@/components/DateField";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -151,24 +152,16 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
                 onChange={e => setFormData({ ...formData, budget_needed: e.target.value })}
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Start Date</label>
-              <input
-                type="date"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.start_date}
-                onChange={e => setFormData({ ...formData, start_date: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">End Date</label>
-              <input
-                type="date"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.end_date}
-                onChange={e => setFormData({ ...formData, end_date: e.target.value })}
-              />
-            </div>
+            <DateField
+              label="Start Date"
+              value={formData.start_date}
+              onChange={val => setFormData({ ...formData, start_date: val })}
+            />
+            <DateField
+              label="End Date"
+              value={formData.end_date}
+              onChange={val => setFormData({ ...formData, end_date: val })}
+            />
             <div className="space-y-2">
               <label className="text-sm font-medium">Status</label>
               <select

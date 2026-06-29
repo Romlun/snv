@@ -3,10 +3,11 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, CheckCircle2, Loader2, User as UserIcon } from "lucide-react";
+import { ArrowLeft, Calendar, CheckCircle2, Loader2, Save, User as UserIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 type TaskStatus = 'Not started' | 'In progress' | 'Waiting' | 'Completed' | 'Cancelled';
+const taskStatuses: TaskStatus[] = ['Not started', 'In progress', 'Waiting', 'Completed', 'Cancelled'];
 type TaskPriority = 'Low' | 'Medium' | 'High';
 type RelatedType = 'donor' | 'church' | 'project';
 
@@ -54,6 +55,9 @@ export default function TaskDetailPage({ params }: { params: Promise<{ id: strin
   const [linkedRecord, setLinkedRecord] = useState<LinkedRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
+  const [statusSaving, setStatusSaving] = useState(false);
+  const [descText, setDescText] = useState("");
+  const [descSaving, setDescSaving] = useState(false);
 
   async function fetchTask() {
     try {
@@ -67,6 +71,7 @@ export default function TaskDetailPage({ params }: { params: Promise<{ id: strin
       if (error) throw error;
       const taskData = data as TaskRow;
       setTask(taskData);
+      setDescText(taskData.description || "");
 
       if (taskData.related_to_id && taskData.related_to_type) {
         const table = taskData.related_to_type === 'donor' ? 'donors' : taskData.related_to_type === 'church' ? 'churches' : 'projects';
@@ -114,6 +119,37 @@ export default function TaskDetailPage({ params }: { params: Promise<{ id: strin
       alert("Error completing task");
     } finally {
       setCompleting(false);
+    }
+  };
+
+  const handleStatusChange = async (newStatus: TaskStatus) => {
+    if (statusSaving) return;
+    setStatusSaving(true);
+    try {
+      const completed_date = newStatus === 'Completed' ? new Date().toISOString() : null;
+      const { error } = await supabase.from('tasks').update({ status: newStatus, completed_date }).eq('id', id);
+      if (error) throw error;
+      setTask(prev => prev ? { ...prev, status: newStatus, completed_date } : null);
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      alert("Error updating status");
+    } finally {
+      setStatusSaving(false);
+    }
+  };
+
+  const handleSaveNotes = async () => {
+    setDescSaving(true);
+    try {
+      const { error } = await supabase.from('tasks').update({ description: descText || null }).eq('id', id);
+      if (error) throw error;
+      setTask(prev => prev ? { ...prev, description: descText || null } : null);
+    } catch (err) {
+      console.error(err);
+      alert("Error saving notes");
+    } finally {
+      setDescSaving(false);
     }
   };
 
@@ -183,6 +219,20 @@ export default function TaskDetailPage({ params }: { params: Promise<{ id: strin
                 <p className="font-medium">{formatDate(task.completed_date)}</p>
               </div>
               <div>
+                <p className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-1">Status</p>
+                <select
+                  value={task.status}
+                  onChange={e => handleStatusChange(e.target.value as TaskStatus)}
+                  disabled={statusSaving}
+                  className="text-sm border rounded-md px-2 py-1 dark:bg-zinc-950 dark:border-zinc-700 outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                >
+                  {taskStatuses.map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+                {statusSaving && <span className="ml-2 text-xs text-zinc-400">Saving…</span>}
+              </div>
+              <div>
                 <p className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-1">Linked Record</p>
                 {linkedRecord ? (
                   <Link href={linkedRecord.href} className="font-medium text-blue-600 hover:underline">
@@ -228,8 +278,22 @@ export default function TaskDetailPage({ params }: { params: Promise<{ id: strin
 
         <div className="lg:col-span-2 space-y-6">
           <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-            <h2 className="font-semibold mb-4">Description</h2>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">{task.description || "No description yet."}</p>
+            <h2 className="font-semibold mb-4">Notes / Progress</h2>
+            <textarea
+              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-32 resize-y text-sm"
+              value={descText}
+              onChange={e => setDescText(e.target.value)}
+              placeholder="Add notes or track progress..."
+            />
+            <button
+              type="button"
+              onClick={handleSaveNotes}
+              disabled={descSaving}
+              className="mt-2 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {descSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Save Notes
+            </button>
           </section>
         </div>
       </div>
