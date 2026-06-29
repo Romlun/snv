@@ -8,7 +8,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v0.1 Phase 1 (Foundation: DB + Auth + RLS)`
+`snv Mission CRM — v0.2 Phase 1 (Foundation DEPLOYED; modules next)`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -61,24 +61,32 @@ PR/verify/merge → update this file → GATE 2.
 
 ---
 
-## 4. CURRENT STATE (session 1)
-**What exists (verified on disk):**
-- Full Next 16 app shell with route pages: donors, churches, projects, tasks,
-  budget, calendar, inventory, settings; Sidebar + EngagementScoreRing components.
-- Strong TypeScript domain model in `src/types/crm.ts` (donors, churches, projects,
-  tasks, staff, resources, budget) — already includes engagement score, recurring
-  giving fields, lifetime giving, donor stages, church engagement.
-- **Running on mock fixtures** (`src/lib/mock-data.ts`), NOT a real backend.
+## 4. CURRENT STATE (session 2 — FOUNDATION DEPLOYED)
+**Phase 1 foundation is built, deployed, and verified.** Main now IS the real app.
+- DB: both migrations applied to Supabase `snv` and verified against live state —
+  13 tables incl. `gifts`; role enum = Admin/Staff/Volunteer; org "Light in the
+  East" seeded; RLS ON every table with full CRUD policy coverage; trigger +
+  helper funcs present.
+- Code: Supabase client/server helpers (`src/lib/supabase/`), login, proxy
+  middleware (`src/proxy.ts`), `src/types/database.ts`, donor pages on live
+  queries — all merged to `main` (merge commit `5979757`).
+- Deploy: Vercel production READY at **snv-zeta.vercel.app** on `main`.
+- Smoke test passed (build OK, /login 200, /donors 307 redirect when unauth).
 
-**The gaps that ARE Phase 1:**
-1. No database — schema, RLS, persistence all unbuilt.
-2. No auth, no role/permission enforcement.
-3. No Supabase client installed.
-(Bilingual + finer roles are deliberately deferred — see decisions.)
+**What's still on mock data / unbuilt (this is Phase 1 remaining + Phase 3 work):**
+- Only the **donors** module is wired to the DB. Churches, projects, tasks,
+  budget, inventory, calendar, dashboard pages still read `src/lib/mock-data.ts`.
+- No gift-entry UI yet (table exists; engagement score / recurring tracker compute
+  off it once data flows).
+- i18n strings module (D2) not yet created — strings still inline in components.
 
-**The prototype types are the schema blueprint.** The DB will match `crm.ts` shape so
-the front-end needs minimal rework — with one normalization: embedded `givingHistory`
-array becomes a proper `gifts` table (needed for engagement score + recurring tracking).
+**Build order from here (per operator, build by business module, small milestones
+of 2–5 days each, reviewed before next):** Churches → Projects → Tasks → Budget →
+Inventory → Dashboard (replace mock metrics) → Reporting → AI features.
+
+**Blueprint note:** `src/types/database.ts` (generated/typed to the live schema) is
+now the authoritative type source for new module work, alongside `src/types/crm.ts`
+(the original UI types). Reconcile against the DB, not mock-data shapes.
 
 ---
 
@@ -139,15 +147,25 @@ table exposed before its policy exists.
 - ⚠️ Donor + church records are PII. RLS before exposure, always.
 - ⚠️ PostgREST gotchas apply: no `.order('random()')`; no embedded-left-join null
   filters as "not exists"; `.select().limit()` caps at 1000 (use `.range()`/RPC).
-- ⚠️ Supabase project currently has NO schema — first migration is greenfield.
+- ⚠️ Schema is LIVE with full RLS. New module work must respect existing policies
+  (Admin/Staff full data access; Volunteer = own tasks only, no donor/gift/contact PII).
 
 ---
 
-## 10. INFRA STATUS (verified session 1 via MCP)
+## 10. INFRA STATUS (verified session 2 via MCP)
 - Supabase `snv` (`eriflhdyylssjnxygseq`) ACTIVE_HEALTHY, us-east-1, Postgres 17.6.
-  Director MCP confirmed connected and able to operate.
-- No migrations applied yet. No tables. No buckets. No edge functions.
-- Vercel: linked. (Deployment verification pending first real build.)
+- **Both migrations APPLIED + verified:** 20250627000000_initial_schema,
+  20250627000001_director_corrections. 13 tables, RLS full coverage, role enum
+  Admin/Staff/Volunteer, gifts table with future-capture cols, org seeded.
+- Vercel: project `snv` (`prj_7qTkMQbxPEEq1D14vkghNqAMQFQh`), team `ecm-os`
+  (`team_onqVX5EAyfn5vbEvmLlmlwqc`). Production READY on `main` at
+  **snv-zeta.vercel.app** (merge commit `5979757`).
+- Env vars: Vercel Production uses legacy `eyJ...` anon key; local `.env.local`
+  aligned to the SAME legacy key. Both valid for the project.
+  - Future cleanup (low priority): optionally standardize both to the new
+    `sb_publishable_...` key. Not required — both work.
+- `AGENTS.md.backup-102523` is an untracked local junk file — delete or gitignore
+  (not committed; harmless).
 
 ## 11. AUTO-MERGE SCOPE
 Conservative default: Director does NOT auto-merge migrations, RLS, auth, billing,
@@ -157,16 +175,23 @@ at GATE 2 until further notice.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW:** Director writing this file (done on commit) → then designing the Phase 1
-  database schema + 3-tier RLS directly on Supabase via MCP, using `crm.ts` as
-  blueprint. Additive/reversible → Director Tier-1 authority.
-- **NEXT:** present schema to operator, then dispatch Designer (if UI rework needed)
-  and Code Agent (install Supabase client, swap mock data → real queries).
+- **NOW:** Foundation merged + deployed. Nothing mid-flight.
+- **NEXT (awaiting operator go):** First business module = **Churches** (per the
+  agreed build order). Needs: Designer spec? (mostly exists as prototype UI) →
+  Code Agent wires churches pages to live DB (read/list/create/edit/visit log),
+  replacing mock-data, respecting RLS. Small milestone, then Quality + review.
+- **Standing process change (operator):** build by business module, not by
+  technical layer; milestones of 2–5 days, each reviewed before the next starts.
 
-## 13. SESSION NOTE (session 1)
-Cold start, first Director. Established identity, stack, team, decisions D1–D4,
-precedents P1–P2. Verified Supabase connectivity and read local repo via Desktop
-Commander — found a working mock-data prototype with a strong type model and no
-backend. Phase 1 reframed as "build the foundation under the existing shell."
-Operator decisions this session: gifts manual-first; English-only structured for
-later Russian; 3-tier roles. Next: schema design on Supabase.
+## 13. SESSION NOTE (session 2)
+Reconciled a major surprise: the "Phase 1 foundation unbuilt" assumption from
+session 1 was wrong. Jules's real backend (schema, auth, Supabase client, donor
+CRUD, 208-line migration) existed UNMERGED on branch feat/mission-crm-system-mvp-…
+and was never applied to the DB. Verified via git (branch not ancestor of main) +
+MCP (empty DB). Did NOT rebuild — verified and deployed the existing work instead.
+Quality caught two real bugs in the Code Agent's corrective migration: (1) RESTRICTIVE
+policies that would have locked out all users incl. Admins, (2) initially missing
+gifts table + wrong role enum. Sent back, fixed, re-reviewed. Applied both migrations
+to live DB, verified, smoke-tested (build OK, auth redirect works), merged to main,
+confirmed Vercel production READY at snv-zeta.vercel.app. Aligned local + Vercel
+anon keys (both legacy eyJ). Foundation is now real and live. Next: Churches module.
