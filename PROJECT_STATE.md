@@ -184,16 +184,23 @@ at GATE 2 until further notice.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW:** Nothing mid-flight. Foundation fully live + verified end-to-end: first
-  Admin user created via signup, logged in successfully. 3 migrations applied
-  (initial, corrections, handle_new_user search_path fix), all merged to main,
-  production READY (commit `968dbef`).
-- **NEXT (awaiting operator go):** First business module = **Churches** — wire the
-  existing churches pages to the live DB (list/create/edit + visit logs), replace
-  mock-data, respect RLS. Small milestone → Quality (incl. real auth-path test per
-  P4) → review → merge.
-- **Process change (operator):** build by business module, milestones 2–5 days,
-  each reviewed before the next.
+- **NOW:** Nothing mid-flight.
+- **DONE this session:** Security hardening (migration 0003: function search_path +
+  execute grants — security advisor actionable warnings cleared). **Churches module**
+  built on live DB (list, detail, create, edit, visit-log) — operator tested all 5
+  flows on production, all pass. Merged, deployed READY (commit `9de75c0`).
+- **MODULE BUILD ORDER (operator):** ✅Donors ✅Churches → **Projects (NEXT)** →
+  Tasks → Budget → Inventory → Dashboard (live metrics) → User Management (Admin
+  creates/invites users + role-based UI) → Gift entry + Engagement Score →
+  Reporting → AI features. Build by module, 2–5 day milestones, each tested before
+  the next.
+- **DEFERRED polish:** Operator notes there are UI/UX improvements to make, but we
+  agreed to defer them until all modules exist, then do a consistent polish pass.
+  (Specific items TBD — operator will name them later.)
+- **DEFERRED:** Leaked-password protection (Pro-plan only; enable if upgraded).
+  `current_user_role`/`current_user_org`/`handle_new_user` still show as
+  authenticated-executable in advisor — accepted (RLS calls them by design; optional
+  future refinement to wrap them out of the REST API).
 
 ## 13. SESSION NOTE (session 2)
 Reconciled a major surprise: the "Phase 1 foundation unbuilt" assumption from
