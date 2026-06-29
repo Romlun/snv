@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import DateField from "@/components/DateField";
 
 type TaskStatus = 'Not started' | 'In progress' | 'Waiting' | 'Completed' | 'Cancelled';
 type TaskPriority = 'Low' | 'Medium' | 'High';
@@ -149,15 +150,11 @@ export default function NewTaskPage() {
                 ))}
               </select>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Due Date</label>
-              <input
-                type="date"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.due_date}
-                onChange={e => setFormData({ ...formData, due_date: e.target.value })}
-              />
-            </div>
+            <DateField
+              label="Due Date"
+              value={formData.due_date}
+              onChange={val => setFormData({ ...formData, due_date: val })}
+            />
             <div className="space-y-2">
               <label className="text-sm font-medium">Priority</label>
               <select

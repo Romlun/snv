@@ -1,8 +1,10 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { EngagementScoreRing } from "@/components/EngagementScoreRing";
+import DateField from "@/components/DateField";
 import {
   Mail,
   Phone,
@@ -13,7 +15,8 @@ import {
   ArrowLeft,
   Loader2,
   Clock,
-  Landmark
+  Landmark,
+  Plus,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -29,8 +32,12 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
   const [staff, setStaff] = useState<Profile | null>(null);
   const [visitLogs, setVisitLogs] = useState<ContactLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showPlanVisit, setShowPlanVisit] = useState(false);
+  const [planVisitForm, setPlanVisitForm] = useState({ date: "", note: "" });
+  const [planVisitSaving, setPlanVisitSaving] = useState(false);
 
   const supabase = createClient();
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchChurchData() {
@@ -71,6 +78,42 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
 
     fetchChurchData();
   }, [id, supabase]);
+
+  const handlePlanVisit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!planVisitForm.date) return;
+    setPlanVisitSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { error: churchError } = await supabase
+        .from('churches')
+        .update({ next_visit_date: planVisitForm.date })
+        .eq('id', id);
+      if (churchError) throw churchError;
+
+      await supabase.from('tasks').insert({
+        title: `Planned visit to ${church?.name}`,
+        related_to_type: 'church',
+        related_to_id: id,
+        due_date: new Date(planVisitForm.date).toISOString(),
+        priority: 'Medium',
+        status: 'Not started',
+        assigned_to: user?.id,
+        description: planVisitForm.note || null,
+      });
+
+      setChurch(prev => prev ? { ...prev, next_visit_date: planVisitForm.date } : null);
+      setPlanVisitForm({ date: '', note: '' });
+      setShowPlanVisit(false);
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      alert("Error planning visit");
+    } finally {
+      setPlanVisitSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -143,9 +186,9 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
                 <MapPin className="h-4 w-4 text-zinc-400 mt-0.5" />
                 <span>{church.address || 'No address provided'}</span>
               </div>
-              <div className="flex items-center gap-3 text-sm font-medium text-amber-600">
-                <Clock className="h-4 w-4" />
-                <span>Next Visit: {church.next_visit_date || 'Not scheduled'}</span>
+              <div className={`flex items-center gap-3 text-sm font-semibold rounded-lg px-3 py-2 ${church.next_visit_date ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400' : 'text-zinc-400'}`}>
+                <Clock className="h-4 w-4 shrink-0" />
+                <span>{church.next_visit_date ? `Next visit: ${new Date(church.next_visit_date + 'T00:00:00').toLocaleDateString()}` : 'No visit planned'}</span>
               </div>
             </div>
           </section>
@@ -204,8 +247,54 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
           <section className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
             <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800 flex items-center justify-between">
               <h2 className="font-semibold">Visit History</h2>
-              <Link href={`/churches/${church.id}/visit`} className="text-sm text-blue-600 font-medium">+ Log Visit</Link>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowPlanVisit(v => !v)}
+                  className="inline-flex items-center gap-1 text-sm text-blue-600 font-medium hover:underline"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Plan Visit
+                </button>
+                <Link href={`/churches/${church.id}/visit`} className="text-sm text-blue-600 font-medium">+ Log Visit</Link>
+              </div>
             </div>
+            {showPlanVisit && (
+              <form onSubmit={handlePlanVisit} className="p-4 border-b dark:border-zinc-800 space-y-3 bg-blue-50/50 dark:bg-blue-900/10">
+                <DateField
+                  label="Planned Visit Date"
+                  value={planVisitForm.date}
+                  onChange={val => setPlanVisitForm(f => ({ ...f, date: val }))}
+                  required
+                />
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Note (optional)</label>
+                  <input
+                    className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    placeholder="Any details about the visit..."
+                    value={planVisitForm.note}
+                    onChange={e => setPlanVisitForm(f => ({ ...f, note: e.target.value }))}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={planVisitSaving || !planVisitForm.date}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
+                    {planVisitSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                    Schedule Visit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPlanVisit(false)}
+                    className="rounded-lg border px-3 py-1.5 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
             <div className="p-6">
               <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-zinc-200 dark:before:bg-zinc-800">
                 {visitLogs.length > 0 ? visitLogs.map((log) => (
