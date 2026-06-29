@@ -84,6 +84,19 @@ export default function LogChurchVisitPage({ params }: { params: Promise<{ id: s
 
       if (logError) throw logError;
 
+      if (formData.next_step && nextFollowUpDate) {
+        await supabase.from('tasks').insert({
+          title: `Follow up: ${formData.next_step}`,
+          description: `Automatically created from church visit with ${church?.name}. Notes: ${formData.notes}`,
+          assigned_to: user?.id,
+          related_to_id: id,
+          related_to_type: 'church',
+          due_date: new Date(nextFollowUpDate).toISOString(),
+          priority: 'Medium',
+          status: 'Not started',
+        });
+      }
+
       router.push(`/churches/${id}`);
       router.refresh();
     } catch (err) {
