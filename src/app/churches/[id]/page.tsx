@@ -25,6 +25,16 @@ import { Database } from "@/types/database";
 type Church = Database['public']['Tables']['churches']['Row'];
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type ContactLog = Database['public']['Tables']['contact_logs']['Row'];
+type PlanVisitType = 'call' | 'meeting' | 'church visit' | 'event';
+
+const planVisitTypes: PlanVisitType[] = ['call', 'meeting', 'church visit', 'event'];
+
+function getPlanVisitTitle(type: PlanVisitType, churchName: string) {
+  if (type === 'church visit') return `Planned visit to ${churchName}`;
+  if (type === 'meeting') return `Planned meeting with ${churchName}`;
+  if (type === 'event') return `Planned event with ${churchName}`;
+  return `Planned call to ${churchName}`;
+}
 
 export default function ChurchDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -33,7 +43,7 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
   const [visitLogs, setVisitLogs] = useState<ContactLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPlanVisit, setShowPlanVisit] = useState(false);
-  const [planVisitForm, setPlanVisitForm] = useState({ date: "", note: "" });
+  const [planVisitForm, setPlanVisitForm] = useState<{ date: string; note: string; type: PlanVisitType }>({ date: "", note: "", type: "church visit" });
   const [planVisitSaving, setPlanVisitSaving] = useState(false);
 
   const supabase = createClient();
@@ -93,7 +103,7 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
       if (churchError) throw churchError;
 
       await supabase.from('tasks').insert({
-        title: `Planned visit to ${church?.name}`,
+        title: getPlanVisitTitle(planVisitForm.type, church?.name || 'church'),
         related_to_type: 'church',
         related_to_id: id,
         due_date: new Date(planVisitForm.date).toISOString(),
@@ -104,7 +114,7 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
       });
 
       setChurch(prev => prev ? { ...prev, next_visit_date: planVisitForm.date } : null);
-      setPlanVisitForm({ date: '', note: '' });
+      setPlanVisitForm({ date: '', note: '', type: 'church visit' });
       setShowPlanVisit(false);
       router.refresh();
     } catch (err) {
@@ -267,6 +277,18 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
                   onChange={val => setPlanVisitForm(f => ({ ...f, date: val }))}
                   required
                 />
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Type</label>
+                  <select
+                    className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    value={planVisitForm.type}
+                    onChange={e => setPlanVisitForm(f => ({ ...f, type: e.target.value as PlanVisitType }))}
+                  >
+                    {planVisitTypes.map(type => (
+                      <option key={type} value={type}>{type === 'church visit' ? 'Visit' : type.charAt(0).toUpperCase() + type.slice(1)}</option>
+                    ))}
+                  </select>
+                </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Note (optional)</label>
                   <input
