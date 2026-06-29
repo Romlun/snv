@@ -13,7 +13,6 @@ interface FormData {
   description: string;
   goal_description: string;
   budget_needed: string;
-  current_funding: string;
   start_date: string;
   end_date: string;
   status: ProjectStatus;
@@ -21,6 +20,14 @@ interface FormData {
 }
 
 const projectStatuses: ProjectStatus[] = ['Idea', 'Planning', 'Active', 'Waiting', 'Completed', 'Cancelled'];
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function validDateOrNull(value: string) {
+  if (!DATE_RE.test(value)) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? value : null;
+}
 
 function parseTags(tags: string) {
   return tags
@@ -39,7 +46,6 @@ export default function NewProjectPage() {
     description: "",
     goal_description: "",
     budget_needed: "",
-    current_funding: "",
     start_date: "",
     end_date: "",
     status: "Planning",
@@ -57,9 +63,8 @@ export default function NewProjectPage() {
         description: formData.description || null,
         goal_description: formData.goal_description || null,
         budget_needed: Number(formData.budget_needed || 0),
-        current_funding: Number(formData.current_funding || 0),
-        start_date: formData.start_date || null,
-        end_date: formData.end_date || null,
+        start_date: validDateOrNull(formData.start_date),
+        end_date: validDateOrNull(formData.end_date),
         status: formData.status,
         tags: tags.length > 0 ? tags : null,
       });
@@ -104,17 +109,6 @@ export default function NewProjectPage() {
                 className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.budget_needed}
                 onChange={e => setFormData({ ...formData, budget_needed: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Current Funding</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.current_funding}
-                onChange={e => setFormData({ ...formData, current_funding: e.target.value })}
               />
             </div>
             <div className="space-y-2">

@@ -10,6 +10,15 @@ import { Database } from "@/types/database";
 type Donor = Database['public']['Tables']['donors']['Row'];
 type ContactType = Database['public']['Tables']['contact_logs']['Row']['type'];
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function validDateOrNull(value: string) {
+  if (!DATE_RE.test(value)) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? value : null;
+}
+
 interface InteractionFormData {
   type: ContactType;
   notes: string;
@@ -47,6 +56,7 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      const nextFollowUpDate = validDateOrNull(formData.next_follow_up_date);
 
       // 1. Create Contact Log
       const { error: logError } = await supabase.from('contact_logs').insert({
@@ -56,7 +66,7 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
         notes: formData.notes,
         outcome: formData.outcome,
         next_step: formData.next_step,
-        next_follow_up_date: formData.next_follow_up_date || null,
+        next_follow_up_date: nextFollowUpDate,
       });
 
       if (logError) throw logError;
@@ -66,21 +76,21 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
         last_contact_date: new Date().toISOString().split('T')[0],
       };
 
-      if (formData.next_follow_up_date) {
-        updateData.next_follow_up_date = formData.next_follow_up_date;
+      if (nextFollowUpDate) {
+        updateData.next_follow_up_date = nextFollowUpDate;
       }
 
       await supabase.from('donors').update(updateData).eq('id', id);
 
       // 3. Create Task if next step is defined
-      if (formData.next_step && formData.next_follow_up_date) {
+      if (formData.next_step && nextFollowUpDate) {
         await supabase.from('tasks').insert({
           title: `Follow up: ${formData.next_step}`,
           description: `Automatically created from interaction with ${donor?.name}. Notes: ${formData.notes}`,
           assigned_to: user?.id,
           related_to_id: id,
           related_to_type: 'donor',
-          due_date: new Date(formData.next_follow_up_date).toISOString(),
+          due_date: new Date(nextFollowUpDate).toISOString(),
           priority: 'Medium',
           status: 'Not started',
         });

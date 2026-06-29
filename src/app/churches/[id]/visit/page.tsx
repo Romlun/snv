@@ -9,6 +9,28 @@ import { Database } from "@/types/database";
 
 type Church = Database['public']['Tables']['churches']['Row'];
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const DATETIME_LOCAL_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+
+function validDateOrNull(value: string) {
+  if (!DATE_RE.test(value)) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? value : null;
+}
+
+function validDateTimeIsoOrNull(value: string) {
+  if (!DATETIME_LOCAL_RE.test(value)) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function localDateTimeInputValue() {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 16);
+}
+
 interface VisitFormData {
   contact_date: string;
   notes: string;
@@ -25,7 +47,7 @@ export default function LogChurchVisitPage({ params }: { params: Promise<{ id: s
   const [church, setChurch] = useState<Church | null>(null);
 
   const [formData, setFormData] = useState<VisitFormData>({
-    contact_date: new Date().toISOString().slice(0, 16),
+    contact_date: localDateTimeInputValue(),
     notes: "",
     outcome: "",
     next_step: "",
@@ -46,16 +68,18 @@ export default function LogChurchVisitPage({ params }: { params: Promise<{ id: s
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      const contactDate = validDateTimeIsoOrNull(formData.contact_date);
+      const nextFollowUpDate = validDateOrNull(formData.next_follow_up_date);
 
       const { error: logError } = await supabase.from('contact_logs').insert({
         church_id: id,
         staff_id: user?.id,
         type: 'church visit',
-        contact_date: new Date(formData.contact_date).toISOString(),
+        ...(contactDate ? { contact_date: contactDate } : {}),
         notes: formData.notes,
         outcome: formData.outcome || null,
         next_step: formData.next_step || null,
-        next_follow_up_date: formData.next_follow_up_date || null,
+        next_follow_up_date: nextFollowUpDate,
       });
 
       if (logError) throw logError;
@@ -83,7 +107,6 @@ export default function LogChurchVisitPage({ params }: { params: Promise<{ id: s
           <div className="space-y-2">
             <label className="text-sm font-medium">Visit Date</label>
             <input
-              required
               type="datetime-local"
               className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
               value={formData.contact_date}

@@ -8,6 +8,7 @@ import {
   DollarSign,
   FileText,
   Loader2,
+  Plus,
   Tags,
   Target,
   User as UserIcon
@@ -50,9 +51,65 @@ interface BudgetEntry {
   updated_at: string;
 }
 
+interface Donor {
+  id: string;
+  name: string;
+}
+
+interface GiftProfile {
+  name: string | null;
+}
+
+interface GiftContributionRow {
+  id: string;
+  amount: number;
+  gift_date: string;
+  notes: string | null;
+  method: string | null;
+  donor_id: string | null;
+  donors: GiftProfile | GiftProfile[] | null;
+}
+
+interface Contribution {
+  id: string;
+  amount: number;
+  gift_date: string;
+  notes: string | null;
+  method: string | null;
+  donorName: string | null;
+}
+
+interface AddFundsFormData {
+  amount: string;
+  donor_id: string;
+  gift_date: string;
+  method: string;
+  notes: string;
+}
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 function getFundingPercent(project: Project) {
   if (!project.budget_needed) return 0;
   return Math.min(100, Math.round((project.current_funding / project.budget_needed) * 100));
+}
+
+function todayDateInputValue() {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 10);
+}
+
+function validDateOrNull(value: string) {
+  if (!DATE_RE.test(value)) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? value : null;
+}
+
+function getDonorName(donors: GiftContributionRow['donors']) {
+  const donor = Array.isArray(donors) ? donors[0] : donors;
+  return donor?.name || null;
 }
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -60,51 +117,125 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const [project, setProject] = useState<Project | null>(null);
   const [assignedStaff, setAssignedStaff] = useState<AssignedStaff[]>([]);
   const [budgetEntries, setBudgetEntries] = useState<BudgetEntry[]>([]);
+  const [donors, setDonors] = useState<Donor[]>([]);
+  const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [showAddFunds, setShowAddFunds] = useState(false);
+  const [addingFunds, setAddingFunds] = useState(false);
+  const [fundForm, setFundForm] = useState<AddFundsFormData>({
+    amount: "",
+    donor_id: "",
+    gift_date: todayDateInputValue(),
+    method: "",
+    notes: "",
+  });
   const [loading, setLoading] = useState(true);
 
   const supabase = createClient();
 
-  useEffect(() => {
-    async function fetchProjectData() {
-      try {
+  async function fetchProjectData(showPageLoading = false) {
+    try {
+      if (showPageLoading) {
         setLoading(true);
-        const { data: projectData, error: projectError } = await supabase
-          .from('projects')
-          .select('*')
-          .eq('id', id)
-          .single();
+      }
+      const { data: projectData, error: projectError } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-        if (projectError) throw projectError;
-        setProject(projectData);
+      if (projectError) throw projectError;
+      setProject(projectData);
 
-        const { data: staffData } = await supabase
-          .from('project_staff')
-          .select('staff_id, profiles(full_name, email)')
-          .eq('project_id', id);
-        setAssignedStaff((staffData || []).map(row => {
-          const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
-          return {
-            id: row.staff_id,
-            name: profile?.full_name || profile?.email || row.staff_id,
-          };
-        }));
+      const { data: staffData } = await supabase
+        .from('project_staff')
+        .select('staff_id, profiles(full_name, email)')
+        .eq('project_id', id);
+      setAssignedStaff((staffData || []).map(row => {
+        const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+        return {
+          id: row.staff_id,
+          name: profile?.full_name || profile?.email || row.staff_id,
+        };
+      }));
 
-        const { data: budgetData } = await supabase
-          .from('budget_entries')
-          .select('*')
-          .eq('project_id', id)
-          .order('category');
-        setBudgetEntries((budgetData || []) as BudgetEntry[]);
+      const { data: budgetData } = await supabase
+        .from('budget_entries')
+        .select('*')
+        .eq('project_id', id)
+        .order('category');
+      setBudgetEntries((budgetData || []) as BudgetEntry[]);
 
-      } catch (err) {
-        console.error(err);
-      } finally {
+      const { data: donorData } = await supabase
+        .from('donors')
+        .select('id, name')
+        .order('name');
+      setDonors((donorData || []) as Donor[]);
+
+      const { data: giftData } = await supabase
+        .from('gifts')
+        .select('id, amount, gift_date, notes, method, donor_id, donors(name)')
+        .eq('project_id', id)
+        .order('gift_date', { ascending: false });
+      setContributions(((giftData || []) as GiftContributionRow[]).map(gift => ({
+        id: gift.id,
+        amount: gift.amount,
+        gift_date: gift.gift_date,
+        notes: gift.notes,
+        method: gift.method,
+        donorName: getDonorName(gift.donors),
+      })));
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (showPageLoading) {
         setLoading(false);
       }
     }
+  }
 
-    fetchProjectData();
-  }, [id, supabase]);
+  useEffect(() => {
+    fetchProjectData(true);
+  }, [id]);
+
+  const handleAddFunds = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddingFunds(true);
+
+    try {
+      const amount = Number(fundForm.amount);
+      if (!amount || amount <= 0) {
+        throw new Error("Enter a valid amount");
+      }
+
+      const giftDate = validDateOrNull(fundForm.gift_date);
+      const { error } = await supabase.from('gifts').insert({
+        project_id: id,
+        amount,
+        donor_id: fundForm.donor_id || null,
+        gift_date: giftDate || undefined,
+        method: fundForm.method || null,
+        notes: fundForm.notes || null,
+      });
+
+      if (error) throw error;
+
+      await fetchProjectData();
+      setFundForm({
+        amount: "",
+        donor_id: "",
+        gift_date: todayDateInputValue(),
+        method: "",
+        notes: "",
+      });
+      setShowAddFunds(false);
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "Error adding funds");
+    } finally {
+      setAddingFunds(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -160,8 +291,92 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             <div className="h-full bg-blue-600" style={{ width: `${fundingPercent}%` }} />
           </div>
           <p className="mt-2 text-xs text-zinc-500">${project.current_funding.toLocaleString()} of ${project.budget_needed.toLocaleString()}</p>
+          <button
+            type="button"
+            onClick={() => setShowAddFunds(value => !value)}
+            className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Add Funds
+          </button>
         </div>
       </div>
+
+      {showAddFunds ? (
+        <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
+          <h2 className="font-semibold mb-4">Add Funds</h2>
+          <form onSubmit={handleAddFunds} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Amount</label>
+              <input
+                required
+                type="number"
+                min="0.01"
+                step="0.01"
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                value={fundForm.amount}
+                onChange={e => setFundForm({ ...fundForm, amount: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Donor</label>
+              <select
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                value={fundForm.donor_id}
+                onChange={e => setFundForm({ ...fundForm, donor_id: e.target.value })}
+              >
+                <option value="">No donor selected</option>
+                {donors.map(donor => (
+                  <option key={donor.id} value={donor.id}>{donor.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Gift Date</label>
+              <input
+                type="date"
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                value={fundForm.gift_date}
+                onChange={e => setFundForm({ ...fundForm, gift_date: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Method</label>
+              <input
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="cash, check, card, online"
+                value={fundForm.method}
+                onChange={e => setFundForm({ ...fundForm, method: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-medium">Note</label>
+              <textarea
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-20"
+                value={fundForm.notes}
+                onChange={e => setFundForm({ ...fundForm, notes: e.target.value })}
+              />
+            </div>
+            <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
+              <button
+                type="submit"
+                disabled={addingFunds}
+                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {addingFunds ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
+                Save Funds
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAddFunds(false)}
+                className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </section>
+      ) : null}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
@@ -254,6 +469,34 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               Goal
             </h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">{project.goal_description || "No goal description yet."}</p>
+          </section>
+
+          <section className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
+            <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800">
+              <h2 className="font-semibold">Contributions</h2>
+            </div>
+            <div className="p-6">
+              {contributions.length > 0 ? (
+                <div className="space-y-3">
+                  {contributions.map(gift => (
+                    <div key={gift.id} className="flex flex-col gap-2 border rounded-lg p-4 dark:border-zinc-800 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="font-medium">{gift.donorName || "No donor selected"}</p>
+                        <p className="text-xs text-zinc-500">
+                          {gift.gift_date} {gift.method ? `- ${gift.method}` : ""}
+                        </p>
+                        {gift.notes ? <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{gift.notes}</p> : null}
+                      </div>
+                      <p className="text-sm font-bold text-green-600">${gift.amount.toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-10 text-zinc-500">
+                  No contributions recorded yet.
+                </div>
+              )}
+            </div>
           </section>
 
           <section className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
