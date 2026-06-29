@@ -27,6 +27,7 @@ function usToIso(us: string): string {
 
 export default function DateField({ value, onChange, label, required }: Props) {
   const [rawText, setRawText] = useState(() => isoToUs(value));
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLInputElement>(null);
   const pickerRef = useRef<HTMLInputElement>(null);
   const lastEmitted = useRef<string>(value);
@@ -47,6 +48,18 @@ export default function DateField({ value, onChange, label, required }: Props) {
     }
   }, [rawText]);
 
+  useEffect(() => {
+    function handleOutsideMouseDown(e: MouseEvent) {
+      if (!wrapperRef.current?.contains(e.target as Node)) {
+        textRef.current?.blur();
+        pickerRef.current?.blur();
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsideMouseDown);
+    return () => document.removeEventListener("mousedown", handleOutsideMouseDown);
+  }, []);
+
   function handleText(e: React.ChangeEvent<HTMLInputElement>) {
     const text = e.target.value;
     setRawText(text);
@@ -65,7 +78,7 @@ export default function DateField({ value, onChange, label, required }: Props) {
   const incomplete = rawText !== "" && usToIso(rawText) === "";
 
   return (
-    <div className="space-y-2">
+    <div ref={wrapperRef} className="space-y-2">
       <label className="text-sm font-medium">
         {label}
         {required && <span className="text-red-500 ml-0.5">*</span>}
