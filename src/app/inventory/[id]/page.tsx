@@ -115,6 +115,7 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
     transaction_date: todayDateInputValue(),
     notes: "",
   });
+  const [amountWasAutoFilled, setAmountWasAutoFilled] = useState(true);
 
   async function fetchResourceData(showPageLoading = false) {
     try {
@@ -165,6 +166,45 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
     fetchResourceData(true);
   }, [id]);
 
+  function getAutoAmount(quantityValue: string) {
+    if (resource?.price === null || resource?.price === undefined) return null;
+
+    const quantity = Number(quantityValue);
+    if (!quantity || quantity <= 0) return "";
+
+    return (Number(resource.price) * quantity).toFixed(2);
+  }
+
+  const handleTransactionTypeChange = (type: TransactionType) => {
+    const shouldAutoFill = amountWasAutoFilled || !transactionForm.amount;
+    const autoAmount = type === "sale" && shouldAutoFill ? getAutoAmount(transactionForm.quantity) : null;
+
+    setTransactionForm(prev => ({
+      ...prev,
+      type,
+      amount: type === "giveaway" && amountWasAutoFilled ? "" : autoAmount !== null ? autoAmount : prev.amount,
+    }));
+
+    if (type === "sale" && shouldAutoFill && autoAmount !== null) {
+      setAmountWasAutoFilled(true);
+    }
+  };
+
+  const handleQuantityChange = (quantity: string) => {
+    const shouldAutoFill = transactionForm.type === "sale" && (amountWasAutoFilled || !transactionForm.amount);
+    const autoAmount = shouldAutoFill ? getAutoAmount(quantity) : null;
+
+    setTransactionForm(prev => ({
+      ...prev,
+      quantity,
+      amount: autoAmount !== null ? autoAmount : prev.amount,
+    }));
+
+    if (shouldAutoFill && autoAmount !== null) {
+      setAmountWasAutoFilled(true);
+    }
+  };
+
   const handleRecordTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddingTransaction(true);
@@ -201,6 +241,7 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
         transaction_date: todayDateInputValue(),
         notes: "",
       });
+      setAmountWasAutoFilled(true);
       setShowTransactionForm(false);
     } catch (err) {
       console.error(err);
@@ -276,7 +317,7 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
               <select
                 className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
                 value={transactionForm.type}
-                onChange={e => setTransactionForm({ ...transactionForm, type: e.target.value as TransactionType })}
+                onChange={e => handleTransactionTypeChange(e.target.value as TransactionType)}
               >
                 <option value="sale">sale</option>
                 <option value="giveaway">giveaway</option>
@@ -291,7 +332,7 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
                 step="1"
                 className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
                 value={transactionForm.quantity}
-                onChange={e => setTransactionForm({ ...transactionForm, quantity: e.target.value })}
+                onChange={e => handleQuantityChange(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -328,7 +369,10 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
                 step="0.01"
                 className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
                 value={transactionForm.amount}
-                onChange={e => setTransactionForm({ ...transactionForm, amount: e.target.value })}
+                onChange={e => {
+                  setAmountWasAutoFilled(false);
+                  setTransactionForm({ ...transactionForm, amount: e.target.value });
+                }}
               />
             </div>
             <DateField
