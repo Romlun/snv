@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { BookOpen, Loader2, Plus, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { getTransactionDateRange, type TimeRange } from "@/lib/date-ranges";
 
 interface Resource {
   id: string;
@@ -15,8 +16,6 @@ interface Resource {
   price: number | null;
   location: string | null;
 }
-
-type TimeRange = 'week' | 'month' | 'quarter' | 'year' | 'all';
 
 interface ResourceTransaction {
   quantity: number;
@@ -40,27 +39,6 @@ const timeRangeOptions: { value: TimeRange; label: string }[] = [
 
 function formatMoney(value: number | null) {
   return Number(value || 0).toLocaleString(undefined, { style: "currency", currency: "USD" });
-}
-
-function getTransactionDateRange(range: TimeRange) {
-  const end = new Date();
-  const start = new Date(end);
-  start.setHours(0, 0, 0, 0);
-
-  if (range === 'week') {
-    start.setDate(start.getDate() - start.getDay());
-  } else if (range === 'month') {
-    start.setDate(1);
-  } else if (range === 'quarter') {
-    const quarterStartMonth = Math.floor(start.getMonth() / 3) * 3;
-    start.setMonth(quarterStartMonth, 1);
-  } else if (range === 'year') {
-    start.setMonth(0, 1);
-  } else {
-    return { start: null, end };
-  }
-
-  return { start, end };
 }
 
 export default function InventoryPage() {
