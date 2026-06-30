@@ -184,30 +184,37 @@ at GATE 2 until further notice.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW:** Nothing mid-flight.
-- **DONE (session 3):** Projects module (live DB: list, detail, create, edit,
-  funding progress) — tested, merged (`c7b4cba`). Then two improvements, tested +
-  merged (`ae639b3`): (1) DATE INPUT FIX — native date fields now accept keyboard
-  editing across donors/churches/projects (was rejecting typed dates as invalid).
-  (2) PROJECT "ADD FUNDS" — adds a gift record linked to the project; project
-  `current_funding` is now AUTO-SUMMED from linked gifts via DB trigger
-  (migration 0004, `recalculate_project_current_funding`). donor_id on gifts made
-  nullable so funds can be added without a donor. Trigger verified live (insert→sum
-  up, delete→sum down).
-- **IMPORTANT — current_funding is now DERIVED.** It's recalculated from gifts by
-  trigger. Manual edits to it on the project form will be overwritten by the gift
-  sum. (Possible future cleanup: make the field read-only on the edit form.)
-- **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects → **Tasks (NEXT)** →
-  Budget → Inventory → Dashboard (live metrics) → User Management (Admin
-  creates/invites users + role-based UI) → Gift entry + Engagement Score →
-  Reporting → AI features. Build by module, test each before the next.
-- **DEFERRED polish:** Operator notes there are UI/UX improvements to make, but we
-  agreed to defer them until all modules exist, then do a consistent polish pass.
-  (Specific items TBD — operator will name them later.)
-- **DEFERRED:** Leaked-password protection (Pro-plan only; enable if upgraded).
-  `current_user_role`/`current_user_org`/`handle_new_user` still show as
-  authenticated-executable in advisor — accepted (RLS calls them by design; optional
-  future refinement to wrap them out of the REST API).
+- **NOW:** Budget module is NEXT. Nothing mid-flight.
+- **DONE (session 4):** Tasks module (live DB: list, detail, create, edit, mark-
+  complete, status dropdown) + church-visit auto-creates follow-up task — tested,
+  merged (`399d35c`). Then a UX bundle merged (`165eacd`): editable task status,
+  plan-future-church-visit. Then append-only NOTES: new `notes` table (migration
+  0005, RLS — Admin/Staff full; Volunteers only their own task notes; no volunteer
+  access to donor/church/project notes), reusable `NotesLog` component wired to Tasks
+  (merged `ff2d3b7`). Then the DATE CONTROL was rebuilt properly: replaced the native
+  `<input type=date>` (root cause of every date bug — typing AND close issues) with
+  an in-page **react-day-picker v10** calendar in `src/components/DateField.tsx`,
+  US MM/DD/YYYY typing preserved, timezone-safe via date-fns local parse/format,
+  closes on outside-click + Escape (merged `5fdc9fc`).
+- **PENDING CONFIRMATION:** Operator to verify the new calendar on production —
+  (a) closes on outside-click, (b) shows the exact day picked (no tz off-by-one).
+  Until confirmed, treat date control as shipped-but-unverified.
+- **DESIGN TOOL (future):** Stitch (Google's AI UI-design tool, via MCP) is the
+  intended designer for the DEFERRED POLISH PHASE — not now (would create
+  inconsistent UI mid-build). When adopted: (1) ROTATE the API key first — one was
+  pasted in chat and is compromised; (2) verify what the MCP accesses before
+  connecting to a PII repo.
+- **IMPORTANT — current_funding is DERIVED** (trigger-summed from gifts; manual edits
+  get overwritten).
+- **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects ✅Tasks → **Budget (NEXT)**
+  → Inventory → Dashboard (live metrics) → User Management (Admin creates/invites
+  users + role-based UI; also unblocks testing Volunteer RLS) → Gift entry +
+  Engagement Score → Reporting → AI features.
+- **DEFERRED verification:** Volunteer-role RLS (tasks + task-notes scoped to own)
+  — can't test until a Volunteer account exists (needs User Management).
+- **DEFERRED polish:** UI/UX improvements (incl. Stitch design pass) — after all
+  modules exist. Specific items TBD.
+- **DEFERRED:** Leaked-password protection (Pro-plan only).
 
 ## 13. SESSION NOTE (session 2)
 Reconciled a major surprise: the "Phase 1 foundation unbuilt" assumption from
