@@ -184,24 +184,33 @@ at GATE 2 until further notice.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW:** Inventory module is NEXT. Nothing mid-flight.
-- **DONE (session 5):** Budget module (live DB: overview w/ category-grouped totals,
-  create, edit, delete) — tested, merged. Then Budget improvements (merged `88d8475`):
-  category is now a DROPDOWN (10 standard categories); "Add Funds" per budget entry
-  via new `budget_contributions` table (migration 0006) with auto-summed `raised`
-  via trigger `recalculate_budget_entry_raised` (SECURITY DEFINER, search_path='',
-  RLS Admin/Staff only). `raised` is now DERIVED/display-only. Trigger verified live
-  (400→150). All tested on production.
-- **DEPLOY GOTCHA (resolved):** Vercel skipped the production build when branch-push
-  and merge landed seconds apart (webhook dedup). Fix: empty commit to main to
-  re-trigger. LESSON: after merging, verify production is on the NEW commit SHA (not
-  just that *a* deploy is READY); leave a gap between branch push and merge.
-- **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects ✅Tasks ✅Budget →
-  **Inventory (NEXT)** → Dashboard (live metrics) → User Management (Admin
-  creates/invites users + role-based UI; also unblocks testing Volunteer RLS) →
-  Gift entry + Engagement Score → Reporting → AI features.
+- **NOW:** Dashboard module is NEXT. Nothing mid-flight.
+- **DONE (session 6):** Inventory module (live DB: resources, detail w/ transaction
+  history, create, edit) — tested, merged. Sale/giveaway transactions auto-update
+  `quantity_sold`/`quantity_given` via trigger `recalculate_resource_quantities`
+  (migration 0007, same SECURITY DEFINER/search_path='' pattern); `quantity_available`
+  deliberately stays manual (on-hand stock, not auto-decremented — avoids ambiguous
+  math). Trigger verified live. Then two UX improvements, tested + merged:
+  (1) transaction amount auto-fills as price × quantity on sales (stays editable —
+  `amountWasAutoFilled` flag clears on manual edit, re-engages on quantity change);
+  giveaways don't auto-calculate from price. (2) Inventory stats panel with a
+  time-range selector (Week/Month/Quarter/Year/All Time) showing books sold, revenue
+  (sales only), books given away (separate, no $). Date-range helper
+  (`getTransactionDateRange`) is clean and will be REUSED/generalized for Dashboard,
+  not rebuilt.
+- **DEPLOY PATTERN (recurring, has a fix):** Vercel sometimes skips the production
+  build when branch-push and merge land seconds apart. STANDARD PROCEDURE NOW: push
+  branch → wait ~10s → merge to main → push → wait ~60s → verify production deploy
+  SHA matches the merge commit (not just "a deploy is READY") → if stale, empty
+  commit to main to re-trigger. This has worked reliably both times it recurred.
+- **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects ✅Tasks ✅Budget ✅Inventory
+  → **Dashboard (NEXT — live metrics, reuse Inventory's date-range pattern)** →
+  User Management (Admin creates/invites users + role-based UI; unblocks Volunteer
+  RLS testing) → Gift entry + Engagement Score → Reporting → AI features.
 - **DERIVED FIELDS (don't hand-edit):** projects.current_funding (sums gifts),
-  budget_entries.raised (sums budget_contributions) — both trigger-maintained.
+  budget_entries.raised (sums budget_contributions), resources.quantity_sold/
+  quantity_given (sum resource_transactions by type) — all trigger-maintained.
+  quantity_available is the one manual exception (on-hand stock).
 - **DATE CONTROL:** in-page react-day-picker v10 (DateField.tsx) — confirmed working
   by operator (typing, calendar, close-on-outside-click all good). Settled.
 - **DESIGN TOOL (future):** Stitch (Google AI UI-design tool via MCP) = intended
