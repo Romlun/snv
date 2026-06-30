@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { BookOpen, Loader2, Plus, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -16,17 +16,62 @@ interface Resource {
   location: string | null;
 }
 
+type TimeRange = 'week' | 'month' | 'quarter' | 'year' | 'all';
+
+interface ResourceTransaction {
+  quantity: number;
+  type: string;
+  amount: number | null;
+}
+
+interface InventoryStats {
+  booksSold: number;
+  revenue: number;
+  booksGivenAway: number;
+}
+
+const timeRangeOptions: { value: TimeRange; label: string }[] = [
+  { value: 'week', label: 'This Week' },
+  { value: 'month', label: 'This Month' },
+  { value: 'quarter', label: 'This Quarter' },
+  { value: 'year', label: 'This Year' },
+  { value: 'all', label: 'All Time' },
+];
+
 function formatMoney(value: number | null) {
   return Number(value || 0).toLocaleString(undefined, { style: "currency", currency: "USD" });
 }
 
+function getTransactionDateRange(range: TimeRange) {
+  const end = new Date();
+  const start = new Date(end);
+  start.setHours(0, 0, 0, 0);
+
+  if (range === 'week') {
+    start.setDate(start.getDate() - start.getDay());
+  } else if (range === 'month') {
+    start.setDate(1);
+  } else if (range === 'quarter') {
+    const quarterStartMonth = Math.floor(start.getMonth() / 3) * 3;
+    start.setMonth(quarterStartMonth, 1);
+  } else if (range === 'year') {
+    start.setMonth(0, 1);
+  } else {
+    return { start: null, end };
+  }
+
+  return { start, end };
+}
+
 export default function InventoryPage() {
   const [resources, setResources] = useState<Resource[]>([]);
+  const [stats, setStats] = useState<InventoryStats>({ booksSold: 0, revenue: 0, booksGivenAway: 0 });
+  const [timeRange, setTimeRange] = useState<TimeRange>('month');
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     async function fetchResources() {
@@ -49,6 +94,43 @@ export default function InventoryPage() {
     fetchResources();
   }, [supabase]);
 
+  useEffect(() => {
+    async function fetchTransactionStats() {
+      const { start, end } = getTransactionDateRange(timeRange);
+      let query = supabase
+        .from('resource_transactions')
+        .select('quantity, type, amount')
+        .lte('transaction_date', end.toISOString());
+
+      if (start) {
+        query = query.gte('transaction_date', start.toISOString());
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error(error);
+        setStats({ booksSold: 0, revenue: 0, booksGivenAway: 0 });
+        return;
+      }
+
+      const nextStats = ((data || []) as ResourceTransaction[]).reduce<InventoryStats>((totals, transaction) => {
+        if (transaction.type === 'sale') {
+          totals.booksSold += Number(transaction.quantity || 0);
+          totals.revenue += Number(transaction.amount || 0);
+        } else if (transaction.type === 'giveaway') {
+          totals.booksGivenAway += Number(transaction.quantity || 0);
+        }
+
+        return totals;
+      }, { booksSold: 0, revenue: 0, booksGivenAway: 0 });
+
+      setStats(nextStats);
+    }
+
+    fetchTransactionStats();
+  }, [supabase, timeRange]);
+
   const filteredResources = resources.filter(resource =>
     resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (resource.category || "").toLowerCase().includes(searchTerm.toLowerCase())
@@ -66,6 +148,38 @@ export default function InventoryPage() {
           Add resource
         </Link>
       </div>
+
+      <section className="space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-semibold">Inventory Activity</h2>
+            <p className="text-sm text-zinc-500">Sales and giveaways by transaction date.</p>
+          </div>
+          <select
+            className="w-full sm:w-48 px-3 py-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+            value={timeRange}
+            onChange={e => setTimeRange(e.target.value as TimeRange)}
+          >
+            {timeRangeOptions.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white border rounded-xl p-4 dark:bg-zinc-900 dark:border-zinc-800">
+            <p className="text-sm text-zinc-500 font-medium">Books Sold</p>
+            <p className="text-2xl font-bold">{stats.booksSold}</p>
+          </div>
+          <div className="bg-white border rounded-xl p-4 dark:bg-zinc-900 dark:border-zinc-800">
+            <p className="text-sm text-zinc-500 font-medium">Revenue</p>
+            <p className="text-2xl font-bold text-green-600">{formatMoney(stats.revenue)}</p>
+          </div>
+          <div className="bg-white border rounded-xl p-4 dark:bg-zinc-900 dark:border-zinc-800">
+            <p className="text-sm text-zinc-500 font-medium">Books Given Away</p>
+            <p className="text-2xl font-bold">{stats.booksGivenAway}</p>
+          </div>
+        </div>
+      </section>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
