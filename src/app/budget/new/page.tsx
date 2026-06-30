@@ -15,7 +15,6 @@ interface FormData {
   category: string;
   name: string;
   needed: string;
-  raised: string;
   is_project_based: boolean;
   project_id: string;
 }
@@ -42,7 +41,6 @@ export default function NewBudgetEntryPage() {
     category: "General Operations",
     name: "",
     needed: "",
-    raised: "",
     is_project_based: false,
     project_id: "",
   });
@@ -68,7 +66,7 @@ export default function NewBudgetEntryPage() {
         category: formData.category,
         name: formData.name,
         needed: Number(formData.needed || 0),
-        raised: Number(formData.raised || 0),
+        raised: 0,
         is_project_based: formData.is_project_based,
         project_id: formData.is_project_based && formData.project_id ? formData.project_id : null,
       });
@@ -97,18 +95,16 @@ export default function NewBudgetEntryPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Category</label>
-              <input
+              <select
                 required
-                list="budget-categories"
                 className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.category}
                 onChange={e => setFormData({ ...formData, category: e.target.value })}
-              />
-              <datalist id="budget-categories">
+              >
                 {suggestedCategories.map(category => (
-                  <option key={category} value={category} />
+                  <option key={category} value={category}>{category}</option>
                 ))}
-              </datalist>
+              </select>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Name</label>
@@ -132,14 +128,9 @@ export default function NewBudgetEntryPage() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Raised</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.raised}
-                onChange={e => setFormData({ ...formData, raised: e.target.value })}
-              />
+              <div className="w-full px-3 py-2 border rounded-lg bg-zinc-50 text-zinc-500 dark:bg-zinc-950 dark:border-zinc-800">
+                $0.00
+              </div>
             </div>
           </div>
 
