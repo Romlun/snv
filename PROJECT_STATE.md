@@ -184,37 +184,34 @@ at GATE 2 until further notice.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW:** Budget module is NEXT. Nothing mid-flight.
-- **DONE (session 4):** Tasks module (live DB: list, detail, create, edit, mark-
-  complete, status dropdown) + church-visit auto-creates follow-up task — tested,
-  merged (`399d35c`). Then a UX bundle merged (`165eacd`): editable task status,
-  plan-future-church-visit. Then append-only NOTES: new `notes` table (migration
-  0005, RLS — Admin/Staff full; Volunteers only their own task notes; no volunteer
-  access to donor/church/project notes), reusable `NotesLog` component wired to Tasks
-  (merged `ff2d3b7`). Then the DATE CONTROL was rebuilt properly: replaced the native
-  `<input type=date>` (root cause of every date bug — typing AND close issues) with
-  an in-page **react-day-picker v10** calendar in `src/components/DateField.tsx`,
-  US MM/DD/YYYY typing preserved, timezone-safe via date-fns local parse/format,
-  closes on outside-click + Escape (merged `5fdc9fc`).
-- **PENDING CONFIRMATION:** Operator to verify the new calendar on production —
-  (a) closes on outside-click, (b) shows the exact day picked (no tz off-by-one).
-  Until confirmed, treat date control as shipped-but-unverified.
-- **DESIGN TOOL (future):** Stitch (Google's AI UI-design tool, via MCP) is the
-  intended designer for the DEFERRED POLISH PHASE — not now (would create
-  inconsistent UI mid-build). When adopted: (1) ROTATE the API key first — one was
-  pasted in chat and is compromised; (2) verify what the MCP accesses before
+- **NOW:** Inventory module is NEXT. Nothing mid-flight.
+- **DONE (session 5):** Budget module (live DB: overview w/ category-grouped totals,
+  create, edit, delete) — tested, merged. Then Budget improvements (merged `88d8475`):
+  category is now a DROPDOWN (10 standard categories); "Add Funds" per budget entry
+  via new `budget_contributions` table (migration 0006) with auto-summed `raised`
+  via trigger `recalculate_budget_entry_raised` (SECURITY DEFINER, search_path='',
+  RLS Admin/Staff only). `raised` is now DERIVED/display-only. Trigger verified live
+  (400→150). All tested on production.
+- **DEPLOY GOTCHA (resolved):** Vercel skipped the production build when branch-push
+  and merge landed seconds apart (webhook dedup). Fix: empty commit to main to
+  re-trigger. LESSON: after merging, verify production is on the NEW commit SHA (not
+  just that *a* deploy is READY); leave a gap between branch push and merge.
+- **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects ✅Tasks ✅Budget →
+  **Inventory (NEXT)** → Dashboard (live metrics) → User Management (Admin
+  creates/invites users + role-based UI; also unblocks testing Volunteer RLS) →
+  Gift entry + Engagement Score → Reporting → AI features.
+- **DERIVED FIELDS (don't hand-edit):** projects.current_funding (sums gifts),
+  budget_entries.raised (sums budget_contributions) — both trigger-maintained.
+- **DATE CONTROL:** in-page react-day-picker v10 (DateField.tsx) — confirmed working
+  by operator (typing, calendar, close-on-outside-click all good). Settled.
+- **DESIGN TOOL (future):** Stitch (Google AI UI-design tool via MCP) = intended
+  designer for the DEFERRED POLISH PHASE, not now. When adopted: (1) ROTATE the API
+  key first — one was pasted in chat, compromised; (2) verify MCP scope before
   connecting to a PII repo.
-- **IMPORTANT — current_funding is DERIVED** (trigger-summed from gifts; manual edits
-  get overwritten).
-- **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects ✅Tasks → **Budget (NEXT)**
-  → Inventory → Dashboard (live metrics) → User Management (Admin creates/invites
-  users + role-based UI; also unblocks testing Volunteer RLS) → Gift entry +
-  Engagement Score → Reporting → AI features.
 - **DEFERRED verification:** Volunteer-role RLS (tasks + task-notes scoped to own)
-  — can't test until a Volunteer account exists (needs User Management).
-- **DEFERRED polish:** UI/UX improvements (incl. Stitch design pass) — after all
-  modules exist. Specific items TBD.
-- **DEFERRED:** Leaked-password protection (Pro-plan only).
+  — untestable until a Volunteer account exists (needs User Management).
+- **DEFERRED polish:** UI/UX pass (incl. Stitch) after all modules exist. Items TBD.
+- **DEFERRED:** Leaked-password protection (Supabase Pro-plan only).
 
 ## 13. SESSION NOTE (session 2)
 Reconciled a major surprise: the "Phase 1 foundation unbuilt" assumption from
