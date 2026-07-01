@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v0.8 Language Schools module LIVE (new outreach pipeline)`
+`snv Mission CRM — v0.9 Unified Notes/Next-Step log across Donors/Churches/Schools`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -93,7 +93,7 @@ deploy SHA → operator click-tests on production → Director updates this file
 
 ---
 
-## 4. CURRENT STATE — ALL 8 MVP MODULES + ENGAGEMENT SCORE (DONORS + CHURCHES) + DONATION TRACKING + LANGUAGE SCHOOLS LIVE (as of session 11)
+## 4. CURRENT STATE — ALL 8 MVP MODULES + ENGAGEMENT SCORE (DONORS + CHURCHES) + DONATION TRACKING + LANGUAGE SCHOOLS + UNIFIED NOTES/NEXT-STEP LIVE (as of session 12)
 The app is a real, working, tested production application. Every module below is
 wired to the live Supabase database (no mock data remaining anywhere), enforces the
 3-tier RLS role model, and has been personally click-tested by the operator on
@@ -182,6 +182,20 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   the operator's two real leads (Bright Kids ESL, Happy Language School) via
   a reviewed one-time import script, `supabase/import-language-schools-initial.sql`
   — this is real business data, not test data, not meant to be deleted.
+- ✅ **Unified Notes/Next-Step log (session 12)** — the `notes` table (already
+  built for Tasks, already typed for donor/church use but never wired up)
+  now powers a shared `NotesLog` component across Donors, Churches, and
+  Language Schools. Each note has an optional `next_step`; when provided, it
+  syncs to the parent entity's own `next_step` column (donors and churches
+  both GAINED this column in this session — see P10, they didn't have it
+  before, only language_schools did). Notes/Next-Step is no longer
+  free-text-editable on any Edit form for these three entities — managed
+  exclusively through the log going forward, preserving a real history
+  instead of a silently-overwritten value. Existing notes/next_step text was
+  backfilled into the log via a reviewed script,
+  `supabase/backfill-notes-log-from-static-fields.sql` (idempotent, safe to
+  re-run). New/Create forms are unaffected — still take an initial
+  notes/next_step value at creation.
 
 **What's NOT built yet, in priority order:**
 1. **Notification/cadence automation** — DEFERRED, operator request. Needs (a) a
@@ -279,6 +293,18 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   the row is already committed) and one that reads `NEW` directly (for BEFORE
   triggers on the row's own table). Apply this split any time a derived field is
   computed by a BEFORE trigger on the same row whose columns feed the formula.
+- **P10 — Never assume schema parity across entity types, even similar-looking
+  ones. Check every affected table before writing a cross-entity directive.**
+  Caught live (session 12): Director directed a Code Agent change assuming
+  donors/churches/language_schools all had a `next_step` column, because
+  language_schools did and the modules "look the same." Donors never had one;
+  churches never had one either — only language_schools did, from its original
+  spreadsheet-driven schema design. The resulting code (NotesLog's parent-sync)
+  would throw on every save for donors and churches. Both caught and fixed by
+  the Director actually reading the live schema (`information_schema.columns`)
+  for ALL affected tables before merging, not just spot-checking one. Do this
+  BEFORE writing a directive that assumes N entity types share a column, not
+  just after something breaks.
 
 ## 7. ROLE / AUTH MODEL
 3 tiers via a `role` enum on `profiles`, enforced in RLS (verified live):
@@ -343,24 +369,13 @@ chat earlier in this project and is COMPROMISED — a fresh one must be generate
 and never pasted in chat; (2) verify what the MCP actually accesses before
 connecting it to a repo holding donor PII.
 
-## 10. INFRA STATUS (verified live, session 11)
+## 10. INFRA STATUS (verified live, session 12)
 - Supabase `snv` (`eriflhdyylssjnxygseq`) ACTIVE_HEALTHY, us-east-1, Postgres 17.6.
-- **15 migrations applied and verified against live state** (0000 through 0014):
-  initial schema → RLS/role/gifts corrections → handle_new_user search_path fix →
-  function hardening (search_path + execute grants) → churches/donors/tasks visit
-  automation (app-code, no migration) → project funding trigger → notes table →
-  budget_contributions trigger → resource_transactions trigger → profiles
-  team-visibility RLS fix → engagement score calculation (donors.engagement_score,
-  repurposed prototype column) → engagement score BEFORE-trigger staleness fix
-  (see P9) → engagement score search_path pin → gifts.church_id +
-  churches.total_giving/donors.lifetime_giving derived triggers +
-  get_engagement_score_breakdown RPC → church engagement score (formula D7,
-  visit-recency via contact_logs + giving-recency via gifts.church_id +
-  next_visit_date follow-up health, P9-safe BEFORE/AFTER trigger split,
-  get_church_engagement_score_breakdown RPC) → language_schools module
-  (new table + language_school_status enum + RLS mirroring churches +
-  contact_logs.language_school_id column, see D8). All tables have full RLS
-  coverage.
+- **18 migrations applied and verified against live state** (0000 through 0017):
+  ...through language_schools module (D8) → notes.next_step column →
+  donors.next_step column (P10 fix — Director's directive incorrectly assumed
+  this already existed) → churches.next_step column (same P10 fix, same
+  incorrect assumption). All tables have full RLS coverage.
 - Vercel: project `snv`, team `ecm-os`. Production READY on `main` at
   **snv-zeta.vercel.app**. Env vars set: `NEXT_PUBLIC_SUPABASE_URL`,
   `NEXT_PUBLIC_SUPABASE_ANON_KEY` (legacy `eyJ...` format, matches local
@@ -380,12 +395,17 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: nothing mid-flight.** Clean handoff point — the Language Schools
-  module (new: table, RLS, 5 pages, status select component, sidebar entry,
-  real-data import for the operator's 2 actual leads) shipped, merged,
-  deployed. Director-level verification done (build clean, RLS tested live,
-  import script reviewed and run, results spot-checked, deploy SHA matches
-  merge commit). Awaiting operator's click-test on production.
+- **NOW: one small piece pending.** The core Notes/Next-Step unification is
+  merged, deployed, and DB-verified (donors/churches next_step columns added
+  and fixed per P10, backfill run, build clean, deploy SHA matches merge
+  commit). Still outstanding: a follow-up directive is out to the Code Agent
+  to restore a compact "Next Step: {value}" line in the Contact Information
+  panel on all three detail pages — this was lost when the old dedicated
+  Notes/Next Step sections were replaced by NotesLog, and NotesLog alone
+  doesn't show the CURRENT next step at a glance if the most recent note
+  didn't set one (only the log's most recent next_step entry, which could be
+  several notes back). Next Director: check if that directive has landed; if
+  not, it's a small, well-scoped piece, not a redesign.
 - **NEXT:** operator wants a dedicated conversation (not a quick dispatch) to
   design the notification/follow-up-cadence rules before any automation code —
   see §4 item 1. Do not build this reactively; it needs real product thinking,
