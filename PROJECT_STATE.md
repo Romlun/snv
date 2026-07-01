@@ -204,9 +204,18 @@ at GATE 2 until further notice.
   SHA matches the merge commit (not just "a deploy is READY") → if stale, empty
   commit to main to re-trigger. This has worked reliably both times it recurred.
 - **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects ✅Tasks ✅Budget ✅Inventory
-  → **Dashboard (NEXT — live metrics, reuse Inventory's date-range pattern)** →
-  User Management (Admin creates/invites users + role-based UI; unblocks Volunteer
-  RLS testing) → Gift entry + Engagement Score → Reporting → AI features.
+  ✅Dashboard → **User Management (NEXT — Admin creates/invites users + role-based
+  UI; unblocks Volunteer RLS testing)** → Gift entry + Engagement Score → Reporting
+  → AI features.
+- **DASHBOARD (session 6/7):** src/app/page.tsx fully live (async server component,
+  parallel queries, no hardcoded org filtering — RLS only). 5 stat cards (Total
+  Donors, Churches, Active Projects, Budget Progress %, Overdue Tasks). Inventory
+  Snapshot (This Month: sold/revenue/given-away, via shared src/lib/date-ranges.ts —
+  now used by both Dashboard and Inventory). "Needs Follow-Up" panel — DELIBERATELY
+  a proxy (overdue next_follow_up_date OR last_contact 60+ days/null), honestly
+  labeled, NOT the real engagement score (that's a future module — do not confuse
+  the two). Upcoming Tasks (live, excludes Completed/Cancelled). All tested on
+  production.
 - **DERIVED FIELDS (don't hand-edit):** projects.current_funding (sums gifts),
   budget_entries.raised (sums budget_contributions), resources.quantity_sold/
   quantity_given (sum resource_transactions by type) — all trigger-maintained.
