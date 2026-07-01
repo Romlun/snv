@@ -395,17 +395,26 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: one small piece pending.** The core Notes/Next-Step unification is
-  merged, deployed, and DB-verified (donors/churches next_step columns added
-  and fixed per P10, backfill run, build clean, deploy SHA matches merge
-  commit). Still outstanding: a follow-up directive is out to the Code Agent
-  to restore a compact "Next Step: {value}" line in the Contact Information
-  panel on all three detail pages — this was lost when the old dedicated
-  Notes/Next Step sections were replaced by NotesLog, and NotesLog alone
-  doesn't show the CURRENT next step at a glance if the most recent note
-  didn't set one (only the log's most recent next_step entry, which could be
-  several notes back). Next Director: check if that directive has landed; if
-  not, it's a small, well-scoped piece, not a redesign.
+- **NOW: nothing mid-flight.** The Notes/Next-Step unification (including the
+  "current Next Step" glance-value follow-up) is fully merged, deployed, and
+  verified — Director read every file in both rounds, not just the reports.
+  Awaiting operator's click-test on production.
+- **DISCOVERED, NOT YET FIXED (session 12):** `src/types/database.ts` is
+  significantly stale — many migrations across this project (donors/churches
+  `next_step`, `lifetime_giving`/`total_giving` nullability, language_schools,
+  notes.next_step, etc.) were never reflected back into the generated types
+  file. Code Agents have been working around this with manual intersection
+  types (e.g. `Database['public']['Tables']['donors']['Row'] & { next_step:
+  string | null }`) rather than the file being regenerated. Director attempted
+  a regeneration this session (`Supabase:generate_typescript_types`) and it
+  surfaced ~15 real (if minor) null-safety type errors across 6 files —
+  pre-existing gaps the stale types had been masking, not anything caused by
+  the regeneration itself. Reverted rather than block the current merge on an
+  unrelated, larger cleanup. NEXT DIRECTOR: dispatch "regenerate
+  src/types/database.ts + fix the resulting null-safety errors" as its own
+  scoped Code Agent task — do NOT regenerate the types file yourself and
+  leave a broken build; either fix the fallout in the same pass or don't
+  commit the regeneration.
 - **NEXT:** operator wants a dedicated conversation (not a quick dispatch) to
   design the notification/follow-up-cadence rules before any automation code —
   see §4 item 1. Do not build this reactively; it needs real product thinking,
