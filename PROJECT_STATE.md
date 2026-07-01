@@ -204,9 +204,50 @@ at GATE 2 until further notice.
   SHA matches the merge commit (not just "a deploy is READY") → if stale, empty
   commit to main to re-trigger. This has worked reliably both times it recurred.
 - **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects ✅Tasks ✅Budget ✅Inventory
-  ✅Dashboard → **User Management (NEXT — Admin creates/invites users + role-based
-  UI; unblocks Volunteer RLS testing)** → Gift entry + Engagement Score → Reporting
-  → AI features.
+  ✅Dashboard ✅User Management → **Calendar (NEXT — full events: visits, meetings,
+  deadlines, tasks in one view)** → Engagement Score → notification/cadence system
+  (DEFERRED — needs email infra + rules design, see below) → Reporting → AI features.
+- **USER MANAGEMENT (session 7) — COMPLETE, security-reviewed carefully:**
+  Admin can create Staff/Volunteer accounts (Admin sets temp password directly, no
+  invite-email flow — operator's chosen approach), delete accounts (blocks
+  self-delete + last-Admin deletion), edit any team member's role including
+  promoting to Admin (blocks self-role-change), reset any team member's password,
+  and every user can change their OWN password (self-service, no admin privilege
+  needed). ARCHITECTURE: all privileged actions live in src/app/settings/actions.ts
+  as Server Actions ("use server"), sharing ONE authorization helper
+  (getAdminCaller()) that does a real database role lookup against the CALLER's
+  session — never trusts client-submitted role claims. The service-role key
+  (SUPABASE_SERVICE_ROLE_KEY, set in Vercel Production env, server-only) is used
+  ONLY via src/lib/supabase/admin.ts, which has a runtime `typeof window` guard and
+  is never imported by any client-marked file — traced and confirmed personally by
+  Director across 4 separate privileged actions (create/delete/role-edit/reset).
+  UI role/delete/reset controls are Admin-only and hidden for the caller's own row.
+  RLS FIX (migration 0008): profiles SELECT was originally "own row only" for
+  EVERYONE (a gap from session 1, before roles existed) — now Admin can view/update
+  all profiles in their org; Staff/Volunteer still see only their own (operator
+  decision: full team visibility is Admin-only, not Staff).
+  VERIFIED LIVE by operator: created a Volunteer account, logged in as them,
+  confirmed they could NOT see donor data and could only see their own tasks —
+  first real proof the Volunteer RLS scoping (built across many earlier sessions)
+  actually works. This closes the long-standing "deferred verification" item.
+- **NOTIFICATION/CADENCE SYSTEM — DEFERRED, NOT STARTED (operator request, session 7):**
+  Operator wants: auto-email on new donor, and an adaptive follow-up cadence (e.g.
+  "call first" for large gifts, interval varies by donor/gift size) — this is the
+  Phase 3 "reusable journeys" feature from the original spec, the most complex
+  remaining piece. BLOCKERS/OPEN QUESTIONS before building:
+    1. No transactional email service configured (Supabase doesn't send arbitrary
+       app emails) — needs a new account (Resend/Postmark/SendGrid), a new API key,
+       new infra.
+    2. Cadence RULES are undecided (operator: "I don't know how often... every
+       month or 2 or 3, or depends on the amount"). Do NOT invent these rules —
+       design them WITH the operator in a dedicated conversation before any code.
+  Director recommendation (operator agreed): build Calendar + Engagement Score
+  first (both ready with existing data), let the operator use the Dashboard's
+  Needs-Follow-Up panel for a while to get a feel for real timing, THEN design the
+  cadence rules together before building automation.
+- **CALENDAR (next task):** operator wants a full calendar — visits, meetings,
+  deadlines, tasks all in one view, "like Google/Apple Calendar." Existing
+  src/app/calendar/page.tsx is unbuilt/placeholder — verify before starting.
 - **DASHBOARD (session 6/7):** src/app/page.tsx fully live (async server component,
   parallel queries, no hardcoded org filtering — RLS only). 5 stat cards (Total
   Donors, Churches, Active Projects, Budget Progress %, Overdue Tasks). Inventory
@@ -226,8 +267,8 @@ at GATE 2 until further notice.
   designer for the DEFERRED POLISH PHASE, not now. When adopted: (1) ROTATE the API
   key first — one was pasted in chat, compromised; (2) verify MCP scope before
   connecting to a PII repo.
-- **DEFERRED verification:** Volunteer-role RLS (tasks + task-notes scoped to own)
-  — untestable until a Volunteer account exists (needs User Management).
+- **VERIFIED (was deferred):** Volunteer-role RLS (tasks + task-notes scoped to own,
+  no donor/church/gift/contact-log access) — confirmed live by operator, session 7.
 - **DEFERRED polish:** UI/UX pass (incl. Stitch) after all modules exist. Items TBD.
 - **DEFERRED:** Leaked-password protection (Supabase Pro-plan only).
 
