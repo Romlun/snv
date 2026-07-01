@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { EngagementScoreRing } from "@/components/EngagementScoreRing";
 import DateField from "@/components/DateField";
+import { RelationshipStatusSelect } from "@/components/RelationshipStatusSelect";
 import {
   Mail,
   Phone,
-  Calendar,
   MapPin,
-  MessageSquare,
   User as UserIcon,
   ArrowLeft,
   Loader2,
@@ -27,7 +26,62 @@ type Profile = Database['public']['Tables']['profiles']['Row'];
 type ContactLog = Database['public']['Tables']['contact_logs']['Row'];
 type PlanVisitType = 'call' | 'meeting' | 'church visit' | 'event';
 
+interface ProjectOption {
+  id: string;
+  name: string;
+}
+
+interface GiftProject {
+  name: string | null;
+}
+
+interface GiftHistoryRow {
+  id: string;
+  amount: number;
+  gift_date: string;
+  notes: string | null;
+  method: string | null;
+  project_id: string | null;
+  projects: GiftProject | GiftProject[] | null;
+}
+
+interface GiftHistoryItem {
+  id: string;
+  amount: number;
+  gift_date: string;
+  notes: string | null;
+  method: string | null;
+  projectName: string | null;
+}
+
+interface AddGiftFormData {
+  amount: string;
+  project_id: string;
+  gift_date: string;
+  method: string;
+  notes: string;
+}
+
 const planVisitTypes: PlanVisitType[] = ['call', 'meeting', 'church visit', 'event'];
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function todayDateInputValue() {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 10);
+}
+
+function validDateOrNull(value: string) {
+  if (!DATE_RE.test(value)) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? value : null;
+}
+
+function getProjectName(projects: GiftHistoryRow['projects']) {
+  const project = Array.isArray(projects) ? projects[0] : projects;
+  return project?.name || null;
+}
 
 function getPlanVisitTitle(type: PlanVisitType, churchName: string) {
   if (type === 'church visit') return `Planned visit to ${churchName}`;
@@ -41,53 +95,93 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
   const [church, setChurch] = useState<Church | null>(null);
   const [staff, setStaff] = useState<Profile | null>(null);
   const [visitLogs, setVisitLogs] = useState<ContactLog[]>([]);
+  const [projects, setProjects] = useState<ProjectOption[]>([]);
+  const [giftHistory, setGiftHistory] = useState<GiftHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPlanVisit, setShowPlanVisit] = useState(false);
   const [planVisitForm, setPlanVisitForm] = useState<{ date: string; note: string; type: PlanVisitType }>({ date: "", note: "", type: "church visit" });
   const [planVisitSaving, setPlanVisitSaving] = useState(false);
+  const [showAddGift, setShowAddGift] = useState(false);
+  const [addingGift, setAddingGift] = useState(false);
+  const [giftForm, setGiftForm] = useState<AddGiftFormData>({
+    amount: "",
+    project_id: "",
+    gift_date: todayDateInputValue(),
+    method: "",
+    notes: "",
+  });
 
   const supabase = createClient();
   const router = useRouter();
 
-  useEffect(() => {
-    async function fetchChurchData() {
-      try {
+  async function fetchChurchData(showPageLoading = false) {
+    try {
+      if (showPageLoading) {
         setLoading(true);
-        const { data: churchData, error: churchError } = await supabase
-          .from('churches')
+      }
+
+      const { data: churchData, error: churchError } = await supabase
+        .from('churches')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (churchError) throw churchError;
+      setChurch(churchData);
+
+      if (churchData.assigned_staff_id) {
+        const { data: staffData } = await supabase
+          .from('profiles')
           .select('*')
-          .eq('id', id)
+          .eq('id', churchData.assigned_staff_id)
           .single();
+        setStaff(staffData);
+      } else {
+        setStaff(null);
+      }
 
-        if (churchError) throw churchError;
-        setChurch(churchData);
+      const { data: logData } = await supabase
+        .from('contact_logs')
+        .select('*')
+        .eq('church_id', id)
+        .eq('type', 'church visit')
+        .order('contact_date', { ascending: false });
+      setVisitLogs(logData || []);
 
-        if (churchData.assigned_staff_id) {
-          const { data: staffData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', churchData.assigned_staff_id)
-            .single();
-          setStaff(staffData);
-        }
+      const { data: projectData } = await supabase
+        .from('projects')
+        .select('id, name')
+        .eq('status', 'Active')
+        .order('name');
+      setProjects((projectData || []) as ProjectOption[]);
 
-        const { data: logData } = await supabase
-          .from('contact_logs')
-          .select('*')
-          .eq('church_id', id)
-          .eq('type', 'church visit')
-          .order('contact_date', { ascending: false });
-        setVisitLogs(logData || []);
-
-      } catch (err) {
-        console.error(err);
-      } finally {
+      const { data: giftData } = await supabase
+        .from('gifts')
+        .select('id, amount, gift_date, notes, method, project_id, projects(name)')
+        .eq('church_id', id)
+        .order('gift_date', { ascending: false });
+      setGiftHistory(((giftData || []) as GiftHistoryRow[]).map(gift => ({
+        id: gift.id,
+        amount: gift.amount,
+        gift_date: gift.gift_date,
+        notes: gift.notes,
+        method: gift.method,
+        projectName: getProjectName(gift.projects),
+      })));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (showPageLoading) {
         setLoading(false);
       }
     }
+  }
 
-    fetchChurchData();
-  }, [id, supabase]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchChurchData(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const handlePlanVisit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +219,45 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
     }
   };
 
+  const handleAddGift = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddingGift(true);
+
+    try {
+      const amount = Number(giftForm.amount);
+      if (!amount || amount <= 0) {
+        throw new Error("Enter a valid amount");
+      }
+
+      const giftDate = validDateOrNull(giftForm.gift_date);
+      const { error } = await supabase.from('gifts').insert({
+        church_id: id,
+        project_id: giftForm.project_id || null,
+        amount,
+        gift_date: giftDate || undefined,
+        method: giftForm.method || null,
+        notes: giftForm.notes || null,
+      });
+
+      if (error) throw error;
+
+      await fetchChurchData();
+      setGiftForm({
+        amount: "",
+        project_id: "",
+        gift_date: todayDateInputValue(),
+        method: "",
+        notes: "",
+      });
+      setShowAddGift(false);
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "Error adding gift");
+    } finally {
+      setAddingGift(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
@@ -156,9 +289,12 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
                <Link href={`/churches/${church.id}/edit`} className="text-sm font-medium text-blue-600 hover:underline">Edit</Link>
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
-              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                {church.relationship_status}
-              </span>
+              <RelationshipStatusSelect
+                id={church.id}
+                table="churches"
+                value={church.relationship_status}
+                onSaved={relationship_status => setChurch(prev => prev ? { ...prev, relationship_status } : prev)}
+              />
               <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300">
                 {church.denomination || "No denomination listed"}
               </span>
@@ -174,6 +310,78 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
           <EngagementScoreRing score={church.engagement_score} />
         </div>
       </div>
+
+      {showAddGift ? (
+        <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
+          <h2 className="font-semibold mb-4">Add Gift</h2>
+          <form onSubmit={handleAddGift} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Amount</label>
+              <input
+                required
+                type="number"
+                min="0.01"
+                step="0.01"
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                value={giftForm.amount}
+                onChange={e => setGiftForm({ ...giftForm, amount: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Project</label>
+              <select
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                value={giftForm.project_id}
+                onChange={e => setGiftForm({ ...giftForm, project_id: e.target.value })}
+              >
+                <option value="">None</option>
+                {projects.map(project => (
+                  <option key={project.id} value={project.id}>{project.name}</option>
+                ))}
+              </select>
+            </div>
+            <DateField
+              label="Gift Date"
+              value={giftForm.gift_date}
+              onChange={val => setGiftForm({ ...giftForm, gift_date: val })}
+            />
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Method</label>
+              <input
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="cash, check, card, online"
+                value={giftForm.method}
+                onChange={e => setGiftForm({ ...giftForm, method: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-medium">Note</label>
+              <textarea
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-20"
+                value={giftForm.notes}
+                onChange={e => setGiftForm({ ...giftForm, notes: e.target.value })}
+              />
+            </div>
+            <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
+              <button
+                type="submit"
+                disabled={addingGift}
+                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {addingGift ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
+                Save Gift
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAddGift(false)}
+                className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </section>
+      ) : null}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
@@ -246,6 +454,45 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
             <div className="bg-white border rounded-xl p-4 dark:bg-zinc-900 dark:border-zinc-800">
               <p className="text-sm text-zinc-500 font-medium">Relationship</p>
               <p className="text-2xl font-bold">{church.relationship_status}</p>
+            </div>
+          </section>
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setShowAddGift(value => !value)}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Add Gift
+            </button>
+          </div>
+
+          <section className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
+            <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800">
+              <h2 className="font-semibold">Gift History</h2>
+            </div>
+            <div className="p-6">
+              {giftHistory.length > 0 ? (
+                <div className="space-y-3">
+                  {giftHistory.map(gift => (
+                    <div key={gift.id} className="flex flex-col gap-2 border rounded-lg p-4 dark:border-zinc-800 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="font-medium">{gift.projectName || "General gift"}</p>
+                        <p className="text-xs text-zinc-500">
+                          {gift.gift_date} {gift.method ? `- ${gift.method}` : ""}
+                        </p>
+                        {gift.notes ? <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{gift.notes}</p> : null}
+                      </div>
+                      <p className="text-sm font-bold text-green-600">${gift.amount.toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-10 text-zinc-500">
+                  No gifts recorded yet.
+                </div>
+              )}
             </div>
           </section>
 
