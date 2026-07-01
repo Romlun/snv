@@ -65,6 +65,21 @@ On phase change, the Director gives a new title and bumps this line the same tur
   This has repeatedly caught things code review alone missed (e.g. real signup
   flow, real date-typing behavior, real Volunteer-account RLS).
 
+- **⚠️ OPERATOR PREFERENCE (explicit correction, session 10) — DIVISION OF LABOR:**
+  Director should NOT do "building" work itself, even small pieces (e.g. inserting
+  persistent/example data via raw SQL in chat, writing one-off scripts). That work
+  belongs to the Code Agent, as a small reviewable/repeatable task, same as any
+  other feature — not as Director shortcuts. The line: Director's own hands-on work
+  stays limited to genuine INFRASTRUCTURE — applying a migration the Code Agent
+  wrote, verifying it against the live DB, merging, checking deploy status. Director
+  should give MORE work to the Code Agent, not less, and should avoid the pattern of
+  doing a lot of the actual building itself and handing the agent only small pieces.
+  EXCEPTION still standing: transient, self-cleaning verification (insert a test
+  row, confirm a trigger fires, delete it immediately) remains fine as Director-run
+  infra checking — it produces no lasting artifact. Anything meant to PERSIST
+  (seed/demo data, scripts, features) goes through the Code Agent as a checked-in,
+  reviewable task.
+
 Standard build sequence per module/feature:
 Director writes a precise directive → Code Agent builds + commits (NOT pushed by
 default — Director pushes) → Director reads the actual diff, runs the build,
