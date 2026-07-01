@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v0.5 Engagement Score LIVE; notification/cadence conversation next`
+`snv Mission CRM — v0.6 Donation tracking (donors+churches), inline status, score breakdown LIVE`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -75,15 +75,22 @@ Director updates this file.
 
 ---
 
-## 4. CURRENT STATE — ALL 8 MVP MODULES + ENGAGEMENT SCORE LIVE (as of session 8)
+## 4. CURRENT STATE — ALL 8 MVP MODULES + ENGAGEMENT SCORE + DONATION TRACKING LIVE (as of session 9)
 The app is a real, working, tested production application. Every module below is
 wired to the live Supabase database (no mock data remaining anywhere), enforces the
 3-tier RLS role model, and has been personally click-tested by the operator on
 **snv-zeta.vercel.app**:
 
-- ✅ **Donors** — list/detail/create/edit, contact-log with auto-follow-up-task.
+- ✅ **Donors** — list/detail/create/edit, contact-log with auto-follow-up-task,
+  "Add Gift" (general or project-linked, `gifts.donor_id` fixed to the donor,
+  `project_id` optional), gift history list, inline relationship-status select
+  (no navigation to edit), clickable Engagement Score ring showing a full
+  breakdown popover (contact/giving/recurring/follow-up, each with points and
+  the underlying fact — see `DonorEngagementScore.tsx`).
 - ✅ **Churches** — list/detail/create/edit, visit log with auto-follow-up-task,
-  "Plan Visit" (future visits, with type: call/visit/event/meeting).
+  "Plan Visit" (future visits, with type: call/visit/event/meeting), "Add Gift"
+  (church-level giving, `gifts.church_id` fixed, `project_id` optional, no
+  `donor_id`), gift history list, inline relationship-status select.
 - ✅ **Projects** — list/detail/create/edit, funding progress, "Add Funds"
   (creates a `gifts` row; `current_funding` is DERIVED via trigger).
 - ✅ **Tasks** — list/detail/create/edit/mark-complete, status dropdown,
@@ -109,10 +116,20 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   prototype-era column — no new column needed). Formula (operator-approved
   Option A): contact recency 40pts + giving recency 25pts + recurring status
   15pts + follow-up health 20pts, linear decay within each recency band (no
-  cliffs). Already surfaced in three places that pre-existed from the prototype
-  and just needed a real column to read from: `EngagementScoreRing` on the donor
-  detail page, the "Score" column on the donors list, and now the Dashboard panel
-  above. See §6 P9 for a real bug caught and fixed during build.
+  cliffs). Surfaced via `EngagementScoreRing` (donor detail, donors list,
+  churches — plain, non-clickable) and `DonorEngagementScore` (donor detail +
+  donors list only — wraps the ring with a click-to-expand breakdown popover
+  via the `get_engagement_score_breakdown` RPC). See §6 P9 for a real bug
+  caught and fixed during build.
+- ✅ **Donation tracking (session 9)** — `gifts` now supports three optional
+  attribution columns: `donor_id`, `project_id`, `church_id` (all nullable,
+  a gift can be tied to any combination). Two more previously-stale
+  prototype totals are now trigger-maintained the same way `engagement_score`
+  was: `donors.lifetime_giving` and `churches.total_giving` (sum of gifts by
+  `donor_id` / `church_id` respectively). `churches.engagement_score` is
+  STILL the old unwired prototype value — same treatment as donors was NOT
+  yet applied there; a natural future follow-up if the operator wants church
+  scoring, not done because it wasn't asked for.
 
 **What's NOT built yet, in priority order:**
 1. **Notification/cadence automation** — DEFERRED, operator request. Needs (a) a
@@ -213,9 +230,13 @@ Auth via Supabase Auth. Every table with PII has RLS ON from creation.
   `resources.quantity_sold` / `quantity_given` (sum `resource_transactions` by
   type), `donors.engagement_score` (BEFORE trigger on donors' own recency/status
   columns + AFTER trigger on `gifts` — see P9 for the staleness bug this pattern
-  can hide if a BEFORE trigger re-queries instead of reading `NEW`).
+  can hide if a BEFORE trigger re-queries instead of reading `NEW`),
+  `donors.lifetime_giving` and `churches.total_giving` (both sum `gifts` by
+  `donor_id` / `church_id` respectively — AFTER trigger on `gifts`).
   `resources.quantity_available` is the ONE manual exception (on-hand
-  stock, deliberately not auto-decremented).
+  stock, deliberately not auto-decremented). `churches.engagement_score` is
+  NOT yet in this list — still a stale manual prototype value, unlike every
+  other derived field here.
 - ⚠️ **Vercel deploy-skip pattern (recurring, has a known fix — P8):** pushing a
   branch and merging to main within seconds can make Vercel's GitHub webhook skip
   the production build. STANDARD PROCEDURE: push branch → wait ~10s → merge to
@@ -237,17 +258,18 @@ chat earlier in this project and is COMPROMISED — a fresh one must be generate
 and never pasted in chat; (2) verify what the MCP actually accesses before
 connecting it to a repo holding donor PII.
 
-## 10. INFRA STATUS (verified live, session 8)
+## 10. INFRA STATUS (verified live, session 9)
 - Supabase `snv` (`eriflhdyylssjnxygseq`) ACTIVE_HEALTHY, us-east-1, Postgres 17.6.
-- **12 migrations applied and verified against live state** (0000 through 0011):
+- **13 migrations applied and verified against live state** (0000 through 0012):
   initial schema → RLS/role/gifts corrections → handle_new_user search_path fix →
   function hardening (search_path + execute grants) → churches/donors/tasks visit
   automation (app-code, no migration) → project funding trigger → notes table →
   budget_contributions trigger → resource_transactions trigger → profiles
   team-visibility RLS fix → engagement score calculation (donors.engagement_score,
   repurposed prototype column) → engagement score BEFORE-trigger staleness fix
-  (see P9) → engagement score search_path pin. All 13+ tables have full RLS
-  coverage.
+  (see P9) → engagement score search_path pin → gifts.church_id +
+  churches.total_giving/donors.lifetime_giving derived triggers +
+  get_engagement_score_breakdown RPC. All 13+ tables have full RLS coverage.
 - Vercel: project `snv`, team `ecm-os`. Production READY on `main` at
   **snv-zeta.vercel.app**. Env vars set: `NEXT_PUBLIC_SUPABASE_URL`,
   `NEXT_PUBLIC_SUPABASE_ANON_KEY` (legacy `eyJ...` format, matches local
@@ -267,11 +289,11 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: nothing mid-flight.** Clean handoff point — Engagement Score shipped,
-  merged, deployed. Awaiting operator's click-test on production before
-  considering it fully closed (director-level verification is done: formula
-  tested live insert/update/gift-add/gift-delete, build clean, deploy SHA
-  matches merge commit — see session 8 notes below).
+- **NOW: nothing mid-flight.** Clean handoff point — donation tracking, inline
+  relationship status, and score breakdown all shipped, merged, deployed.
+  Director-level verification done (build clean, DB triggers tested live with
+  insert/delete on a temp church, deploy SHA matches merge commit). Awaiting
+  operator's click-test on production.
 - **NEXT:** operator wants a dedicated conversation (not a quick dispatch) to
   design the notification/follow-up-cadence rules before any automation code —
   see §4 item 1. Do not build this reactively; it needs real product thinking,
@@ -305,3 +327,14 @@ stuck situation. Inherit everything in this file verbatim; nothing here should b
 re-litigated without a specific new reason. The operator is engaged, technical
 enough to relay directives precisely, and has been doing real click-through testing
 on production after every merge — trust that testing when it's reported as passed.
+
+**Session 9 note:** unlike session 8, the Code Agent worked on the correct feature
+branch, committed correctly, and completed all four requested parts (donor gift
+tracking, church gift tracking, inline relationship status on both entities, and
+the score breakdown popover) without skipping anything — confirmed by the Director
+reading every file in the diff, not just trusting the report. Worth noting as a
+data point rather than a rule: giving the Code Agent an explicit numbered list of
+parts with "state completion status per part in your report" seems to correlate
+with more complete follow-through than a looser directive. Not elevating this to a
+precedent yet — one data point — but worth watching on the next multi-part
+directive.
