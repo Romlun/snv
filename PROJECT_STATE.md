@@ -245,9 +245,26 @@ at GATE 2 until further notice.
   first (both ready with existing data), let the operator use the Dashboard's
   Needs-Follow-Up panel for a while to get a feel for real timing, THEN design the
   cadence rules together before building automation.
-- **CALENDAR (next task):** operator wants a full calendar — visits, meetings,
-  deadlines, tasks all in one view, "like Google/Apple Calendar." Existing
-  src/app/calendar/page.tsx is unbuilt/placeholder — verify before starting.
+- **CALENDAR (next task, NOT YET STARTED):** operator wants a full calendar —
+  visits, meetings, deadlines, tasks all in one view, "like Google/Apple Calendar."
+  src/app/calendar/page.tsx is still the unbuilt placeholder — confirmed session 7.
+  PLANNED APPROACH (directive already written, not yet successfully dispatched —
+  Code Agent hit its own usage limit before starting, see below):
+    - Month-grid view (7-col week rows), prev/next navigation, "Today" button.
+    - Aggregates FOUR existing data sources (Calendar has NO table of its own):
+      tasks.due_date, churches.next_visit_date, projects.start_date/end_date,
+      contact_logs.contact_date (history). Parallel-fetch per visible month, same
+      pattern as Dashboard.
+    - Day cells show small color-coded chips by type; click a day/chip → detail
+      panel linking to the real record (task/church/project).
+    - No new library — plain date math or date-fns (already installed); do NOT add
+      a calendar package, build the grid directly.
+    - Volunteers will correctly see less (their own tasks only) — that's expected
+      RLS behavior, not a bug to work around.
+  STATUS: Code Agent (Codex) attempted this and hit its own sandbox/usage-limit
+  block (locked until ~10:35 PM local, unrelated to repo/Supabase/Vercel) before
+  writing any code. No files touched, nothing to clean up. Re-dispatch the same
+  directive once the Code Agent is available again.
 - **DASHBOARD (session 6/7):** src/app/page.tsx fully live (async server component,
   parallel queries, no hardcoded org filtering — RLS only). 5 stat cards (Total
   Donors, Churches, Active Projects, Budget Progress %, Overdue Tasks). Inventory
