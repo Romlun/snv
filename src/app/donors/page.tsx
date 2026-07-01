@@ -2,7 +2,8 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { EngagementScoreRing } from "@/components/EngagementScoreRing";
+import { DonorEngagementScore } from "@/components/DonorEngagementScore";
+import { RelationshipStatusSelect } from "@/components/RelationshipStatusSelect";
 import Link from "next/link";
 import { Search, Plus, Filter, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -113,12 +114,17 @@ export default function DonorsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                      {donor.stage}
-                    </span>
+                    <RelationshipStatusSelect
+                      id={donor.id}
+                      table="donors"
+                      value={donor.relationship_status}
+                      onSaved={relationship_status => setDonors(prev => prev.map(row => (
+                        row.id === donor.id ? { ...row, relationship_status } : row
+                      )))}
+                    />
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <EngagementScoreRing score={donor.engagement_score} />
+                    <DonorEngagementScore donorId={donor.id} score={donor.engagement_score} />
                   </td>
                   <td className="px-6 py-4 text-right font-medium">
                     ${donor.lifetime_giving.toLocaleString()}

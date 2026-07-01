@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { EngagementScoreRing } from "@/components/EngagementScoreRing";
+import { RelationshipStatusSelect } from "@/components/RelationshipStatusSelect";
 import Link from "next/link";
 import { Search, Plus, Filter, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -114,9 +115,14 @@ export default function ChurchesPage() {
                   </td>
                   <td className="px-6 py-4">{church.pastor || "Not listed"}</td>
                   <td className="px-6 py-4">
-                    <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                      {church.relationship_status}
-                    </span>
+                    <RelationshipStatusSelect
+                      id={church.id}
+                      table="churches"
+                      value={church.relationship_status}
+                      onSaved={relationship_status => setChurches(prev => prev.map(row => (
+                        row.id === church.id ? { ...row, relationship_status } : row
+                      )))}
+                    />
                   </td>
                   <td className="px-6 py-4 text-center">
                     <EngagementScoreRing score={church.engagement_score} />
