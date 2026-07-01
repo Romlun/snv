@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v0.4 All 8 Core Modules LIVE; Engagement Score next`
+`snv Mission CRM — v0.5 Engagement Score LIVE; notification/cadence conversation next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -75,7 +75,7 @@ Director updates this file.
 
 ---
 
-## 4. CURRENT STATE — ALL 8 ORIGINAL MVP MODULES LIVE (as of session 7)
+## 4. CURRENT STATE — ALL 8 MVP MODULES + ENGAGEMENT SCORE LIVE (as of session 8)
 The app is a real, working, tested production application. Every module below is
 wired to the live Supabase database (no mock data remaining anywhere), enforces the
 3-tier RLS role model, and has been personally click-tested by the operator on
@@ -95,28 +95,33 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   auto-updates `quantity_sold`/`quantity_given` via trigger (`quantity_available`
   stays manual by design), transaction amount auto-fills price×quantity, stats
   panel with time-range filter.
-- ✅ **Dashboard** — live stat cards, Inventory snapshot, "Needs Follow-Up" panel
-  (an honest PROXY — overdue/stale contact — NOT the real engagement score),
-  Upcoming Tasks.
+- ✅ **Dashboard** — live stat cards, Inventory snapshot, real **Engagement Score**
+  panel ("Engagement Needs Attention" — donors below score 40, ascending), not a
+  proxy anymore, Upcoming Tasks.
 - ✅ **Calendar** — month-grid aggregating tasks/church visits/project
   dates/contact history (no table of its own).
 - ✅ **User Management** (not in the original MVP list, became necessary) — Admin
   can create/delete/edit-role/reset-password for team members; everyone can change
   their own password; sign-out. See §10 for the security architecture — this was
   reviewed with extra care (service-role key involved).
+- ✅ **Engagement Score** — real 0-100 score per donor, DB-computed and
+  trigger-maintained (`donors.engagement_score`, repurposed from an unused
+  prototype-era column — no new column needed). Formula (operator-approved
+  Option A): contact recency 40pts + giving recency 25pts + recurring status
+  15pts + follow-up health 20pts, linear decay within each recency band (no
+  cliffs). Already surfaced in three places that pre-existed from the prototype
+  and just needed a real column to read from: `EngagementScoreRing` on the donor
+  detail page, the "Score" column on the donors list, and now the Dashboard panel
+  above. See §6 P9 for a real bug caught and fixed during build.
 
 **What's NOT built yet, in priority order:**
-1. **Engagement Score** — NEXT. Real 0-100 score (contact recency, giving recency,
-   recurring status, follow-up health) to replace the Dashboard's current proxy.
-   All the underlying data already exists (`gifts`, `last_contact_date`,
-   `next_follow_up_date`, `is_recurring`). This is a calculation/UI job, not new
-   architecture — genuinely ready to build.
-2. **Notification/cadence automation** — DEFERRED, operator request. Needs (a) a
+1. **Notification/cadence automation** — DEFERRED, operator request. Needs (a) a
    transactional email service decision (none configured — Supabase does not send
    arbitrary app emails), and (b) a dedicated conversation to design the actual
    follow-up cadence rules (operator does not have these yet). Do NOT invent rules.
-3. **Reporting, AI features** — later phases, not yet scoped in detail.
-4. **Deferred polish/design pass** — after functional work settles. Candidate tool:
+   NEXT UP — operator wants a dedicated conversation for this, not a quick dispatch.
+2. **Reporting, AI features** — later phases, not yet scoped in detail.
+3. **Deferred polish/design pass** — after functional work settles. Candidate tool:
    Stitch (Google AI UI-design MCP) — see §9 for the security caveat on its key.
 
 ---
@@ -171,6 +176,18 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   merge commit exactly** before telling the operator to test — don't trust "a
   deploy is READY." See §10 deploy pattern; this recurring Vercel quirk has bitten
   twice and has a known, reliable fix.
+- **P9 — A BEFORE-trigger that recomputes a derived column must read from NEW,
+  never re-query its own table.** Caught live (session 8, Engagement Score): a
+  BEFORE UPDATE trigger called a helper function that did `SELECT ... FROM
+  donors WHERE id = ...` to fetch its own inputs — but at BEFORE-trigger time the
+  table still holds the OLD row, so the computed value was always one update
+  behind the actual change (verified with a live insert/update/gift-add/gift-
+  delete test cycle before merge, not just "it applied"). Fix: split into a pure
+  calculation function that takes explicit parameter values, plus two callers —
+  one that queries the DB (safe for AFTER triggers on a *different* table, where
+  the row is already committed) and one that reads `NEW` directly (for BEFORE
+  triggers on the row's own table). Apply this split any time a derived field is
+  computed by a BEFORE trigger on the same row whose columns feed the formula.
 
 ## 7. ROLE / AUTH MODEL
 3 tiers via a `role` enum on `profiles`, enforced in RLS (verified live):
@@ -194,7 +211,10 @@ Auth via Supabase Auth. Every table with PII has RLS ON from creation.
   `projects.current_funding` (sums `gifts` where `project_id` set),
   `budget_entries.raised` (sums `budget_contributions`),
   `resources.quantity_sold` / `quantity_given` (sum `resource_transactions` by
-  type). `resources.quantity_available` is the ONE manual exception (on-hand
+  type), `donors.engagement_score` (BEFORE trigger on donors' own recency/status
+  columns + AFTER trigger on `gifts` — see P9 for the staleness bug this pattern
+  can hide if a BEFORE trigger re-queries instead of reading `NEW`).
+  `resources.quantity_available` is the ONE manual exception (on-hand
   stock, deliberately not auto-decremented).
 - ⚠️ **Vercel deploy-skip pattern (recurring, has a known fix — P8):** pushing a
   branch and merging to main within seconds can make Vercel's GitHub webhook skip
@@ -217,14 +237,17 @@ chat earlier in this project and is COMPROMISED — a fresh one must be generate
 and never pasted in chat; (2) verify what the MCP actually accesses before
 connecting it to a repo holding donor PII.
 
-## 10. INFRA STATUS (verified live, session 7)
+## 10. INFRA STATUS (verified live, session 8)
 - Supabase `snv` (`eriflhdyylssjnxygseq`) ACTIVE_HEALTHY, us-east-1, Postgres 17.6.
-- **9 migrations applied and verified against live state** (0000 through 0008):
+- **12 migrations applied and verified against live state** (0000 through 0011):
   initial schema → RLS/role/gifts corrections → handle_new_user search_path fix →
   function hardening (search_path + execute grants) → churches/donors/tasks visit
   automation (app-code, no migration) → project funding trigger → notes table →
   budget_contributions trigger → resource_transactions trigger → profiles
-  team-visibility RLS fix. All 13+ tables have full RLS coverage.
+  team-visibility RLS fix → engagement score calculation (donors.engagement_score,
+  repurposed prototype column) → engagement score BEFORE-trigger staleness fix
+  (see P9) → engagement score search_path pin. All 13+ tables have full RLS
+  coverage.
 - Vercel: project `snv`, team `ecm-os`. Production READY on `main` at
   **snv-zeta.vercel.app**. Env vars set: `NEXT_PUBLIC_SUPABASE_URL`,
   `NEXT_PUBLIC_SUPABASE_ANON_KEY` (legacy `eyJ...` format, matches local
@@ -244,26 +267,15 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: nothing mid-flight.** Clean handoff point — all 8 MVP modules complete,
-  merged, deployed, and click-tested by the operator on production.
-- **NEXT: Engagement Score module.** Build a real 0-100 score per donor (contact
-  recency, giving recency, recurring status, follow-up health) using existing data
-  — no new architecture needed. Suggested first steps for the next Director:
-    1. Design the exact scoring formula/weights (this is a product decision —
-       consider proposing 2-3 concrete formulas to the operator rather than
-       picking one silently, since "what counts as engaged" affects how the whole
-       team reads donor health).
-    2. Decide where it's computed: a DB function/view (recalculated on read or via
-       trigger) vs. computed in the app layer. Recommend a DB approach for
-       consistency with how funding/quantity totals are already derived (P7).
-    3. Replace the Dashboard's "Needs Follow-Up" proxy panel with the real score
-       once it exists — don't leave both showing different numbers.
-    4. Show the score on the donor detail page (a colored ring — there's already
-       an unused `EngagementScoreRing.tsx` component from the original prototype,
-       worth checking if it fits before building a new one).
-- **AFTER THAT:** operator wants a dedicated conversation (not a quick dispatch)
-  to design the notification/follow-up-cadence rules before any automation code —
-  see §4 item 2. Do not build this reactively; it needs real product thinking.
+- **NOW: nothing mid-flight.** Clean handoff point — Engagement Score shipped,
+  merged, deployed. Awaiting operator's click-test on production before
+  considering it fully closed (director-level verification is done: formula
+  tested live insert/update/gift-add/gift-delete, build clean, deploy SHA
+  matches merge commit — see session 8 notes below).
+- **NEXT:** operator wants a dedicated conversation (not a quick dispatch) to
+  design the notification/follow-up-cadence rules before any automation code —
+  see §4 item 1. Do not build this reactively; it needs real product thinking,
+  starting with a transactional email service decision (none configured yet).
 
 ## 13. SESSION NOTES
 Detailed session-by-session history (sessions 1–7) lives in **PROJECT_LOG.md**
@@ -271,6 +283,20 @@ Detailed session-by-session history (sessions 1–7) lives in **PROJECT_LOG.md**
 It is NOT required reading to start working; everything currently load-bearing is
 in this file's sections above (decisions, precedents, hazards, derived fields,
 deploy pattern, current state).
+
+**Session 8 note:** the Code Agent left its Engagement Score work uncommitted
+directly on local `main` rather than on the feature branch — caught during
+Director review, not a real problem (fixed by stashing, switching branches,
+re-applying, committing there instead), but worth naming explicitly in future
+directives which branch to work on rather than assuming it's understood. Also
+worth noting: the Code Agent only built the Dashboard panel (1 of 3 requested
+pieces) and didn't reuse `EngagementScoreRing.tsx` as instructed — turned out
+the donor detail page and donors list already had it wired from an earlier
+session, using the same column name the new migration repurposed, so nothing
+was actually missing in the end, but that was discovered by the Director
+reading the live donor detail/list pages directly, not from the Code Agent's
+report. Reinforces P4/the Quality-role discipline: read the actual code, don't
+trust a "done" report at face value.
 
 **Handoff context for whoever reads this next:** this was a deliberate, clean swap
 at a strong milestone (all 8 MVP modules just finished), driven by context-length
