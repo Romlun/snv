@@ -25,8 +25,8 @@ function formatDate(value: string | null) {
 export default async function Dashboard() {
   const supabase = await createClient();
   const today = new Date().toISOString().split('T')[0];
-  const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const { start: monthStart, end: monthEnd } = getTransactionDateRange('month');
+  const lowEngagementThreshold = 40;
 
   const [
     donorsResult,
@@ -34,7 +34,7 @@ export default async function Dashboard() {
     projectsResult,
     overdueTasksResult,
     budgetResult,
-    followUpResult,
+    lowEngagementResult,
     upcomingTasksResult,
     inventoryResult,
   ] = await Promise.all([
@@ -47,10 +47,10 @@ export default async function Dashboard() {
       .neq('status', 'Cancelled'),
     supabase.from('budget_entries').select('raised, needed'),
     supabase.from('donors')
-      .select('id, name, last_contact_date, next_follow_up_date')
-      .or(`next_follow_up_date.lt.${today},last_contact_date.lt.${sixtyDaysAgo},last_contact_date.is.null`)
-      .order('next_follow_up_date', { ascending: true, nullsFirst: false })
-      .order('last_contact_date', { ascending: true, nullsFirst: true })
+      .select('id, name, engagement_score')
+      .lt('engagement_score', lowEngagementThreshold)
+      .order('engagement_score', { ascending: true })
+      .order('name', { ascending: true })
       .limit(10),
     supabase.from('tasks')
       .select('id, title, due_date, priority, status')
@@ -87,8 +87,8 @@ export default async function Dashboard() {
     { booksSold: 0, revenue: 0, booksGivenAway: 0 }
   );
 
-  type FollowUpDonor = { id: string; name: string; last_contact_date: string | null; next_follow_up_date: string | null };
-  const followUpDonors = (followUpResult.data ?? []) as FollowUpDonor[];
+  type LowEngagementDonor = { id: string; name: string; engagement_score: number };
+  const lowEngagementDonors = (lowEngagementResult.data ?? []) as LowEngagementDonor[];
 
   type TaskRow = { id: string; title: string; due_date: string | null; priority: string; status: string };
   const upcomingTasks = (upcomingTasksResult.data ?? []) as TaskRow[];
@@ -148,40 +148,29 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        {/* Needs Follow-Up */}
+        {/* Engagement Needs Attention */}
         <div className="bg-white rounded-xl border overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
           <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800 flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-amber-500" />
-            <h2 className="font-semibold">Needs Follow-Up</h2>
+            <h2 className="font-semibold">Engagement Needs Attention</h2>
           </div>
           <div className="divide-y dark:divide-zinc-800">
-            {followUpDonors.length === 0 ? (
-              <p className="p-4 text-sm text-zinc-500">No donors need follow-up right now.</p>
+            {lowEngagementDonors.length === 0 ? (
+              <p className="p-4 text-sm text-zinc-500">No donors are below the engagement threshold right now.</p>
             ) : (
-              followUpDonors.map((donor) => {
-                const followUpOverdue = donor.next_follow_up_date && donor.next_follow_up_date < today;
-                return (
-                  <div key={donor.id} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                    <div>
-                      <Link href={`/donors/${donor.id}`} className="font-medium hover:underline">{donor.name}</Link>
-                      <p className="text-sm text-zinc-500">
-                        Last contact: {formatDate(donor.last_contact_date)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      {followUpOverdue ? (
-                        <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-100 text-red-800">
-                          Follow-up overdue
-                        </div>
-                      ) : (
-                        <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-100 text-amber-800">
-                          No contact 60+ days
-                        </div>
-                      )}
-                    </div>
+              lowEngagementDonors.map((donor) => (
+                <div key={donor.id} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                  <div>
+                    <Link href={`/donors/${donor.id}`} className="font-medium hover:underline">{donor.name}</Link>
+                    <p className="text-sm text-zinc-500">
+                      Engagement score is below {lowEngagementThreshold}
+                    </p>
                   </div>
-                );
-              })
+                  <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                    {donor.engagement_score}/100
+                  </div>
+                </div>
+              ))
             )}
           </div>
           <div className="p-4 border-t dark:border-zinc-800">
