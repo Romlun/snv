@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Plus, Users } from "lucide-react";
-import { addTeamMember } from "./actions";
+import { Loader2, Plus, Trash2, Users } from "lucide-react";
+import { addTeamMember, deleteTeamMember } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 
 type TeamMemberRole = 'Admin' | 'Staff' | 'Volunteer';
@@ -45,6 +45,7 @@ export default function SettingsPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [savingRoleId, setSavingRoleId] = useState<string | null>(null);
+  const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [formMessage, setFormMessage] = useState<string | null>(null);
 
@@ -133,6 +134,31 @@ export default function SettingsPage() {
       setError(err instanceof Error ? err.message : "Error updating role");
     } finally {
       setSavingRoleId(null);
+    }
+  };
+
+  const handleDeleteMember = async (member: TeamMember) => {
+    if (!isAdmin || member.id === currentUserId) return;
+
+    const confirmed = window.confirm(`Are you sure you want to delete ${getDisplayName(member)}? This cannot be undone.`);
+    if (!confirmed) return;
+
+    setDeletingMemberId(member.id);
+    setError(null);
+    setFormMessage(null);
+
+    try {
+      const result = await deleteTeamMember(member.id);
+
+      if (!result.success) {
+        setError(result.error || "Unable to delete team member.");
+        return;
+      }
+
+      setFormMessage("Team member deleted.");
+      await fetchTeamMembers();
+    } finally {
+      setDeletingMemberId(null);
     }
   };
 
@@ -262,12 +288,14 @@ export default function SettingsPage() {
                 <th className="px-6 py-3">Name</th>
                 <th className="px-6 py-3">Email</th>
                 <th className="px-6 py-3 text-right">Role</th>
+                {isAdmin ? <th className="px-6 py-3 text-right">Action</th> : null}
               </tr>
             </thead>
             <tbody className="divide-y dark:divide-zinc-800">
               {teamMembers.map(member => {
                 const isCurrentUser = member.id === currentUserId;
                 const isSavingRole = savingRoleId === member.id;
+                const isDeletingMember = deletingMemberId === member.id;
 
                 return (
                   <tr key={member.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
@@ -297,6 +325,23 @@ export default function SettingsPage() {
                         </span>
                       )}
                     </td>
+                    {isAdmin ? (
+                      <td className="px-6 py-4 text-right">
+                        {isCurrentUser ? (
+                          <span className="text-xs font-medium text-zinc-500">Protected</span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteMember(member)}
+                            disabled={isDeletingMember}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 dark:border-red-900/50 dark:hover:bg-red-950/20"
+                          >
+                            {isDeletingMember ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                            Delete
+                          </button>
+                        )}
+                      </td>
+                    ) : null}
                   </tr>
                 );
               })}
