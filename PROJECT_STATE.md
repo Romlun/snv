@@ -8,7 +8,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v0.3 Core Modules DONE; Calendar next, then Engagement Score`
+`snv Mission CRM — v0.4 All 8 Core Modules LIVE; Engagement Score next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -204,9 +204,20 @@ at GATE 2 until further notice.
   SHA matches the merge commit (not just "a deploy is READY") → if stale, empty
   commit to main to re-trigger. This has worked reliably both times it recurred.
 - **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects ✅Tasks ✅Budget ✅Inventory
-  ✅Dashboard ✅User Management → **Calendar (NEXT — full events: visits, meetings,
-  deadlines, tasks in one view)** → Engagement Score → notification/cadence system
-  (DEFERRED — needs email infra + rules design, see below) → Reporting → AI features.
+  ✅Dashboard ✅User Management ✅Calendar → **Engagement Score (NEXT)** →
+  notification/cadence system (DEFERRED — needs email infra + rules design, see
+  below) → Reporting → AI features. **ALL 8 ORIGINAL MVP MODULES ARE NOW BUILT,
+  TESTED, AND LIVE.** Engagement Score is the only remaining item from the
+  original Phase-1-plus-extras scope.
+- **CALENDAR — COMPLETE (session 7).** Built by Claude Code (not Codex — Codex hit
+  its own usage-limit lockout mid-session; the Calendar directive was re-dispatched
+  to Claude Code and completed cleanly on the first attempt, code-reviewed and
+  merged the same as every other module). src/app/calendar/page.tsx: month-grid
+  view, prev/next/Today navigation, aggregates 4 existing tables in parallel
+  (tasks.due_date, churches.next_visit_date, projects.start_date/end_date,
+  contact_logs.contact_date) — Calendar has NO table of its own. Color-coded event
+  chips per type, click-a-day detail panel linking to real records. No hardcoded
+  org IDs (RLS-only, as everywhere else). Tested live by operator — works well.
 - **USER MANAGEMENT (session 7) — COMPLETE, security-reviewed carefully:**
   Admin can create Staff/Volunteer accounts (Admin sets temp password directly, no
   invite-email flow — operator's chosen approach), delete accounts (blocks
@@ -245,26 +256,6 @@ at GATE 2 until further notice.
   first (both ready with existing data), let the operator use the Dashboard's
   Needs-Follow-Up panel for a while to get a feel for real timing, THEN design the
   cadence rules together before building automation.
-- **CALENDAR (next task, NOT YET STARTED):** operator wants a full calendar —
-  visits, meetings, deadlines, tasks all in one view, "like Google/Apple Calendar."
-  src/app/calendar/page.tsx is still the unbuilt placeholder — confirmed session 7.
-  PLANNED APPROACH (directive already written, not yet successfully dispatched —
-  Code Agent hit its own usage limit before starting, see below):
-    - Month-grid view (7-col week rows), prev/next navigation, "Today" button.
-    - Aggregates FOUR existing data sources (Calendar has NO table of its own):
-      tasks.due_date, churches.next_visit_date, projects.start_date/end_date,
-      contact_logs.contact_date (history). Parallel-fetch per visible month, same
-      pattern as Dashboard.
-    - Day cells show small color-coded chips by type; click a day/chip → detail
-      panel linking to the real record (task/church/project).
-    - No new library — plain date math or date-fns (already installed); do NOT add
-      a calendar package, build the grid directly.
-    - Volunteers will correctly see less (their own tasks only) — that's expected
-      RLS behavior, not a bug to work around.
-  STATUS: Code Agent (Codex) attempted this and hit its own sandbox/usage-limit
-  block (locked until ~10:35 PM local, unrelated to repo/Supabase/Vercel) before
-  writing any code. No files touched, nothing to clean up. Re-dispatch the same
-  directive once the Code Agent is available again.
 - **DASHBOARD (session 6/7):** src/app/page.tsx fully live (async server component,
   parallel queries, no hardcoded org filtering — RLS only). 5 stat cards (Total
   Donors, Churches, Active Projects, Budget Progress %, Overdue Tasks). Inventory
