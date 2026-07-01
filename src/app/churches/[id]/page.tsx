@@ -22,7 +22,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Database } from "@/types/database";
 
-type Church = Database['public']['Tables']['churches']['Row'];
+type Church = Database['public']['Tables']['churches']['Row'] & { next_step: string | null };
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type ContactLog = Database['public']['Tables']['contact_logs']['Row'];
 type PlanVisitType = 'call' | 'meeting' | 'church visit' | 'event';
@@ -409,6 +409,10 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
                 <Clock className="h-4 w-4 shrink-0" />
                 <span>{church.next_visit_date ? `Next visit: ${new Date(church.next_visit_date + 'T00:00:00').toLocaleDateString()}` : 'No visit planned'}</span>
               </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Clock className="h-4 w-4 text-zinc-400" />
+                <span>Next Step: {church.next_step || 'Not set'}</span>
+              </div>
             </div>
           </section>
 
@@ -460,7 +464,11 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
 
           <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
             <h2 className="font-semibold mb-4">Notes / Next Step</h2>
-            <NotesLog entityType="church" entityId={church.id} />
+            <NotesLog
+              entityType="church"
+              entityId={church.id}
+              onNextStepSaved={next_step => setChurch(prev => prev ? { ...prev, next_step } : prev)}
+            />
           </section>
 
           <div className="flex justify-end">

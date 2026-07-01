@@ -187,6 +187,10 @@ export default function LanguageSchoolDetailPage({ params }: { params: Promise<{
                 <Clock className="h-4 w-4 shrink-0" />
                 <span>{school.next_follow_up_date ? `Next follow-up: ${new Date(school.next_follow_up_date + 'T00:00:00').toLocaleDateString()}` : 'No follow-up scheduled'}</span>
               </div>
+              <div className="flex items-center gap-3 text-sm">
+                <MessageSquare className="h-4 w-4 text-zinc-400" />
+                <span>Next Step: {school.next_step || 'Not set'}</span>
+              </div>
             </div>
           </section>
 
