@@ -1,8 +1,10 @@
 # PROJECT_STATE.md — snv (Mission CRM)
 
 > Single source of truth. The Director is the ONLY writer. Code Agent edits this
-> file only on explicit Director instruction. Designer and Quality never write it.
-> Read this in full at every session start. Do not act on memory of prior sessions.
+> file only on explicit Director instruction. Designer/Quality subagents (if used)
+> never write it. Read this in full at every session start. Do not act on memory
+> of prior sessions. Detailed history lives in PROJECT_LOG.md (COLD) — read only
+> for provenance on a specific past decision; not required for a session start.
 
 ---
 
@@ -18,281 +20,262 @@ On phase change, the Director gives a new title and bumps this line the same tur
 - **Director:** (this Claude Project) — planner, architect, security, MCP operator,
   sole writer of this file.
 - **Operator:** Roman (GitHub `Romlun`). Relays directives to the local Code Agent
-  and reports back. Final approver on product + irreversible ops.
+  and reports results back. Final approver on product + irreversible ops.
 - **Mission of the app:** one centralized system where the mission team can see who
   they work with, what's been done, what's next, who's responsible, and how the
-  mission is progressing. The CRM must drive *action and follow-up* — not just store
-  records. Guiding test for every feature: does it help the team notice and act on a
-  relationship before it goes cold?
+  mission is progressing. The CRM must drive *action and follow-up* — not just
+  store records. Guiding test for every feature: does it help the team notice and
+  act on a relationship before it goes cold?
 
 ---
 
-## 2. STACK
-- **Frontend:** Next.js **16.2.9** (App Router), React **19.2.4**, TypeScript, Tailwind v4.
-  - ⚠️ **NON-STANDARD NEXT.JS.** This is Next 16 — newer than agent training data.
-    `AGENTS.md` mandates reading `node_modules/next/dist/docs/` before writing any
-    framework code. Every build directive must repeat this instruction.
-- **UI libs present:** lucide-react, clsx, tailwind-merge, date-fns.
-- **Backend:** Supabase (Postgres 17). Project `snv`, ref `eriflhdyylssjnxygseq`,
-  region `us-east-1`, status ACTIVE_HEALTHY. Linked to Vercel.
-  - ⚠️ `@supabase/supabase-js` is **NOT yet installed**. No DB client, auth, or
-    persistence wired in yet. This is the core Phase 1 work.
-- **Hosting:** Vercel (project linked to the repo + Supabase).
-- **Repo:** github.com/Romlun/snv. Local clone: `/Users/romanlunickin/snv`.
-  - Note: `package.json` name is still `temp-app` — rename when convenient (low priority).
-  - Note: local has uncommitted work (src/components, src/lib, src/types) ahead of
-    GitHub main as of session 1.
+## 2. STACK (current, verified live)
+- **Frontend:** Next.js **16.2.9** (App Router), React **19.2.4**, TypeScript,
+  Tailwind v4.
+  - ⚠️ **NON-STANDARD NEXT.JS.** Newer than agent training data. `AGENTS.md`
+    mandates reading `node_modules/next/dist/docs/` before writing framework code.
+    Repeat this instruction in every build directive.
+- **UI libs:** lucide-react, clsx, tailwind-merge, date-fns, react-day-picker v10.
+- **Backend:** Supabase (Postgres 17.6). Project `snv`, ref `eriflhdyylssjnxygseq`,
+  region us-east-1, ACTIVE_HEALTHY. `@supabase/supabase-js` + `@supabase/ssr` fully
+  installed and wired (`src/lib/supabase/client.ts`, `server.ts`, `admin.ts`).
+- **Hosting:** Vercel. Project `snv` (`prj_7qTkMQbxPEEq1D14vkghNqAMQFQh`), team
+  `ecm-os` (`team_onqVX5EAyfn5vbEvmLlmlwqc`). Production: **snv-zeta.vercel.app**.
+- **Repo:** github.com/Romlun/snv, local clone `/Users/romanlunickin/snv`. Single
+  branch model in practice: a long-lived feature branch
+  (`feat/mission-crm-system-mvp-5918110685099165761`) that Code Agents work on,
+  merged to `main` after Director review each time. `main` = what's deployed.
 
 ---
 
-## 3. BUILD TEAM & FLOW
-- **Designer** [Claude Code subagent] → DESIGN_SPEC.md before UI code. GATE 1 approval.
-- **Code Agent** [Codex CLI / Jules] → only actor that writes source. Role file is
-  `AGENTS.md` in repo (fully configured: minimal-change/YAGNI, git checkpoints,
-  no self-approval, Director owns state).
-- **Quality** [Claude Code subagent] → reviews + RUNS the work, cites evidence.
-  On fail → QUALITY_REPORT.md → back to Code Agent.
-- **Director** → creates/merges PRs via GitHub API (pg_net through Supabase MCP),
-  verifies Vercel preview READY before merge, operates Supabase directly via MCP.
-- Subagents installed at `/Users/romanlunickin/snv/.claude/agents`.
+## 3. BUILD TEAM & FLOW (as actually practiced)
+- **Code Agent:** Codex CLI or Claude Code, run locally by the operator in the repo
+  — either works interchangeably on the same branch/AGENTS.md. Operator pastes
+  Director's directive in, relays the report back. Only actor that writes source.
+- **Quality:** in practice the Director performs this role directly — reads actual
+  committed code via Desktop Commander (not just trusting the Code Agent's report),
+  runs `npm run build`, greps for hazards (hardcoded org IDs, missing search_path,
+  RLS gaps), and for DB migrations applies + tests them live before merging. A
+  separate Quality subagent exists but has not been the practical bottleneck —
+  the real gate is Director code-reading + live SQL verification.
+- **Director** → applies/verifies Supabase migrations via MCP, merges branch→main
+  locally via Desktop Commander git, verifies the Vercel production deploy lands on
+  the exact merge SHA (see §10 deploy pattern), updates this file.
+- **Operator** → final click-through test on production after every merge+deploy.
+  This has repeatedly caught things code review alone missed (e.g. real signup
+  flow, real date-typing behavior, real Volunteer-account RLS).
 
-Build sequence: Designer → GATE 1 → Code Agent → Quality (evidence) → Director
-PR/verify/merge → update this file → GATE 2.
-
----
-
-## 4. CURRENT STATE (session 2 — FOUNDATION DEPLOYED)
-**Phase 1 foundation is built, deployed, and verified.** Main now IS the real app.
-- DB: both migrations applied to Supabase `snv` and verified against live state —
-  13 tables incl. `gifts`; role enum = Admin/Staff/Volunteer; org "Light in the
-  East" seeded; RLS ON every table with full CRUD policy coverage; trigger +
-  helper funcs present.
-- Code: Supabase client/server helpers (`src/lib/supabase/`), login, proxy
-  middleware (`src/proxy.ts`), `src/types/database.ts`, donor pages on live
-  queries — all merged to `main` (merge commit `5979757`).
-- Deploy: Vercel production READY at **snv-zeta.vercel.app** on `main`.
-- Smoke test passed (build OK, /login 200, /donors 307 redirect when unauth).
-
-**What's still on mock data / unbuilt (this is Phase 1 remaining + Phase 3 work):**
-- Only the **donors** module is wired to the DB. Churches, projects, tasks,
-  budget, inventory, calendar, dashboard pages still read `src/lib/mock-data.ts`.
-- No gift-entry UI yet (table exists; engagement score / recurring tracker compute
-  off it once data flows).
-- i18n strings module (D2) not yet created — strings still inline in components.
-
-**Build order from here (per operator, build by business module, small milestones
-of 2–5 days each, reviewed before next):** Churches → Projects → Tasks → Budget →
-Inventory → Dashboard (replace mock metrics) → Reporting → AI features.
-
-**Blueprint note:** `src/types/database.ts` (generated/typed to the live schema) is
-now the authoritative type source for new module work, alongside `src/types/crm.ts`
-(the original UI types). Reconcile against the DB, not mock-data shapes.
+Standard build sequence per module/feature:
+Director writes a precise directive → Code Agent builds + commits (NOT pushed by
+default — Director pushes) → Director reads the actual diff, runs the build,
+scans for hazards → if it's a migration, Director applies to live DB + tests the
+SQL directly (insert/verify/delete, not just "it applied") → Director merges to
+main → verifies production deploy SHA → operator click-tests on production →
+Director updates this file.
 
 ---
 
-## 5. PHASE PLAN
-- **Phase 1 (MVP) — CURRENT:** donor + church DBs, contact history, follow-up
-  reminders, projects, tasks, book inventory, budget, dashboard, engagement score,
-  recurring-giving tracker. PLUS the foundation those sit on: Postgres schema, auth,
-  3-tier RLS, Supabase client, swap mock data → real data.
-- **Phase 2:** segmentation/filtering, unified profile timeline, pledges & grants,
-  board-ready reports, finer 8-role permissions, **Russian language + switcher**.
-- **Phase 3:** rousable journeys (welcome/re-engagement/post-visit), bilingual
-  templates + readability check, relationship map, deeper impact tracking,
-  automatic gift capture integration.
+## 4. CURRENT STATE — ALL 8 ORIGINAL MVP MODULES LIVE (as of session 7)
+The app is a real, working, tested production application. Every module below is
+wired to the live Supabase database (no mock data remaining anywhere), enforces the
+3-tier RLS role model, and has been personally click-tested by the operator on
+**snv-zeta.vercel.app**:
+
+- ✅ **Donors** — list/detail/create/edit, contact-log with auto-follow-up-task.
+- ✅ **Churches** — list/detail/create/edit, visit log with auto-follow-up-task,
+  "Plan Visit" (future visits, with type: call/visit/event/meeting).
+- ✅ **Projects** — list/detail/create/edit, funding progress, "Add Funds"
+  (creates a `gifts` row; `current_funding` is DERIVED via trigger).
+- ✅ **Tasks** — list/detail/create/edit/mark-complete, status dropdown,
+  append-only progress notes (`NotesLog` component + `notes` table).
+- ✅ **Budget** — category-grouped overview with totals, create/edit/delete,
+  dropdown categories, "Add Funds" (creates a `budget_contributions` row;
+  `raised` is DERIVED via trigger).
+- ✅ **Inventory** — resources + transaction history, create/edit, sale/giveaway
+  auto-updates `quantity_sold`/`quantity_given` via trigger (`quantity_available`
+  stays manual by design), transaction amount auto-fills price×quantity, stats
+  panel with time-range filter.
+- ✅ **Dashboard** — live stat cards, Inventory snapshot, "Needs Follow-Up" panel
+  (an honest PROXY — overdue/stale contact — NOT the real engagement score),
+  Upcoming Tasks.
+- ✅ **Calendar** — month-grid aggregating tasks/church visits/project
+  dates/contact history (no table of its own).
+- ✅ **User Management** (not in the original MVP list, became necessary) — Admin
+  can create/delete/edit-role/reset-password for team members; everyone can change
+  their own password; sign-out. See §10 for the security architecture — this was
+  reviewed with extra care (service-role key involved).
+
+**What's NOT built yet, in priority order:**
+1. **Engagement Score** — NEXT. Real 0-100 score (contact recency, giving recency,
+   recurring status, follow-up health) to replace the Dashboard's current proxy.
+   All the underlying data already exists (`gifts`, `last_contact_date`,
+   `next_follow_up_date`, `is_recurring`). This is a calculation/UI job, not new
+   architecture — genuinely ready to build.
+2. **Notification/cadence automation** — DEFERRED, operator request. Needs (a) a
+   transactional email service decision (none configured — Supabase does not send
+   arbitrary app emails), and (b) a dedicated conversation to design the actual
+   follow-up cadence rules (operator does not have these yet). Do NOT invent rules.
+3. **Reporting, AI features** — later phases, not yet scoped in detail.
+4. **Deferred polish/design pass** — after functional work settles. Candidate tool:
+   Stitch (Google AI UI-design MCP) — see §9 for the security caveat on its key.
 
 ---
 
-## 6. STANDING DECISIONS
-- **D1 — Gifts manual now, automatic later.** Gifts entered by hand in MVP, but the
-  `gifts` table is modeled for future processor capture: nullable `external_source`,
-  nullable `external_transaction_id`, an idempotency key, and NO assumption that a
-  human is the only writer. "Make it automatic" must be a new integration, not a
-  schema rewrite.
-- **D2 — English-only now, structured for Russian later.** No i18n library or
-  switcher yet. BUT: no user-facing string is hardcoded inline — all UI text routes
-  through a single strings module (one `en` dictionary). `staff.language` column
-  exists, defaults `en`. Adding Russian later = write `ru` dictionary + switch, not
-  a hunt for hardcoded labels.
-- **D3 — 3-tier roles now (Admin / Staff / Volunteer).** RLS enforced properly for
-  these three against real donor PII. Schema shaped so the finer 8 roles
-  (Mission Director, Finance Manager, Project Manager, Donor Relations, Church
-  Relations) slot in later without migration pain. Correctness over richness —
-  donor PII is involved.
-- **D4 — DB matches `crm.ts`.** Schema mirrors existing TypeScript types so UI
-  doesn't get reworked; only `givingHistory` is normalized into a `gifts` table.
+## 5. STANDING DECISIONS
+- **D1 — Gifts manual now, automatic later.** `gifts` table modeled for future
+  processor capture (nullable `external_source`, `external_transaction_id`,
+  idempotency key) — "make it automatic" must be a new integration, not a schema
+  rewrite. Same pattern was reused for `budget_contributions`.
+- **D2 — English-only now, structured for Russian later.** No i18n library/switcher
+  yet. UI text should route through a single strings module long-term; this has
+  NOT been rigorously enforced module-by-module — flag as a Phase 2 cleanup item
+  if it matters before Russian is actually added.
+- **D3 — 3-tier roles (Admin / Staff / Volunteer).** Enforced properly in RLS
+  against real donor PII, verified live with a real Volunteer account (session 7).
+  Finer 8-role model explicitly deferred — operator has no answer yet on when/if
+  to build it (asked and deferred, session 7). Do not revisit without operator ask.
+- **D4 — Full team visibility in Settings is Admin-only**, not Staff (operator
+  decision, session 7) — Staff/Volunteers only see their own profile.
+- **D5 — Admin account creation stays dashboard-only, not UI.** The User
+  Management UI deliberately cannot create a new Admin (only Staff/Volunteer) —
+  extra safety margin on the most powerful role. Promoting an EXISTING user to
+  Admin IS possible via the UI (role dropdown), by design.
+- **D6 — Password flow: Admin sets it directly**, no invite-email flow (operator's
+  explicit choice, both for account creation and admin-initiated resets).
 
-## 7. PRECEDENTS (banked principles)
-- **P1 — Next 16 docs first.** Every Code Agent directive touching framework code
-  must instruct: read `node_modules/next/dist/docs/` before writing. No patterns
-  from memory.
-- **P2 — PII never in chat/logs/commits.** Service-role keys, donor personal data
+## 6. PRECEDENTS (banked principles — apply automatically, don't re-litigate)
+- **P1 — Next 16 docs first.** Every directive touching framework code: read
+  `node_modules/next/dist/docs/` before writing. No patterns from memory.
+- **P2 — PII/secrets never in chat/logs/commits.** Service-role keys, donor PII
   never surfaced in directives, code, or this file.
-- **P3 — SECURITY DEFINER funcs: qualify types + pin search_path.** Any function
-  that runs as SECURITY DEFINER (esp. auth triggers like handle_new_user) MUST
-  schema-qualify custom types (`public.user_role`, not `user_role`) AND set
-  `search_path = public`. Without it, the func can't resolve public-schema types at
-  runtime → "Database error creating new user" on signup. (Cost us a signup-blocking
-  bug, session 2.)
-- **P4 — Smoke tests must exercise a real auth signup**, not just route/redirect
-  checks. The search_path bug passed build + route checks but broke actual user
-  creation. "It builds and redirects" is not "a user can sign up and log in."
+- **P3 — SECURITY DEFINER funcs: schema-qualify + pin search_path = ''.** Every
+  trigger function in this project follows this (`current_user_role`,
+  `current_user_org`, `handle_new_user`, all the `recalculate_*` funcs). Cost a
+  real signup-blocking bug once (session 2) — never skip this on a new function.
+- **P4 — Smoke tests must exercise the REAL flow, not just build/route checks.**
+  "It builds and redirects" is not "a user can actually do the thing." This is why
+  the operator's manual click-through on production is a required step, not a
+  formality — it has caught real bugs code review missed (date typing, real auth).
+- **P5 — When a UI control fails twice in different ways, suspect the wrong
+  foundation, not insufficient patching.** (The date-input saga, session 4 — see
+  PROJECT_LOG.md — three attempts, the first two patched the wrong layer.)
+- **P6 — Privileged server actions share ONE authorization helper**, never a
+  re-implemented check per action. (`getAdminCaller()` in
+  `src/app/settings/actions.ts` — reused across create/delete/role-edit/reset.)
+- **P7 — Derived/trigger-maintained fields are never hand-edited via a form.**
+  See §8 for the current list. When adding a new "total that sums child records"
+  feature, default to this pattern (dedicated child table + SECURITY DEFINER
+  trigger), proven three times now (gifts→projects, budget_contributions→budget,
+  resource_transactions→resources).
+- **P8 — After merging to main, verify the production deploy SHA matches the
+  merge commit exactly** before telling the operator to test — don't trust "a
+  deploy is READY." See §10 deploy pattern; this recurring Vercel quirk has bitten
+  twice and has a known, reliable fix.
 
----
-
-## 8. ROLE / AUTH MODEL (MVP)
-3 tiers via a `role` enum on the user/staff record, enforced in RLS:
-- **Admin** — full read/write across all tables.
+## 7. ROLE / AUTH MODEL
+3 tiers via a `role` enum on `profiles`, enforced in RLS (verified live):
+- **Admin** — full read/write across all tables; only role that can manage other
+  users (create/delete/edit-role/reset-password) and see the full team list.
 - **Staff** — manage donors, churches, projects, tasks, contact logs, inventory,
-  budget; read team data. (Default for mission team members.)
-- **Volunteer** — read/write only their own assigned tasks; no donor PII access.
-Auth via Supabase Auth. Every table with PII gets RLS ON from creation — never a
-table exposed before its policy exists.
+  budget, gifts; can NOT manage other users or see the full team list.
+- **Volunteer** — read/write only own assigned tasks + own task notes; NO access
+  to donors, gifts, contact_logs, or other PII tables. CONFIRMED live, session 7.
+Auth via Supabase Auth. Every table with PII has RLS ON from creation.
 
 ---
 
-## 9. ACTIVE CONSTRAINTS / HAZARDS
+## 8. ACTIVE CONSTRAINTS / HAZARDS
 - ⚠️ Next 16 is non-standard — see P1.
-- ⚠️ Donor + church records are PII. RLS before exposure, always.
-- ⚠️ PostgREST gotchas apply: no `.order('random()')`; no embedded-left-join null
+- ⚠️ Donor + church + gift + contact-log records are PII/financial. RLS before
+  exposure, always. Volunteers must never gain access to these.
+- ⚠️ PostgREST gotchas: no `.order('random()')`; no embedded-left-join null
   filters as "not exists"; `.select().limit()` caps at 1000 (use `.range()`/RPC).
-- ⚠️ Schema is LIVE with full RLS. New module work must respect existing policies
-  (Admin/Staff full data access; Volunteer = own tasks only, no donor/gift/contact PII).
+- ⚠️ **DERIVED FIELDS — never hand-edit via a form, always via child records:**
+  `projects.current_funding` (sums `gifts` where `project_id` set),
+  `budget_entries.raised` (sums `budget_contributions`),
+  `resources.quantity_sold` / `quantity_given` (sum `resource_transactions` by
+  type). `resources.quantity_available` is the ONE manual exception (on-hand
+  stock, deliberately not auto-decremented).
+- ⚠️ **Vercel deploy-skip pattern (recurring, has a known fix — P8):** pushing a
+  branch and merging to main within seconds can make Vercel's GitHub webhook skip
+  the production build. STANDARD PROCEDURE: push branch → wait ~10s → merge to
+  main → push → wait ~60s → verify production's deployed SHA matches the merge
+  commit exactly → if stale, empty-commit to main to re-trigger.
+- ⚠️ The service-role key (`SUPABASE_SERVICE_ROLE_KEY`) exists in Vercel Production
+  env only. It must NEVER be imported into any client-marked file — only via
+  `src/lib/supabase/admin.ts`, only inside `"use server"` Server Actions, only
+  after `getAdminCaller()` confirms the caller is a real Admin.
+- ⚠️ Desktop Commander (local filesystem/git MCP) has intermittently gone
+  unresponsive for several minutes at a time this project (twice, session 7) —
+  transient, resolved by the operator restarting the local MCP connection. Not a
+  repo/code issue when it happens; retry once, then ask the operator to restart.
 
----
+## 9. DESIGN TOOL (future, not now)
+Stitch (Google AI UI-design tool via MCP) is the intended designer for the
+DEFERRED POLISH PHASE — not before. When adopted: (1) an API key was pasted in
+chat earlier in this project and is COMPROMISED — a fresh one must be generated
+and never pasted in chat; (2) verify what the MCP actually accesses before
+connecting it to a repo holding donor PII.
 
-## 10. INFRA STATUS (verified session 2 via MCP)
+## 10. INFRA STATUS (verified live, session 7)
 - Supabase `snv` (`eriflhdyylssjnxygseq`) ACTIVE_HEALTHY, us-east-1, Postgres 17.6.
-- **Both migrations APPLIED + verified:** 20250627000000_initial_schema,
-  20250627000001_director_corrections. 13 tables, RLS full coverage, role enum
-  Admin/Staff/Volunteer, gifts table with future-capture cols, org seeded.
-- Vercel: project `snv` (`prj_7qTkMQbxPEEq1D14vkghNqAMQFQh`), team `ecm-os`
-  (`team_onqVX5EAyfn5vbEvmLlmlwqc`). Production READY on `main` at
-  **snv-zeta.vercel.app** (merge commit `5979757`).
-- Env vars: Vercel Production uses legacy `eyJ...` anon key; local `.env.local`
-  aligned to the SAME legacy key. Both valid for the project.
-  - Future cleanup (low priority): optionally standardize both to the new
-    `sb_publishable_...` key. Not required — both work.
-- `AGENTS.md.backup-102523` is an untracked local junk file — delete or gitignore
-  (not committed; harmless).
+- **9 migrations applied and verified against live state** (0000 through 0008):
+  initial schema → RLS/role/gifts corrections → handle_new_user search_path fix →
+  function hardening (search_path + execute grants) → churches/donors/tasks visit
+  automation (app-code, no migration) → project funding trigger → notes table →
+  budget_contributions trigger → resource_transactions trigger → profiles
+  team-visibility RLS fix. All 13+ tables have full RLS coverage.
+- Vercel: project `snv`, team `ecm-os`. Production READY on `main` at
+  **snv-zeta.vercel.app**. Env vars set: `NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY` (legacy `eyJ...` format, matches local
+  `.env.local`), `SUPABASE_SERVICE_ROLE_KEY` (server-only, `sb_secret_...` format,
+  Production scope).
+- Local `.env.local` is gitignored, aligned to the same anon key as Vercel.
+- Leaked-password protection: Supabase Pro-plan only, not enabled (free tier).
+- `AGENTS.md.backup-102523` — untracked local junk file, harmless, delete whenever.
 
 ## 11. AUTO-MERGE SCOPE
-Conservative default: Director does NOT auto-merge migrations, RLS, auth, billing,
-or customer-facing UI. All Phase 1 work touches these → every PR is operator-gated
-at GATE 2 until further notice.
+Director does NOT auto-merge without reading the actual diff first (migrations,
+RLS, auth, and privileged Server Actions get the most scrutiny). In practice every
+merge this project has gone through Director review before merging — no PR-gate
+ceremony has been needed since Director + operator click-test has been the
+effective gate. Continue this pattern.
 
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW:** Dashboard module is NEXT. Nothing mid-flight.
-- **DONE (session 6):** Inventory module (live DB: resources, detail w/ transaction
-  history, create, edit) — tested, merged. Sale/giveaway transactions auto-update
-  `quantity_sold`/`quantity_given` via trigger `recalculate_resource_quantities`
-  (migration 0007, same SECURITY DEFINER/search_path='' pattern); `quantity_available`
-  deliberately stays manual (on-hand stock, not auto-decremented — avoids ambiguous
-  math). Trigger verified live. Then two UX improvements, tested + merged:
-  (1) transaction amount auto-fills as price × quantity on sales (stays editable —
-  `amountWasAutoFilled` flag clears on manual edit, re-engages on quantity change);
-  giveaways don't auto-calculate from price. (2) Inventory stats panel with a
-  time-range selector (Week/Month/Quarter/Year/All Time) showing books sold, revenue
-  (sales only), books given away (separate, no $). Date-range helper
-  (`getTransactionDateRange`) is clean and will be REUSED/generalized for Dashboard,
-  not rebuilt.
-- **DEPLOY PATTERN (recurring, has a fix):** Vercel sometimes skips the production
-  build when branch-push and merge land seconds apart. STANDARD PROCEDURE NOW: push
-  branch → wait ~10s → merge to main → push → wait ~60s → verify production deploy
-  SHA matches the merge commit (not just "a deploy is READY") → if stale, empty
-  commit to main to re-trigger. This has worked reliably both times it recurred.
-- **MODULE BUILD ORDER:** ✅Donors ✅Churches ✅Projects ✅Tasks ✅Budget ✅Inventory
-  ✅Dashboard ✅User Management ✅Calendar → **Engagement Score (NEXT)** →
-  notification/cadence system (DEFERRED — needs email infra + rules design, see
-  below) → Reporting → AI features. **ALL 8 ORIGINAL MVP MODULES ARE NOW BUILT,
-  TESTED, AND LIVE.** Engagement Score is the only remaining item from the
-  original Phase-1-plus-extras scope.
-- **CALENDAR — COMPLETE (session 7).** Built by Claude Code (not Codex — Codex hit
-  its own usage-limit lockout mid-session; the Calendar directive was re-dispatched
-  to Claude Code and completed cleanly on the first attempt, code-reviewed and
-  merged the same as every other module). src/app/calendar/page.tsx: month-grid
-  view, prev/next/Today navigation, aggregates 4 existing tables in parallel
-  (tasks.due_date, churches.next_visit_date, projects.start_date/end_date,
-  contact_logs.contact_date) — Calendar has NO table of its own. Color-coded event
-  chips per type, click-a-day detail panel linking to real records. No hardcoded
-  org IDs (RLS-only, as everywhere else). Tested live by operator — works well.
-- **USER MANAGEMENT (session 7) — COMPLETE, security-reviewed carefully:**
-  Admin can create Staff/Volunteer accounts (Admin sets temp password directly, no
-  invite-email flow — operator's chosen approach), delete accounts (blocks
-  self-delete + last-Admin deletion), edit any team member's role including
-  promoting to Admin (blocks self-role-change), reset any team member's password,
-  and every user can change their OWN password (self-service, no admin privilege
-  needed). ARCHITECTURE: all privileged actions live in src/app/settings/actions.ts
-  as Server Actions ("use server"), sharing ONE authorization helper
-  (getAdminCaller()) that does a real database role lookup against the CALLER's
-  session — never trusts client-submitted role claims. The service-role key
-  (SUPABASE_SERVICE_ROLE_KEY, set in Vercel Production env, server-only) is used
-  ONLY via src/lib/supabase/admin.ts, which has a runtime `typeof window` guard and
-  is never imported by any client-marked file — traced and confirmed personally by
-  Director across 4 separate privileged actions (create/delete/role-edit/reset).
-  UI role/delete/reset controls are Admin-only and hidden for the caller's own row.
-  RLS FIX (migration 0008): profiles SELECT was originally "own row only" for
-  EVERYONE (a gap from session 1, before roles existed) — now Admin can view/update
-  all profiles in their org; Staff/Volunteer still see only their own (operator
-  decision: full team visibility is Admin-only, not Staff).
-  VERIFIED LIVE by operator: created a Volunteer account, logged in as them,
-  confirmed they could NOT see donor data and could only see their own tasks —
-  first real proof the Volunteer RLS scoping (built across many earlier sessions)
-  actually works. This closes the long-standing "deferred verification" item.
-- **NOTIFICATION/CADENCE SYSTEM — DEFERRED, NOT STARTED (operator request, session 7):**
-  Operator wants: auto-email on new donor, and an adaptive follow-up cadence (e.g.
-  "call first" for large gifts, interval varies by donor/gift size) — this is the
-  Phase 3 "reusable journeys" feature from the original spec, the most complex
-  remaining piece. BLOCKERS/OPEN QUESTIONS before building:
-    1. No transactional email service configured (Supabase doesn't send arbitrary
-       app emails) — needs a new account (Resend/Postmark/SendGrid), a new API key,
-       new infra.
-    2. Cadence RULES are undecided (operator: "I don't know how often... every
-       month or 2 or 3, or depends on the amount"). Do NOT invent these rules —
-       design them WITH the operator in a dedicated conversation before any code.
-  Director recommendation (operator agreed): build Calendar + Engagement Score
-  first (both ready with existing data), let the operator use the Dashboard's
-  Needs-Follow-Up panel for a while to get a feel for real timing, THEN design the
-  cadence rules together before building automation.
-- **DASHBOARD (session 6/7):** src/app/page.tsx fully live (async server component,
-  parallel queries, no hardcoded org filtering — RLS only). 5 stat cards (Total
-  Donors, Churches, Active Projects, Budget Progress %, Overdue Tasks). Inventory
-  Snapshot (This Month: sold/revenue/given-away, via shared src/lib/date-ranges.ts —
-  now used by both Dashboard and Inventory). "Needs Follow-Up" panel — DELIBERATELY
-  a proxy (overdue next_follow_up_date OR last_contact 60+ days/null), honestly
-  labeled, NOT the real engagement score (that's a future module — do not confuse
-  the two). Upcoming Tasks (live, excludes Completed/Cancelled). All tested on
-  production.
-- **DERIVED FIELDS (don't hand-edit):** projects.current_funding (sums gifts),
-  budget_entries.raised (sums budget_contributions), resources.quantity_sold/
-  quantity_given (sum resource_transactions by type) — all trigger-maintained.
-  quantity_available is the one manual exception (on-hand stock).
-- **DATE CONTROL:** in-page react-day-picker v10 (DateField.tsx) — confirmed working
-  by operator (typing, calendar, close-on-outside-click all good). Settled.
-- **DESIGN TOOL (future):** Stitch (Google AI UI-design tool via MCP) = intended
-  designer for the DEFERRED POLISH PHASE, not now. When adopted: (1) ROTATE the API
-  key first — one was pasted in chat, compromised; (2) verify MCP scope before
-  connecting to a PII repo.
-- **VERIFIED (was deferred):** Volunteer-role RLS (tasks + task-notes scoped to own,
-  no donor/church/gift/contact-log access) — confirmed live by operator, session 7.
-- **DEFERRED polish:** UI/UX pass (incl. Stitch) after all modules exist. Items TBD.
-- **DEFERRED:** Leaked-password protection (Supabase Pro-plan only).
+- **NOW: nothing mid-flight.** Clean handoff point — all 8 MVP modules complete,
+  merged, deployed, and click-tested by the operator on production.
+- **NEXT: Engagement Score module.** Build a real 0-100 score per donor (contact
+  recency, giving recency, recurring status, follow-up health) using existing data
+  — no new architecture needed. Suggested first steps for the next Director:
+    1. Design the exact scoring formula/weights (this is a product decision —
+       consider proposing 2-3 concrete formulas to the operator rather than
+       picking one silently, since "what counts as engaged" affects how the whole
+       team reads donor health).
+    2. Decide where it's computed: a DB function/view (recalculated on read or via
+       trigger) vs. computed in the app layer. Recommend a DB approach for
+       consistency with how funding/quantity totals are already derived (P7).
+    3. Replace the Dashboard's "Needs Follow-Up" proxy panel with the real score
+       once it exists — don't leave both showing different numbers.
+    4. Show the score on the donor detail page (a colored ring — there's already
+       an unused `EngagementScoreRing.tsx` component from the original prototype,
+       worth checking if it fits before building a new one).
+- **AFTER THAT:** operator wants a dedicated conversation (not a quick dispatch)
+  to design the notification/follow-up-cadence rules before any automation code —
+  see §4 item 2. Do not build this reactively; it needs real product thinking.
 
-## 13. SESSION NOTE (session 2)
-Reconciled a major surprise: the "Phase 1 foundation unbuilt" assumption from
-session 1 was wrong. Jules's real backend (schema, auth, Supabase client, donor
-CRUD, 208-line migration) existed UNMERGED on branch feat/mission-crm-system-mvp-…
-and was never applied to the DB. Verified via git (branch not ancestor of main) +
-MCP (empty DB). Did NOT rebuild — verified and deployed the existing work instead.
-Quality caught two real bugs in the Code Agent's corrective migration: (1) RESTRICTIVE
-policies that would have locked out all users incl. Admins, (2) initially missing
-gifts table + wrong role enum. Sent back, fixed, re-reviewed. Applied both migrations
-to live DB, verified, smoke-tested (build OK, auth redirect works), merged to main,
-confirmed Vercel production READY at snv-zeta.vercel.app. Aligned local + Vercel
-anon keys (both legacy eyJ). Then hit a signup-blocking bug: handle_new_user trigger
-threw "type user_role does not exist" (SECURITY DEFINER + no search_path). Diagnosed
-via postgres logs, fixed with migration 20250627000002 (qualify type + set
-search_path), applied, merged, redeployed. Operator created first Admin user and
-logged in successfully — foundation proven end-to-end. Banked P3 + P4. Next: Churches.
+## 13. SESSION NOTES
+Detailed session-by-session history (sessions 1–7) lives in **PROJECT_LOG.md**
+(COLD) — read it only if you need provenance on a specific past decision or bug.
+It is NOT required reading to start working; everything currently load-bearing is
+in this file's sections above (decisions, precedents, hazards, derived fields,
+deploy pattern, current state).
+
+**Handoff context for whoever reads this next:** this was a deliberate, clean swap
+at a strong milestone (all 8 MVP modules just finished), driven by context-length
+management in a very long single session — NOT by any quality problem, mistake, or
+stuck situation. Inherit everything in this file verbatim; nothing here should be
+re-litigated without a specific new reason. The operator is engaged, technical
+enough to relay directives precisely, and has been doing real click-through testing
+on production after every merge — trust that testing when it's reported as passed.
