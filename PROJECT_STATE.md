@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v0.7 Church scoring, recurring donor fields, test data LIVE`
+`snv Mission CRM — v0.8 Language Schools module LIVE (new outreach pipeline)`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -93,7 +93,7 @@ deploy SHA → operator click-tests on production → Director updates this file
 
 ---
 
-## 4. CURRENT STATE — ALL 8 MVP MODULES + ENGAGEMENT SCORE (DONORS + CHURCHES) + DONATION TRACKING LIVE (as of session 10)
+## 4. CURRENT STATE — ALL 8 MVP MODULES + ENGAGEMENT SCORE (DONORS + CHURCHES) + DONATION TRACKING + LANGUAGE SCHOOLS LIVE (as of session 11)
 The app is a real, working, tested production application. Every module below is
 wired to the live Supabase database (no mock data remaining anywhere), enforces the
 3-tier RLS role model, and has been personally click-tested by the operator on
@@ -167,6 +167,21 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   in front of real end users — it's currently there deliberately, not by
   accident, but it needs a conscious decision to remove, not an assumption
   that someone else already did.
+- ✅ **Language Schools (session 11, new module)** — outreach/prospecting
+  pipeline for connecting language schools to a free "Tropinka" magazine
+  subscription, built from the operator's real tracking spreadsheet + team
+  guide (both reviewed directly by Director). List/detail/create/edit + a
+  "Log Contact" flow (mirrors churches' visit-log pattern: writes to
+  `contact_logs` via a new `language_school_id` column, updates
+  `last_contact_date`/`next_follow_up_date`, auto-creates a follow-up task
+  via `tasks.related_to_type = 'language_school'` — no schema change needed
+  on `tasks`, it already had a generic polymorphic link). RLS is Admin/Staff
+  only, identical to churches. See D8 for what's deliberately DIFFERENT from
+  the churches pattern and why: own status enum (an acquisition funnel, not
+  a relationship-health scale), no gifts, no engagement score. Seeded with
+  the operator's two real leads (Bright Kids ESL, Happy Language School) via
+  a reviewed one-time import script, `supabase/import-language-schools-initial.sql`
+  — this is real business data, not test data, not meant to be deleted.
 
 **What's NOT built yet, in priority order:**
 1. **Notification/cadence automation** — DEFERRED, operator request. Needs (a) a
@@ -210,6 +225,19 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   a different split, it's a one-migration change (`compute_church_engagement_score`
   + `get_church_engagement_score_breakdown`), nothing structural depends on
   the specific weights.
+- **D8 — Language Schools is structurally similar to churches but semantically
+  different (session 11):** built from the operator's real spreadsheet + team
+  guide. Uses its own `language_school_status` enum (New/Contacted/No
+  Answer/Interested/Follow-up/Connected/Declined — a prospecting funnel
+  toward one outcome) instead of `relationship_status` — a different kind of
+  tracking than ongoing relationship health. Deliberately has NO gifts (no
+  money changes hands in this program — it's a free magazine) and NO
+  engagement score (the status funnel itself carries that signal; no numeric
+  score was fabricated where the data doesn't support one). The `Declined`
+  status value was Director's addition, not literally in the operator's
+  spreadsheet funnel sheet — inferred from the guide's explicit "if refused"
+  section. If the operator wants different weighting/values here, flag it —
+  this whole module is new and less battle-tested than churches/donors.
 
 ## 6. PRECEDENTS (banked principles — apply automatically, don't re-litigate)
 - **P1 — Next 16 docs first.** Every directive touching framework code: read
@@ -315,9 +343,9 @@ chat earlier in this project and is COMPROMISED — a fresh one must be generate
 and never pasted in chat; (2) verify what the MCP actually accesses before
 connecting it to a repo holding donor PII.
 
-## 10. INFRA STATUS (verified live, session 10)
+## 10. INFRA STATUS (verified live, session 11)
 - Supabase `snv` (`eriflhdyylssjnxygseq`) ACTIVE_HEALTHY, us-east-1, Postgres 17.6.
-- **14 migrations applied and verified against live state** (0000 through 0013):
+- **15 migrations applied and verified against live state** (0000 through 0014):
   initial schema → RLS/role/gifts corrections → handle_new_user search_path fix →
   function hardening (search_path + execute grants) → churches/donors/tasks visit
   automation (app-code, no migration) → project funding trigger → notes table →
@@ -329,7 +357,9 @@ connecting it to a repo holding donor PII.
   get_engagement_score_breakdown RPC → church engagement score (formula D7,
   visit-recency via contact_logs + giving-recency via gifts.church_id +
   next_visit_date follow-up health, P9-safe BEFORE/AFTER trigger split,
-  get_church_engagement_score_breakdown RPC). All 13+ tables have full RLS
+  get_church_engagement_score_breakdown RPC) → language_schools module
+  (new table + language_school_status enum + RLS mirroring churches +
+  contact_logs.language_school_id column, see D8). All tables have full RLS
   coverage.
 - Vercel: project `snv`, team `ecm-os`. Production READY on `main` at
   **snv-zeta.vercel.app**. Env vars set: `NEXT_PUBLIC_SUPABASE_URL`,
@@ -350,16 +380,19 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: nothing mid-flight.** Clean handoff point — church engagement scoring,
-  recurring donor fields, and checked-in test-data seed/cleanup scripts all
-  shipped, merged, deployed. Director-level verification done (build clean, DB
-  triggers tested live including the new contact_logs visit-recency path,
-  deploy SHA matches merge commit, seed script run and scores spot-checked
-  against the formula). Awaiting operator's click-test on production.
+- **NOW: nothing mid-flight.** Clean handoff point — the Language Schools
+  module (new: table, RLS, 5 pages, status select component, sidebar entry,
+  real-data import for the operator's 2 actual leads) shipped, merged,
+  deployed. Director-level verification done (build clean, RLS tested live,
+  import script reviewed and run, results spot-checked, deploy SHA matches
+  merge commit). Awaiting operator's click-test on production.
 - **NEXT:** operator wants a dedicated conversation (not a quick dispatch) to
   design the notification/follow-up-cadence rules before any automation code —
   see §4 item 1. Do not build this reactively; it needs real product thinking,
   starting with a transactional email service decision (none configured yet).
+  Note this could plausibly extend to Language Schools' follow-up cadence too
+  once designed, not just donors/churches — worth raising when that
+  conversation happens.
 
 ## 13. SESSION NOTES
 Detailed session-by-session history (sessions 1–7) lives in **PROJECT_LOG.md**
