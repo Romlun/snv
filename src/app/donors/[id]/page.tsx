@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { DonorEngagementScore } from "@/components/DonorEngagementScore";
 import DateField from "@/components/DateField";
+import NotesLog from "@/components/NotesLog";
 import { RelationshipStatusSelect } from "@/components/RelationshipStatusSelect";
 import {
   Mail,
@@ -427,6 +428,11 @@ export default function DonorDetailPage({ params }: { params: Promise<{ id: stri
                 <p className="text-2xl font-bold text-zinc-400 italic text-lg">One-time</p>
               )}
             </div>
+          </section>
+
+          <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
+            <h2 className="font-semibold mb-4">Notes / Next Step</h2>
+            <NotesLog entityType="donor" entityId={donor.id} />
           </section>
 
           <div className="flex justify-end">

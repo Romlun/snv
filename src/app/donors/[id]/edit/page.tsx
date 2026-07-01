@@ -21,7 +21,6 @@ interface FormData {
   relationship_status: RelationshipStatus;
   assigned_staff_id: string;
   church_id: string;
-  notes: string;
   is_recurring: boolean;
   recurring_amount: string;
   recurring_cadence: RecurringCadence;
@@ -44,7 +43,6 @@ export default function EditDonorPage({ params }: { params: Promise<{ id: string
     relationship_status: "Steady",
     assigned_staff_id: "",
     church_id: "",
-    notes: "",
     is_recurring: false,
     recurring_amount: "",
     recurring_cadence: "monthly",
@@ -68,7 +66,6 @@ export default function EditDonorPage({ params }: { params: Promise<{ id: string
             relationship_status: donor.relationship_status,
             assigned_staff_id: donor.assigned_staff_id || "",
             church_id: donor.church_id || "",
-            notes: donor.notes || "",
             is_recurring: donor.is_recurring,
             recurring_amount: donor.recurring_amount === null ? "" : String(donor.recurring_amount),
             recurring_cadence: donor.recurring_cadence === "quarterly" ? "quarterly" : "monthly",
@@ -94,7 +91,6 @@ export default function EditDonorPage({ params }: { params: Promise<{ id: string
         phone: formData.phone || null,
         stage: formData.stage,
         relationship_status: formData.relationship_status,
-        notes: formData.notes || null,
         assigned_staff_id: formData.assigned_staff_id || null,
         church_id: formData.church_id || null,
         is_recurring: formData.is_recurring,
@@ -243,14 +239,6 @@ export default function EditDonorPage({ params }: { params: Promise<{ id: string
                 </div>
               </div>
             ) : null}
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Notes</label>
-            <textarea
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-24"
-              value={formData.notes}
-              onChange={e => setFormData({ ...formData, notes: e.target.value })}
-            />
           </div>
           <button
             type="submit"

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ChurchEngagementScore } from "@/components/ChurchEngagementScore";
 import DateField from "@/components/DateField";
+import NotesLog from "@/components/NotesLog";
 import { RelationshipStatusSelect } from "@/components/RelationshipStatusSelect";
 import {
   Mail,
@@ -457,6 +458,11 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
             </div>
           </section>
 
+          <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
+            <h2 className="font-semibold mb-4">Notes / Next Step</h2>
+            <NotesLog entityType="church" entityId={church.id} />
+          </section>
+
           <div className="flex justify-end">
             <button
               type="button"
@@ -496,10 +502,6 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
             </div>
           </section>
 
-          <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-            <h2 className="font-semibold mb-4">Notes</h2>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">{church.notes || "No notes yet."}</p>
-          </section>
 
           <section className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
             <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800 flex items-center justify-between">
