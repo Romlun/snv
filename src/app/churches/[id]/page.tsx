@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { EngagementScoreRing } from "@/components/EngagementScoreRing";
+import { ChurchEngagementScore } from "@/components/ChurchEngagementScore";
 import DateField from "@/components/DateField";
 import { RelationshipStatusSelect } from "@/components/RelationshipStatusSelect";
 import {
@@ -307,7 +307,7 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
             <p className="text-sm text-zinc-500 font-medium">Engagement Score</p>
             <p className="text-xs text-zinc-400">Based on recent activity</p>
           </div>
-          <EngagementScoreRing score={church.engagement_score} />
+          <ChurchEngagementScore churchId={church.id} score={church.engagement_score} />
         </div>
       </div>
 

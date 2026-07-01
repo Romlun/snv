@@ -11,6 +11,7 @@ type Profile = Database['public']['Tables']['profiles']['Row'];
 type Church = Database['public']['Tables']['churches']['Row'];
 type DonorStage = Database['public']['Tables']['donors']['Row']['stage'];
 type RelationshipStatus = Database['public']['Tables']['donors']['Row']['relationship_status'];
+type RecurringCadence = 'monthly' | 'quarterly';
 
 interface FormData {
   name: string;
@@ -21,6 +22,9 @@ interface FormData {
   assigned_staff_id: string;
   church_id: string;
   notes: string;
+  is_recurring: boolean;
+  recurring_amount: string;
+  recurring_cadence: RecurringCadence;
 }
 
 export default function EditDonorPage({ params }: { params: Promise<{ id: string }> }) {
@@ -41,6 +45,9 @@ export default function EditDonorPage({ params }: { params: Promise<{ id: string
     assigned_staff_id: "",
     church_id: "",
     notes: "",
+    is_recurring: false,
+    recurring_amount: "",
+    recurring_cadence: "monthly",
   });
 
   useEffect(() => {
@@ -62,6 +69,9 @@ export default function EditDonorPage({ params }: { params: Promise<{ id: string
             assigned_staff_id: donor.assigned_staff_id || "",
             church_id: donor.church_id || "",
             notes: donor.notes || "",
+            is_recurring: donor.is_recurring,
+            recurring_amount: donor.recurring_amount === null ? "" : String(donor.recurring_amount),
+            recurring_cadence: donor.recurring_cadence === "quarterly" ? "quarterly" : "monthly",
           });
         }
       } catch (err) {
@@ -87,6 +97,9 @@ export default function EditDonorPage({ params }: { params: Promise<{ id: string
         notes: formData.notes || null,
         assigned_staff_id: formData.assigned_staff_id || null,
         church_id: formData.church_id || null,
+        is_recurring: formData.is_recurring,
+        recurring_amount: formData.is_recurring ? Number(formData.recurring_amount) : null,
+        recurring_cadence: formData.is_recurring ? formData.recurring_cadence : null,
       }).eq('id', id);
 
       if (error) throw error;
@@ -187,6 +200,49 @@ export default function EditDonorPage({ params }: { params: Promise<{ id: string
                 ))}
               </select>
             </div>
+          </div>
+          <div className="space-y-4 rounded-lg border p-4 dark:border-zinc-800">
+            <label className="flex items-center gap-3 text-sm font-medium">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+                checked={formData.is_recurring}
+                onChange={e => setFormData({
+                  ...formData,
+                  is_recurring: e.target.checked,
+                  recurring_amount: e.target.checked ? formData.recurring_amount : "",
+                  recurring_cadence: e.target.checked ? formData.recurring_cadence : "monthly",
+                })}
+              />
+              Recurring donor
+            </label>
+            {formData.is_recurring ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Recurring Amount</label>
+                  <input
+                    required
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                    value={formData.recurring_amount}
+                    onChange={e => setFormData({ ...formData, recurring_amount: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Recurring Cadence</label>
+                  <select
+                    className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                    value={formData.recurring_cadence}
+                    onChange={e => setFormData({ ...formData, recurring_cadence: e.target.value as RecurringCadence })}
+                  >
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                  </select>
+                </div>
+              </div>
+            ) : null}
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Notes</label>
