@@ -29,6 +29,8 @@ const initialFormData: AddUserFormData = {
   role: "Staff",
 };
 
+const teamMemberRoles: TeamMemberRole[] = ['Admin', 'Staff', 'Volunteer'];
+
 function getDisplayName(member: TeamMember) {
   return member.full_name || member.email;
 }
@@ -41,6 +43,8 @@ export default function SettingsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [savingRoleId, setSavingRoleId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [formMessage, setFormMessage] = useState<string | null>(null);
 
@@ -60,6 +64,8 @@ export default function SettingsPage() {
       if (membersError) throw membersError;
 
       setTeamMembers((members || []) as TeamMember[]);
+
+      setCurrentUserId(authData.user?.id || null);
 
       if (authData.user) {
         const { data: currentProfile } = await supabase
@@ -102,6 +108,31 @@ export default function SettingsPage() {
       await fetchTeamMembers();
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleRoleChange = async (member: TeamMember, role: TeamMemberRole) => {
+    if (!isAdmin || member.id === currentUserId || member.role === role) return;
+
+    const previousRole = member.role;
+    setSavingRoleId(member.id);
+    setError(null);
+    setFormMessage(null);
+    setTeamMembers(prev => prev.map(item => item.id === member.id ? { ...item, role } : item));
+
+    try {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ role })
+        .eq('id', member.id);
+
+      if (updateError) throw updateError;
+      setFormMessage("Role updated.");
+    } catch (err) {
+      setTeamMembers(prev => prev.map(item => item.id === member.id ? { ...item, role: previousRole } : item));
+      setError(err instanceof Error ? err.message : "Error updating role");
+    } finally {
+      setSavingRoleId(null);
     }
   };
 
@@ -234,17 +265,41 @@ export default function SettingsPage() {
               </tr>
             </thead>
             <tbody className="divide-y dark:divide-zinc-800">
-              {teamMembers.map(member => (
-                <tr key={member.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                  <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-zinc-50">{getDisplayName(member)}</td>
-                  <td className="px-6 py-4 text-zinc-600 dark:text-zinc-400">{member.email}</td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                      {member.role}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {teamMembers.map(member => {
+                const isCurrentUser = member.id === currentUserId;
+                const isSavingRole = savingRoleId === member.id;
+
+                return (
+                  <tr key={member.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                    <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-zinc-50">
+                      {getDisplayName(member)}
+                      {isCurrentUser ? <span className="ml-2 text-xs font-medium text-zinc-500">(You)</span> : null}
+                    </td>
+                    <td className="px-6 py-4 text-zinc-600 dark:text-zinc-400">{member.email}</td>
+                    <td className="px-6 py-4 text-right">
+                      {isAdmin && !isCurrentUser ? (
+                        <div className="inline-flex items-center gap-2">
+                          {isSavingRole ? <Loader2 className="h-4 w-4 animate-spin text-blue-600" /> : null}
+                          <select
+                            className="px-3 py-1.5 border rounded-lg text-sm dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                            value={member.role}
+                            disabled={isSavingRole}
+                            onChange={e => handleRoleChange(member, e.target.value as TeamMemberRole)}
+                          >
+                            {teamMemberRoles.map(role => (
+                              <option key={role} value={role}>{role}</option>
+                            ))}
+                          </select>
+                        </div>
+                      ) : (
+                        <span className="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                          {member.role}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

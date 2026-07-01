@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -12,9 +12,11 @@ import {
   Wallet,
   Calendar,
   Settings,
-  Heart
+  Heart,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -29,6 +31,14 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <div className="flex h-full w-64 flex-col border-r bg-white dark:bg-zinc-950 dark:border-zinc-800">
@@ -69,6 +79,14 @@ export function Sidebar() {
           <Settings className="h-5 w-5" />
           Settings
         </Link>
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+        >
+          <LogOut className="h-5 w-5" />
+          Sign Out
+        </button>
       </div>
     </div>
   );
