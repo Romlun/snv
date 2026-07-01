@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { EngagementScoreRing } from "@/components/EngagementScoreRing";
+import { ChurchEngagementScore } from "@/components/ChurchEngagementScore";
 import { RelationshipStatusSelect } from "@/components/RelationshipStatusSelect";
 import Link from "next/link";
 import { Search, Plus, Filter, Loader2 } from "lucide-react";
@@ -125,7 +125,7 @@ export default function ChurchesPage() {
                     />
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <EngagementScoreRing score={church.engagement_score} />
+                    <ChurchEngagementScore churchId={church.id} score={church.engagement_score} />
                   </td>
                   <td className="px-6 py-4">
                     {church.next_visit_date || "Not scheduled"}
