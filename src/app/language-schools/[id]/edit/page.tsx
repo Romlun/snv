@@ -22,8 +22,6 @@ interface FormData {
   source: string;
   status: SchoolStatus;
   next_follow_up_date: string;
-  next_step: string;
-  notes: string;
   assigned_staff_id: string;
 }
 
@@ -46,8 +44,6 @@ export default function EditLanguageSchoolPage({ params }: { params: Promise<{ i
     source: "",
     status: "New",
     next_follow_up_date: "",
-    next_step: "",
-    notes: "",
     assigned_staff_id: "",
   });
 
@@ -70,8 +66,6 @@ export default function EditLanguageSchoolPage({ params }: { params: Promise<{ i
             source: school.source || "",
             status: school.status,
             next_follow_up_date: school.next_follow_up_date || "",
-            next_step: school.next_step || "",
-            notes: school.notes || "",
             assigned_staff_id: school.assigned_staff_id || "",
           });
         }
@@ -100,8 +94,6 @@ export default function EditLanguageSchoolPage({ params }: { params: Promise<{ i
         source: formData.source || null,
         status: formData.status,
         next_follow_up_date: formData.next_follow_up_date || null,
-        next_step: formData.next_step || null,
-        notes: formData.notes || null,
         assigned_staff_id: formData.assigned_staff_id || null,
       }).eq('id', id);
 
@@ -237,22 +229,6 @@ export default function EditLanguageSchoolPage({ params }: { params: Promise<{ i
             value={formData.next_follow_up_date}
             onChange={val => setFormData({ ...formData, next_follow_up_date: val })}
           />
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Next Step</label>
-            <input
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.next_step}
-              onChange={e => setFormData({ ...formData, next_step: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Notes</label>
-            <textarea
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-24"
-              value={formData.notes}
-              onChange={e => setFormData({ ...formData, notes: e.target.value })}
-            />
-          </div>
           <button
             type="submit"
             disabled={loading}

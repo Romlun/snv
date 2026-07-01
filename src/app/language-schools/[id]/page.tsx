@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { SchoolStatus, SchoolStatusSelect } from "@/components/SchoolStatusSelect";
+import NotesLog from "@/components/NotesLog";
 import {
   Mail,
   Phone,
@@ -246,13 +247,12 @@ export default function LanguageSchoolDetailPage({ params }: { params: Promise<{
           </section>
 
           <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-            <h2 className="font-semibold mb-4">Next Step</h2>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">{school.next_step || "No next step set."}</p>
-          </section>
-
-          <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-            <h2 className="font-semibold mb-4">Notes</h2>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">{school.notes || "No notes yet."}</p>
+            <h2 className="font-semibold mb-4">Notes / Next Step</h2>
+            <NotesLog
+              entityType="language_school"
+              entityId={school.id}
+              onNextStepSaved={next_step => setSchool(prev => prev ? { ...prev, next_step } : prev)}
+            />
           </section>
 
           <section className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">

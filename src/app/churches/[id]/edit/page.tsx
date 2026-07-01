@@ -17,7 +17,6 @@ interface FormData {
   email: string;
   denomination: string;
   relationship_status: RelationshipStatus;
-  notes: string;
 }
 
 export default function EditChurchPage({ params }: { params: Promise<{ id: string }> }) {
@@ -35,7 +34,6 @@ export default function EditChurchPage({ params }: { params: Promise<{ id: strin
     email: "",
     denomination: "",
     relationship_status: "Steady",
-    notes: "",
   });
 
   useEffect(() => {
@@ -51,7 +49,6 @@ export default function EditChurchPage({ params }: { params: Promise<{ id: strin
             email: church.email || "",
             denomination: church.denomination || "",
             relationship_status: church.relationship_status,
-            notes: church.notes || "",
           });
         }
       } catch (err) {
@@ -76,7 +73,6 @@ export default function EditChurchPage({ params }: { params: Promise<{ id: strin
         email: formData.email || null,
         denomination: formData.denomination || null,
         relationship_status: formData.relationship_status,
-        notes: formData.notes || null,
       }).eq('id', id);
 
       if (error) throw error;
@@ -173,14 +169,6 @@ export default function EditChurchPage({ params }: { params: Promise<{ id: strin
               className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
               value={formData.address}
               onChange={e => setFormData({ ...formData, address: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Notes</label>
-            <textarea
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-24"
-              value={formData.notes}
-              onChange={e => setFormData({ ...formData, notes: e.target.value })}
             />
           </div>
           <button
