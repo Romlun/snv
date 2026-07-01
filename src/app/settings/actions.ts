@@ -166,3 +166,43 @@ export async function deleteTeamMember(userId: string): Promise<AddTeamMemberRes
     return { success: false, error: err instanceof Error ? err.message : "Unable to delete team member." };
   }
 }
+
+export async function resetTeamMemberPassword(userId: string, newPassword: string): Promise<AddTeamMemberResult> {
+  try {
+    if (!userId) {
+      return { success: false, error: "Missing team member id." };
+    }
+
+    if (newPassword.length < 6) {
+      return { success: false, error: "Password must be at least 6 characters." };
+    }
+
+    const { supabase, caller, error: callerError } = await getAdminCaller();
+    if (callerError || !caller) {
+      return { success: false, error: callerError || "Only Admins can manage team members." };
+    }
+
+    const { data: targetProfile, error: targetError } = await supabase
+      .from('profiles')
+      .select('id, org_id')
+      .eq('id', userId)
+      .single();
+
+    if (targetError || !targetProfile || targetProfile.org_id !== caller.org_id) {
+      return { success: false, error: "Team member not found." };
+    }
+
+    const supabaseAdmin = createAdminClient();
+    const { error: resetError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+      password: newPassword,
+    });
+
+    if (resetError) {
+      return { success: false, error: resetError.message };
+    }
+
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unable to reset password." };
+  }
+}
