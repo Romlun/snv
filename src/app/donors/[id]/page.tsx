@@ -22,7 +22,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Database } from "@/types/database";
 
-type Donor = Database['public']['Tables']['donors']['Row'];
+type Donor = Database['public']['Tables']['donors']['Row'] & { next_step: string | null };
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Church = Database['public']['Tables']['churches']['Row'];
 type ContactLog = Database['public']['Tables']['contact_logs']['Row'];
@@ -369,6 +369,10 @@ export default function DonorDetailPage({ params }: { params: Promise<{ id: stri
                 <Clock className="h-4 w-4" />
                 <span>Next Follow-up: {donor.next_follow_up_date || 'Not scheduled'}</span>
               </div>
+              <div className="flex items-center gap-3 text-sm">
+                <MessageSquare className="h-4 w-4 text-zinc-400" />
+                <span>Next Step: {donor.next_step || 'Not set'}</span>
+              </div>
             </div>
           </section>
 
@@ -432,7 +436,11 @@ export default function DonorDetailPage({ params }: { params: Promise<{ id: stri
 
           <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
             <h2 className="font-semibold mb-4">Notes / Next Step</h2>
-            <NotesLog entityType="donor" entityId={donor.id} />
+            <NotesLog
+              entityType="donor"
+              entityId={donor.id}
+              onNextStepSaved={next_step => setDonor(prev => prev ? { ...prev, next_step } : prev)}
+            />
           </section>
 
           <div className="flex justify-end">
