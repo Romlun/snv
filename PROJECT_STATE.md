@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v0.6 Donation tracking (donors+churches), inline status, score breakdown LIVE`
+`snv Mission CRM — v0.7 Church scoring, recurring donor fields, test data LIVE`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -93,7 +93,7 @@ deploy SHA → operator click-tests on production → Director updates this file
 
 ---
 
-## 4. CURRENT STATE — ALL 8 MVP MODULES + ENGAGEMENT SCORE + DONATION TRACKING LIVE (as of session 9)
+## 4. CURRENT STATE — ALL 8 MVP MODULES + ENGAGEMENT SCORE (DONORS + CHURCHES) + DONATION TRACKING LIVE (as of session 10)
 The app is a real, working, tested production application. Every module below is
 wired to the live Supabase database (no mock data remaining anywhere), enforces the
 3-tier RLS role model, and has been personally click-tested by the operator on
@@ -104,11 +104,18 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   `project_id` optional), gift history list, inline relationship-status select
   (no navigation to edit), clickable Engagement Score ring showing a full
   breakdown popover (contact/giving/recurring/follow-up, each with points and
-  the underlying fact — see `DonorEngagementScore.tsx`).
+  the underlying fact — see `DonorEngagementScore.tsx`), and recurring-donor
+  fields (`is_recurring`/`recurring_amount`/`recurring_cadence`) now actually
+  settable on New + Edit forms — previously display-only, a real gap closed
+  session 10.
 - ✅ **Churches** — list/detail/create/edit, visit log with auto-follow-up-task,
   "Plan Visit" (future visits, with type: call/visit/event/meeting), "Add Gift"
   (church-level giving, `gifts.church_id` fixed, `project_id` optional, no
-  `donor_id`), gift history list, inline relationship-status select.
+  `donor_id`), gift history list, inline relationship-status select, and now a
+  REAL Engagement Score (session 10 — see D7 below for the formula and why it
+  differs from the donor formula), clickable with a breakdown popover via
+  `ChurchEngagementScore.tsx` (mirrors `DonorEngagementScore.tsx`, 3 rows not
+  4 — no recurring bucket, see D7).
 - ✅ **Projects** — list/detail/create/edit, funding progress, "Add Funds"
   (creates a `gifts` row; `current_funding` is DERIVED via trigger).
 - ✅ **Tasks** — list/detail/create/edit/mark-complete, status dropdown,
@@ -129,25 +136,37 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   can create/delete/edit-role/reset-password for team members; everyone can change
   their own password; sign-out. See §10 for the security architecture — this was
   reviewed with extra care (service-role key involved).
-- ✅ **Engagement Score** — real 0-100 score per donor, DB-computed and
+- ✅ **Engagement Score (donors)** — real 0-100 score per donor, DB-computed and
   trigger-maintained (`donors.engagement_score`, repurposed from an unused
   prototype-era column — no new column needed). Formula (operator-approved
   Option A): contact recency 40pts + giving recency 25pts + recurring status
   15pts + follow-up health 20pts, linear decay within each recency band (no
-  cliffs). Surfaced via `EngagementScoreRing` (donor detail, donors list,
-  churches — plain, non-clickable) and `DonorEngagementScore` (donor detail +
-  donors list only — wraps the ring with a click-to-expand breakdown popover
-  via the `get_engagement_score_breakdown` RPC). See §6 P9 for a real bug
-  caught and fixed during build.
+  cliffs). Surfaced via `DonorEngagementScore` (donor detail + donors list —
+  wraps `EngagementScoreRing` with a click-to-expand breakdown popover via the
+  `get_engagement_score_breakdown` RPC). See §6 P9 for a real bug caught and
+  fixed during build.
+- ✅ **Engagement Score (churches, session 10)** — real 0-100 score per church,
+  same trigger-maintained pattern. Formula deliberately different from donors
+  — see D7 for why (no individual "recurring" concept for a church) — and uses
+  `contact_logs.contact_date` for visit recency since churches has no stored
+  last-contact column of its own (unlike donors). Surfaced via
+  `ChurchEngagementScore` (church detail + churches list) via the
+  `get_church_engagement_score_breakdown` RPC.
 - ✅ **Donation tracking (session 9)** — `gifts` now supports three optional
   attribution columns: `donor_id`, `project_id`, `church_id` (all nullable,
   a gift can be tied to any combination). Two more previously-stale
   prototype totals are now trigger-maintained the same way `engagement_score`
   was: `donors.lifetime_giving` and `churches.total_giving` (sum of gifts by
-  `donor_id` / `church_id` respectively). `churches.engagement_score` is
-  STILL the old unwired prototype value — same treatment as donors was NOT
-  yet applied there; a natural future follow-up if the operator wants church
-  scoring, not done because it wasn't asked for.
+  `donor_id` / `church_id` respectively).
+- ✅ **Test/demo data (session 10)** — `supabase/seed-test-data.sql` and its
+  companion `supabase/cleanup-test-data.sql` are checked into the repo
+  (Code-Agent-authored, Director-reviewed-and-run). 6 `TEST DONOR — ` and 5
+  `TEST CHURCH — ` records spanning every relationship status and a wide
+  engagement-score range currently live in PRODUCTION for click-testing.
+  Delete via the cleanup script (or by name-prefix `LIKE`) before this goes
+  in front of real end users — it's currently there deliberately, not by
+  accident, but it needs a conscious decision to remove, not an assumption
+  that someone else already did.
 
 **What's NOT built yet, in priority order:**
 1. **Notification/cadence automation** — DEFERRED, operator request. Needs (a) a
@@ -182,6 +201,15 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   Admin IS possible via the UI (role dropdown), by design.
 - **D6 — Password flow: Admin sets it directly**, no invite-email flow (operator's
   explicit choice, both for account creation and admin-initiated resets).
+- **D7 — Church engagement score formula (session 10, operator-approved):**
+  Visit recency 45pts + Giving recency 35pts + Follow-up (next_visit_date)
+  health 20pts = 100, same decay shapes as the donor formula. NO recurring
+  bucket — churches don't have an individual "recurring donor" flag, and
+  Director chose not to fabricate an equivalent signal, redistributing those
+  15pts into visit (+5) and giving (+10) instead. If the operator later wants
+  a different split, it's a one-migration change (`compute_church_engagement_score`
+  + `get_church_engagement_score_breakdown`), nothing structural depends on
+  the specific weights.
 
 ## 6. PRECEDENTS (banked principles — apply automatically, don't re-litigate)
 - **P1 — Next 16 docs first.** Every directive touching framework code: read
@@ -250,11 +278,13 @@ Auth via Supabase Auth. Every table with PII has RLS ON from creation.
   columns + AFTER trigger on `gifts` — see P9 for the staleness bug this pattern
   can hide if a BEFORE trigger re-queries instead of reading `NEW`),
   `donors.lifetime_giving` and `churches.total_giving` (both sum `gifts` by
-  `donor_id` / `church_id` respectively — AFTER trigger on `gifts`).
+  `donor_id` / `church_id` respectively — AFTER trigger on `gifts`),
+  `churches.engagement_score` (BEFORE trigger on churches' own next_visit_date
+  reading NEW directly + AFTER triggers on both `gifts` and `contact_logs` —
+  same P9-safe pattern as donors, see D7 for the formula).
   `resources.quantity_available` is the ONE manual exception (on-hand
-  stock, deliberately not auto-decremented). `churches.engagement_score` is
-  NOT yet in this list — still a stale manual prototype value, unlike every
-  other derived field here.
+  stock, deliberately not auto-decremented). Every prototype-era stat column
+  in the app is now real and trigger-maintained — none left stale.
 - ⚠️ **Vercel deploy-skip pattern (recurring, has a known fix — P8):** pushing a
   branch and merging to main within seconds can make Vercel's GitHub webhook skip
   the production build. STANDARD PROCEDURE: push branch → wait ~10s → merge to
@@ -268,6 +298,15 @@ Auth via Supabase Auth. Every table with PII has RLS ON from creation.
   unresponsive for several minutes at a time this project (twice, session 7) —
   transient, resolved by the operator restarting the local MCP connection. Not a
   repo/code issue when it happens; retry once, then ask the operator to restart.
+- ⚠️ **CONCURRENT DIRECTOR SESSIONS (discovered session 10):** two separate
+  Director chats were open and both pushed to `main` / edited this file within
+  the same ~10 minutes, undetected until a Director noticed a commit (`8dc8400`)
+  it hadn't made. Single-writer discipline for this file depends on there being
+  exactly one active Director session — it silently breaks if the operator has
+  more than one chat open on this project at once. If a Director ever finds a
+  commit on `main` or an edit to this file it doesn't recognize authoring, stop
+  and flag it to the operator immediately rather than assuming it's own earlier
+  work forgotten.
 
 ## 9. DESIGN TOOL (future, not now)
 Stitch (Google AI UI-design tool via MCP) is the intended designer for the
@@ -276,9 +315,9 @@ chat earlier in this project and is COMPROMISED — a fresh one must be generate
 and never pasted in chat; (2) verify what the MCP actually accesses before
 connecting it to a repo holding donor PII.
 
-## 10. INFRA STATUS (verified live, session 9)
+## 10. INFRA STATUS (verified live, session 10)
 - Supabase `snv` (`eriflhdyylssjnxygseq`) ACTIVE_HEALTHY, us-east-1, Postgres 17.6.
-- **13 migrations applied and verified against live state** (0000 through 0012):
+- **14 migrations applied and verified against live state** (0000 through 0013):
   initial schema → RLS/role/gifts corrections → handle_new_user search_path fix →
   function hardening (search_path + execute grants) → churches/donors/tasks visit
   automation (app-code, no migration) → project funding trigger → notes table →
@@ -287,7 +326,11 @@ connecting it to a repo holding donor PII.
   repurposed prototype column) → engagement score BEFORE-trigger staleness fix
   (see P9) → engagement score search_path pin → gifts.church_id +
   churches.total_giving/donors.lifetime_giving derived triggers +
-  get_engagement_score_breakdown RPC. All 13+ tables have full RLS coverage.
+  get_engagement_score_breakdown RPC → church engagement score (formula D7,
+  visit-recency via contact_logs + giving-recency via gifts.church_id +
+  next_visit_date follow-up health, P9-safe BEFORE/AFTER trigger split,
+  get_church_engagement_score_breakdown RPC). All 13+ tables have full RLS
+  coverage.
 - Vercel: project `snv`, team `ecm-os`. Production READY on `main` at
   **snv-zeta.vercel.app**. Env vars set: `NEXT_PUBLIC_SUPABASE_URL`,
   `NEXT_PUBLIC_SUPABASE_ANON_KEY` (legacy `eyJ...` format, matches local
@@ -307,11 +350,12 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: nothing mid-flight.** Clean handoff point — donation tracking, inline
-  relationship status, and score breakdown all shipped, merged, deployed.
-  Director-level verification done (build clean, DB triggers tested live with
-  insert/delete on a temp church, deploy SHA matches merge commit). Awaiting
-  operator's click-test on production.
+- **NOW: nothing mid-flight.** Clean handoff point — church engagement scoring,
+  recurring donor fields, and checked-in test-data seed/cleanup scripts all
+  shipped, merged, deployed. Director-level verification done (build clean, DB
+  triggers tested live including the new contact_logs visit-recency path,
+  deploy SHA matches merge commit, seed script run and scores spot-checked
+  against the formula). Awaiting operator's click-test on production.
 - **NEXT:** operator wants a dedicated conversation (not a quick dispatch) to
   design the notification/follow-up-cadence rules before any automation code —
   see §4 item 1. Do not build this reactively; it needs real product thinking,
