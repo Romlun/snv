@@ -82,11 +82,14 @@ On phase change, the Director gives a new title and bumps this line the same tur
 
 Standard build sequence per module/feature:
 Director writes a precise directive → Code Agent builds + commits (NOT pushed by
-default — Director pushes) → Director reads the actual diff, runs the build,
-scans for hazards → if it's a migration, Director applies to live DB + tests the
-SQL directly (insert/verify/delete, not just "it applied") → Director merges to
-main → verifies production deploy SHA → operator click-tests on production →
-Director updates this file.
+default — Director pushes) → operator or Code Agent runs `npm run dev` in the
+local clone and click-tests on localhost BEFORE Director merges (faster loop
+than waiting on a Vercel preview) → Director reads the actual diff, runs the
+build, scans for hazards → if it's a migration, Director applies to live DB and
+tests the SQL directly (insert/verify/delete, not just "it applied" — this part
+stays Director's job via Supabase MCP, it's infra execution per the division of
+labor above, not app building) → Director merges to main → verifies production
+deploy SHA → operator click-tests on production → Director updates this file.
 
 ---
 
