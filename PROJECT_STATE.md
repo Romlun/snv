@@ -8,7 +8,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v0.2 Phase 1 (Foundation DEPLOYED; modules next)`
+`snv Mission CRM — v0.3 Core Modules DONE; Calendar next, then Engagement Score`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
