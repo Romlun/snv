@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Plus, Trash2, Users } from "lucide-react";
-import { addTeamMember, deleteTeamMember } from "./actions";
+import { KeyRound, Loader2, Plus, Trash2, Users } from "lucide-react";
+import { addTeamMember, deleteTeamMember, resetTeamMemberPassword } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 
 type TeamMemberRole = 'Admin' | 'Staff' | 'Volunteer';
@@ -22,11 +22,21 @@ interface AddUserFormData {
   role: NewUserRole;
 }
 
+interface PasswordFormData {
+  newPassword: string;
+  confirmPassword: string;
+}
+
 const initialFormData: AddUserFormData = {
   email: "",
   full_name: "",
   password: "",
   role: "Staff",
+};
+
+const initialPasswordFormData: PasswordFormData = {
+  newPassword: "",
+  confirmPassword: "",
 };
 
 const teamMemberRoles: TeamMemberRole[] = ['Admin', 'Staff', 'Volunteer'];
@@ -39,32 +49,29 @@ export default function SettingsPage() {
   const supabase = useMemo(() => createClient(), []);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [formData, setFormData] = useState<AddUserFormData>(initialFormData);
+  const [passwordForm, setPasswordForm] = useState<PasswordFormData>(initialPasswordFormData);
+  const [resetPasswordForm, setResetPasswordForm] = useState<PasswordFormData>(initialPasswordFormData);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [savingRoleId, setSavingRoleId] = useState<string | null>(null);
   const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null);
+  const [resettingPasswordId, setResettingPasswordId] = useState<string | null>(null);
+  const [showResetPasswordId, setShowResetPasswordId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [teamError, setTeamError] = useState<string | null>(null);
   const [formMessage, setFormMessage] = useState<string | null>(null);
+  const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
 
   async function fetchTeamMembers() {
     try {
       setLoading(true);
-      setError(null);
+      setTeamError(null);
 
-      const [{ data: members, error: membersError }, { data: authData }] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('id, full_name, email, role')
-          .order('full_name', { ascending: true, nullsFirst: false }),
-        supabase.auth.getUser(),
-      ]);
-
-      if (membersError) throw membersError;
-
-      setTeamMembers((members || []) as TeamMember[]);
+      const { data: authData } = await supabase.auth.getUser();
 
       setCurrentUserId(authData.user?.id || null);
 
@@ -74,12 +81,26 @@ export default function SettingsPage() {
           .select('role')
           .eq('id', authData.user.id)
           .single();
-        setIsAdmin(currentProfile?.role === 'Admin');
+        const userIsAdmin = currentProfile?.role === 'Admin';
+        setIsAdmin(userIsAdmin);
+
+        if (userIsAdmin) {
+          const { data: members, error: membersError } = await supabase
+            .from('profiles')
+            .select('id, full_name, email, role')
+            .order('full_name', { ascending: true, nullsFirst: false });
+
+          if (membersError) throw membersError;
+          setTeamMembers((members || []) as TeamMember[]);
+        } else {
+          setTeamMembers([]);
+        }
       } else {
         setIsAdmin(false);
+        setTeamMembers([]);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setTeamError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -109,6 +130,38 @@ export default function SettingsPage() {
       await fetchTeamMembers();
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangingPassword(true);
+    setError(null);
+    setPasswordMessage(null);
+
+    try {
+      if (passwordForm.newPassword.length < 6) {
+        setError("Password must be at least 6 characters.");
+        return;
+      }
+
+      if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+        setError("Passwords do not match.");
+        return;
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: passwordForm.newPassword,
+      });
+
+      if (updateError) throw updateError;
+
+      setPasswordForm(initialPasswordFormData);
+      setPasswordMessage("Password updated.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error updating password");
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -162,6 +215,39 @@ export default function SettingsPage() {
     }
   };
 
+  const handleResetPassword = async (member: TeamMember) => {
+    if (!isAdmin) return;
+
+    setResettingPasswordId(member.id);
+    setError(null);
+    setFormMessage(null);
+
+    try {
+      if (resetPasswordForm.newPassword.length < 6) {
+        setError("Password must be at least 6 characters.");
+        return;
+      }
+
+      if (resetPasswordForm.newPassword !== resetPasswordForm.confirmPassword) {
+        setError("Passwords do not match.");
+        return;
+      }
+
+      const result = await resetTeamMemberPassword(member.id, resetPasswordForm.newPassword);
+
+      if (!result.success) {
+        setError(result.error || "Unable to reset password.");
+        return;
+      }
+
+      setResetPasswordForm(initialPasswordFormData);
+      setShowResetPasswordId(null);
+      setFormMessage(`Password updated. Share it with ${getDisplayName(member)} directly - it won't be shown again.`);
+    } finally {
+      setResettingPasswordId(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -190,6 +276,59 @@ export default function SettingsPage() {
           {formMessage}
         </div>
       ) : null}
+
+      {error ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      ) : null}
+
+      {passwordMessage ? (
+        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+          {passwordMessage}
+        </div>
+      ) : null}
+
+      <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
+        <div className="mb-4 flex items-center gap-2">
+          <KeyRound className="h-4 w-4 text-zinc-400" />
+          <h2 className="font-semibold">Change Password</h2>
+        </div>
+        <form onSubmit={handleChangePassword} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">New Password</label>
+            <input
+              required
+              type="password"
+              minLength={6}
+              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+              value={passwordForm.newPassword}
+              onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Confirm New Password</label>
+            <input
+              required
+              type="password"
+              minLength={6}
+              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+              value={passwordForm.confirmPassword}
+              onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <button
+              type="submit"
+              disabled={changingPassword}
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {changingPassword ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Change Password
+            </button>
+          </div>
+        </form>
+      </section>
 
       {showAddUser && isAdmin ? (
         <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
@@ -271,9 +410,9 @@ export default function SettingsPage() {
             <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
             <p className="mt-4 text-zinc-500">Loading team members...</p>
           </div>
-        ) : error ? (
+        ) : teamError ? (
           <div className="p-8 text-center bg-red-50">
-            <p className="text-red-600">Error loading settings: {error}</p>
+            <p className="text-red-600">Error loading settings: {teamError}</p>
             <button onClick={fetchTeamMembers} className="mt-4 text-sm font-bold text-red-700 underline">Try again</button>
           </div>
         ) : teamMembers.length === 0 ? (
@@ -330,15 +469,30 @@ export default function SettingsPage() {
                         {isCurrentUser ? (
                           <span className="text-xs font-medium text-zinc-500">Protected</span>
                         ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteMember(member)}
-                            disabled={isDeletingMember}
-                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 dark:border-red-900/50 dark:hover:bg-red-950/20"
-                          >
-                            {isDeletingMember ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                            Delete
-                          </button>
+                          <div className="inline-flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowResetPasswordId(member.id);
+                                setResetPasswordForm(initialPasswordFormData);
+                                setError(null);
+                                setFormMessage(null);
+                              }}
+                              className="inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
+                            >
+                              <KeyRound className="h-3.5 w-3.5" />
+                              Reset Password
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMember(member)}
+                              disabled={isDeletingMember}
+                              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 dark:border-red-900/50 dark:hover:bg-red-950/20"
+                            >
+                              {isDeletingMember ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                              Delete
+                            </button>
+                          </div>
                         )}
                       </td>
                     ) : null}
@@ -349,6 +503,68 @@ export default function SettingsPage() {
           </table>
         )}
       </section>
+      {isAdmin && showResetPasswordId ? (
+        <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
+          {(() => {
+            const member = teamMembers.find(item => item.id === showResetPasswordId);
+            if (!member) return null;
+
+            return (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <KeyRound className="h-4 w-4 text-zinc-400" />
+                  <h2 className="font-semibold">Reset Password for {getDisplayName(member)}</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">New Password</label>
+                    <input
+                      required
+                      type="password"
+                      minLength={6}
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                      value={resetPasswordForm.newPassword}
+                      onChange={e => setResetPasswordForm({ ...resetPasswordForm, newPassword: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Confirm New Password</label>
+                    <input
+                      required
+                      type="password"
+                      minLength={6}
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                      value={resetPasswordForm.confirmPassword}
+                      onChange={e => setResetPasswordForm({ ...resetPasswordForm, confirmPassword: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    disabled={resettingPasswordId === member.id}
+                    onClick={() => handleResetPassword(member)}
+                    className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
+                    {resettingPasswordId === member.id ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                    Save Password
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowResetPasswordId(null);
+                      setResetPasswordForm(initialPasswordFormData);
+                    }}
+                    className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+        </section>
+      ) : null}
     </div>
   );
 }
