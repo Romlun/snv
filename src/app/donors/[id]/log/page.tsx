@@ -115,7 +115,8 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
       </Link>
 
       <div className="bg-white border rounded-xl p-8 dark:bg-zinc-900 dark:border-zinc-800">
-        <h1 className="text-2xl font-bold mb-6">Log Interaction</h1>
+        <h1 className="text-2xl font-bold mb-1">Log Interaction</h1>
+        <p className="text-sm text-zinc-500 mb-6">Log an actual interaction — call, email, text, or meeting. This updates when you last reached out and affects the donor&apos;s engagement score.</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Interaction Type</label>
