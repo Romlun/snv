@@ -136,7 +136,8 @@ export default function LogLanguageSchoolContactPage({ params }: { params: Promi
       </Link>
 
       <div className="bg-white border rounded-xl p-8 dark:bg-zinc-900 dark:border-zinc-800">
-        <h1 className="text-2xl font-bold mb-6">Log Contact</h1>
+        <h1 className="text-2xl font-bold mb-1">Log Contact</h1>
+        <p className="text-sm text-zinc-500 mb-6">Log an actual interaction — call, email, or meeting. This updates when you last reached out to this school.</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Contact Date</label>

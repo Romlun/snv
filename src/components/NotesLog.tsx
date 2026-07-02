@@ -177,6 +177,11 @@ export default function NotesLog({
   return (
     <div className="space-y-4">
       <form onSubmit={handleAddNote} className="space-y-3">
+        <p className="text-sm text-zinc-500">
+          {entityType === 'task'
+            ? "Add a note or progress update."
+            : "Notes are for internal updates, quick thoughts, or anything that isn't a direct interaction — they don't count as contact. Use Log Contact/Visit above for an actual call, email, or meeting."}
+        </p>
         <textarea
           className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-24 resize-y text-sm"
           value={body}
