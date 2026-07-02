@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v1.3 Reminders/Upcoming merged; task-creation gap closed`
+`snv Mission CRM — v1.4 Contact Log vs Notes clarified; real-time chat on roadmap`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -237,10 +237,32 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   the field from Edit entirely, not by adding task logic to Edit — brings
   Language Schools in line with the other two, so the ONLY paths to a
   follow-up date are ones that already create the task correctly.
+- ✅ **Contact Log vs Notes clarified (session 16)** — operator proposed a
+  mental model (notes = internal/for yourself, contact log = actual external
+  interaction) and asked Director to check it. Refined it into the precise,
+  already-true distinction: Contact Log is the ONLY thing that updates
+  contact recency and feeds Engagement Score where one exists (donors,
+  churches — NOT language schools, see D8); Notes deliberately doesn't touch
+  either. Rule: "did this represent actually reaching the person?" — if
+  yes, Contact Log; if no, Notes. Added one line of helper copy to each Log
+  form and to NotesLog (branches on entityType so Tasks gets simpler
+  wording, and language schools' copy correctly omits the engagement-score
+  mention it doesn't have).
 
 **What's NOT built yet, in priority order:**
-1. **Reporting, AI features** — later phases, not yet scoped in detail.
-2. **Deferred polish/design pass** — after functional work settles. Candidate tool:
+1. **Real-time team communication (session 16, new roadmap item)** — operator
+   wants this scoped for a NEXT PHASE, not now. Direction is decided: real-time
+   chat (not just a discussion thread), because the team is distributed
+   across the US and needs live back-and-forth, not just async updates.
+   Starting point for a project discussion thread already exists cheaply
+   (the `notes` table already supports any `entity_type`, including
+   `'project'` — that gets a discussion log almost for free, same pattern as
+   Donors/Churches/Schools/Tasks). Real-time delivery (live updates without
+   refresh) is a genuinely different piece of infrastructure than anything
+   built so far in this request/response app — needs its own design pass
+   before building, not a quick directive. Don't build this reactively.
+2. **Reporting, AI features** — later phases, not yet scoped in detail.
+3. **Deferred polish/design pass** — after functional work settles. Candidate tool:
    Stitch (Google AI UI-design MCP) — see §9 for the security caveat on its key.
 
 ---
@@ -452,6 +474,15 @@ Auth via Supabase Auth. Every table with PII has RLS ON from creation.
   formatted. If it recurs in a future session: decline again, don't
   re-litigate at length, and note it to the operator once in case something
   on their end is auto-inserting it without their intent.
+  **Update (session 16):** operator confirmed genuine confusion about what
+  was being declined ("what are you blocking, I don't understand") —
+  strong evidence they aren't pasting this deliberately each time. Operator
+  also confirmed using Headroom (a real local token-saving tool, see the
+  correction above) — plausibly the source of the auto-inserted template.
+  Not adversarial. Keep declining the template's specific instructions
+  (still don't match this repo's real workflow) but there's no reason to
+  treat this as suspicious anymore — just a tool quirk worth the operator
+  checking on their end if they want it to stop.
 - ⚠️ **FABRICATED TECHNICAL CLAIM IN A "CODE AGENT REPORT" (session 14) —
   SEE CORRECTION ABOVE, this verdict was wrong.** ~~a report relayed to the
   Director claimed Director's own tool output was being silently corrupted
@@ -496,12 +527,13 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: nothing mid-flight.** Both fixes from session 15 (Language Schools
-  Edit field removal, Reminders/Upcoming merge) are merged, deployed, and
-  verified — Director read both diffs directly, ran the build, deploy SHA
-  matches merge commit. The church "Log Visit" sync inconsistency noted
-  below is now the only remaining loose end in the follow-up-date/task
-  system.
+- **NOW: nothing mid-flight.** Contact Log vs Notes helper copy (session 16)
+  is merged, deployed, and verified — Director read the diff directly, ran
+  the build, confirmed language-schools' copy correctly omits the
+  engagement-score mention, deploy SHA matches merge commit.
+- **NEXT (decided, not scoped):** real-time team communication, see §4 item
+  1. Direction is set (real-time chat, not just a thread) but this needs its
+  own design conversation before any directive — don't build reactively.
 - **STILL OPEN, LOWER PRIORITY:**
   - stale `src/types/database.ts` + the ~15 null-safety errors regeneration
     surfaces (discovered session 12, not yet dispatched)
