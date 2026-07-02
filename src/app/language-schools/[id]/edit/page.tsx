@@ -2,7 +2,6 @@
 
 import { use, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import DateField from "@/components/DateField";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -21,7 +20,6 @@ interface FormData {
   website: string;
   source: string;
   status: SchoolStatus;
-  next_follow_up_date: string;
   assigned_staff_id: string;
 }
 
@@ -43,7 +41,6 @@ export default function EditLanguageSchoolPage({ params }: { params: Promise<{ i
     website: "",
     source: "",
     status: "New",
-    next_follow_up_date: "",
     assigned_staff_id: "",
   });
 
@@ -65,7 +62,6 @@ export default function EditLanguageSchoolPage({ params }: { params: Promise<{ i
             website: school.website || "",
             source: school.source || "",
             status: school.status,
-            next_follow_up_date: school.next_follow_up_date || "",
             assigned_staff_id: school.assigned_staff_id || "",
           });
         }
@@ -93,7 +89,6 @@ export default function EditLanguageSchoolPage({ params }: { params: Promise<{ i
         website: formData.website || null,
         source: formData.source || null,
         status: formData.status,
-        next_follow_up_date: formData.next_follow_up_date || null,
         assigned_staff_id: formData.assigned_staff_id || null,
       }).eq('id', id);
 
@@ -224,11 +219,6 @@ export default function EditLanguageSchoolPage({ params }: { params: Promise<{ i
               onChange={e => setFormData({ ...formData, website: e.target.value })}
             />
           </div>
-          <DateField
-            label="Next Follow-up Date"
-            value={formData.next_follow_up_date}
-            onChange={val => setFormData({ ...formData, next_follow_up_date: val })}
-          />
           <button
             type="submit"
             disabled={loading}
