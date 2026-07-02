@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v1.2 Dashboard Reminders panel LIVE`
+`snv Mission CRM — v1.3 Reminders/Upcoming merged; task-creation gap closed`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -214,16 +214,29 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   This is an inconsistency worth fixing eventually (churches is the only one
   of the three where the heavier form and the NotesLog quick-path don't
   agree on what gets synced), not urgent, not done this session.
-- ✅ **Dashboard Reminders panel (session 14)** — the operator's actual
-  notification/cadence answer, decided session 13: in-app only, no email,
-  triggered by both task due dates and follow-up dates. New panel, first in
-  the Dashboard's two-panel grid, combines overdue/due-today Tasks with
-  overdue/due-today Donors/Churches/Language Schools into one list sorted
-  by how overdue each item is. Correctly uses `churches.next_visit_date` vs
-  `donors`/`language_schools.next_follow_up_date` (verified against live
-  schema by both the Code Agent and Director independently). "Engagement
-  Needs Attention," "Upcoming Tasks," and the Overdue Tasks stat card are
-  untouched — purely additive (verified: 119 insertions, 0 deletions).
+- ✅ **Dashboard Reminders panel (session 14, merged with Upcoming Tasks
+  session 15)** — the operator's actual notification/cadence answer,
+  decided session 13: in-app only, no email, triggered by both task due
+  dates and follow-up dates. One panel, first in the Dashboard's two-panel
+  grid, with two stacked sections: "Overdue / Due Today" (combines Tasks +
+  Donors + Churches + Language Schools, sorted by how overdue) and
+  "Upcoming" (next 5 pending tasks). Correctly uses `churches.next_visit_date`
+  vs `donors`/`language_schools.next_follow_up_date`. "Engagement Needs
+  Attention" is the only other panel left in that grid row.
+- ✅ **Task-creation guarantee closed for real usage (session 15)** — operator
+  asked Director to double-check that every real way of setting a follow-up
+  date reliably creates a task (that's what makes an item show up correctly
+  attributed in Reminders). Verified live for donor and language_school
+  (church already verified session 14) — all three correct via NotesLog and
+  the "Log X" forms. Found one real, live gap in the process: Language
+  Schools' Edit form still had a directly-editable `next_follow_up_date`
+  field with no task-creation logic — a leftover from the Notes/Next-Step
+  unification (Director removed `next_step` from that form but didn't
+  realize `next_follow_up_date` was also editable there, unlike Donors/
+  Churches, which never had that field on Edit at all). Fixed by removing
+  the field from Edit entirely, not by adding task logic to Edit — brings
+  Language Schools in line with the other two, so the ONLY paths to a
+  follow-up date are ones that already create the task correctly.
 
 **What's NOT built yet, in priority order:**
 1. **Reporting, AI features** — later phases, not yet scoped in detail.
@@ -483,18 +496,12 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: nothing mid-flight.** Dashboard Reminders panel (session 14) is
-  merged, deployed, and verified — Director read the actual file directly
-  (not the report) after a report contained a false claim about corrupted
-  tool output, ran the build, confirmed correct schema handling, deploy SHA
-  matches merge commit. Awaiting operator's click-test on production.
-- **RECURRING PATTERN, WORTH WATCHING:** this is the SECOND time (session 8,
-  session 14) the Code Agent left work uncommitted directly on local `main`
-  instead of the feature branch. Both times caught and fixed the same way
-  (stash, switch branches, reapply, commit there). Not urgent to fix
-  structurally, but if it keeps happening, worth naming the branch even more
-  explicitly in directives, or asking the operator whether the Code Agent's
-  default working branch could be pre-configured.
+- **NOW: nothing mid-flight.** Both fixes from session 15 (Language Schools
+  Edit field removal, Reminders/Upcoming merge) are merged, deployed, and
+  verified — Director read both diffs directly, ran the build, deploy SHA
+  matches merge commit. The church "Log Visit" sync inconsistency noted
+  below is now the only remaining loose end in the follow-up-date/task
+  system.
 - **STILL OPEN, LOWER PRIORITY:**
   - stale `src/types/database.ts` + the ~15 null-safety errors regeneration
     surfaces (discovered session 12, not yet dispatched)
