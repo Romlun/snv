@@ -467,7 +467,9 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
             <NotesLog
               entityType="church"
               entityId={church.id}
+              entityLabel={church.name}
               onNextStepSaved={next_step => setChurch(prev => prev ? { ...prev, next_step } : prev)}
+              onFollowUpDateSaved={next_visit_date => setChurch(prev => prev ? { ...prev, next_visit_date } : prev)}
             />
           </section>
 
