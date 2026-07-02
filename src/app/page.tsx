@@ -7,6 +7,9 @@ import {
   Clock,
   ListTodo,
   BookOpen,
+  Bell,
+  CheckSquare,
+  GraduationCap,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getTransactionDateRange } from "@/lib/date-ranges";
@@ -64,6 +67,31 @@ export default async function Dashboard() {
       .gte('transaction_date', monthStart!.toISOString()),
   ]);
 
+  const [
+    remindersTasksResult,
+    remindersDonorsResult,
+    remindersChurchesResult,
+    remindersLanguageSchoolsResult,
+  ] = await Promise.all([
+    supabase.from('tasks')
+      .select('id, title, due_date, priority')
+      .lte('due_date', today)
+      .neq('status', 'Completed')
+      .neq('status', 'Cancelled'),
+    supabase.from('donors')
+      .select('id, name, next_follow_up_date')
+      .lte('next_follow_up_date', today)
+      .not('next_follow_up_date', 'is', null),
+    supabase.from('churches')
+      .select('id, name, next_visit_date')
+      .lte('next_visit_date', today)
+      .not('next_visit_date', 'is', null),
+    supabase.from('language_schools')
+      .select('id, name, next_follow_up_date')
+      .lte('next_follow_up_date', today)
+      .not('next_follow_up_date', 'is', null),
+  ]);
+
   const totalDonors = donorsResult.count ?? 0;
   const totalChurches = churchesResult.count ?? 0;
   const activeProjects = projectsResult.count ?? 0;
@@ -92,6 +120,63 @@ export default async function Dashboard() {
 
   type TaskRow = { id: string; title: string; due_date: string | null; priority: string; status: string };
   const upcomingTasks = (upcomingTasksResult.data ?? []) as TaskRow[];
+
+  type ReminderItem = {
+    type: 'task' | 'donor' | 'church' | 'language_school';
+    id: string;
+    label: string;
+    dueDate: string;
+    href: string;
+  };
+
+  const reminderTypeConfig: Record<ReminderItem['type'], { label: string; icon: typeof Users; color: string; bg: string }> = {
+    task: { label: 'Task', icon: CheckSquare, color: 'text-blue-600', bg: 'bg-blue-50' },
+    donor: { label: 'Donor', icon: Users, color: 'text-purple-600', bg: 'bg-purple-50' },
+    church: { label: 'Church', icon: ChurchIcon, color: 'text-green-600', bg: 'bg-green-50' },
+    language_school: { label: 'Language School', icon: GraduationCap, color: 'text-orange-600', bg: 'bg-orange-50' },
+  };
+
+  const reminderTasks = (remindersTasksResult.data ?? []) as { id: string; title: string; due_date: string; priority: string }[];
+  const reminderDonors = (remindersDonorsResult.data ?? []) as { id: string; name: string; next_follow_up_date: string }[];
+  const reminderChurches = (remindersChurchesResult.data ?? []) as { id: string; name: string; next_visit_date: string }[];
+  const reminderLanguageSchools = (remindersLanguageSchoolsResult.data ?? []) as { id: string; name: string; next_follow_up_date: string }[];
+
+  const reminders: ReminderItem[] = [
+    ...reminderTasks.map((t) => ({
+      type: 'task' as const,
+      id: t.id,
+      label: t.title,
+      dueDate: t.due_date,
+      href: `/tasks/${t.id}`,
+    })),
+    ...reminderDonors.map((d) => ({
+      type: 'donor' as const,
+      id: d.id,
+      label: `Follow up with ${d.name}`,
+      dueDate: d.next_follow_up_date,
+      href: `/donors/${d.id}`,
+    })),
+    ...reminderChurches.map((c) => ({
+      type: 'church' as const,
+      id: c.id,
+      label: `Follow up with ${c.name}`,
+      dueDate: c.next_visit_date,
+      href: `/churches/${c.id}`,
+    })),
+    ...reminderLanguageSchools.map((s) => ({
+      type: 'language_school' as const,
+      id: s.id,
+      label: `Follow up with ${s.name}`,
+      dueDate: s.next_follow_up_date,
+      href: `/language-schools/${s.id}`,
+    })),
+  ].sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+
+  function reminderDueLabel(dueDate: string) {
+    const days = Math.round((new Date(today).getTime() - new Date(dueDate.slice(0, 10)).getTime()) / 86400000);
+    if (days <= 0) return 'Due today';
+    return `${days} day${days === 1 ? '' : 's'} overdue`;
+  }
 
   const stats = [
     { name: 'Total Donors', value: totalDonors, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -148,6 +233,40 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Reminders */}
+        <div className="bg-white rounded-xl border overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
+          <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800 flex items-center gap-2">
+            <Bell className="h-5 w-5 text-red-500" />
+            <h2 className="font-semibold">Reminders</h2>
+          </div>
+          <div className="divide-y dark:divide-zinc-800">
+            {reminders.length === 0 ? (
+              <p className="p-4 text-sm text-zinc-500">Nothing due right now.</p>
+            ) : (
+              reminders.map((reminder) => {
+                const config = reminderTypeConfig[reminder.type];
+                return (
+                  <div key={`${reminder.type}-${reminder.id}`} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className={cn("p-1.5 rounded-lg", config.bg)}>
+                        <config.icon className={cn("h-4 w-4", config.color)} />
+                      </div>
+                      <div>
+                        <Link href={reminder.href} className="font-medium hover:underline">{reminder.label}</Link>
+                        <p className="text-sm text-zinc-500">{config.label}</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium text-red-600 dark:text-red-400 whitespace-nowrap">{reminderDueLabel(reminder.dueDate)}</span>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          <div className="p-4 border-t dark:border-zinc-800">
+            <Link href="/tasks" className="text-sm text-blue-600 font-medium hover:underline">View all tasks</Link>
+          </div>
+        </div>
+
         {/* Engagement Needs Attention */}
         <div className="bg-white rounded-xl border overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
           <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800 flex items-center gap-2">
