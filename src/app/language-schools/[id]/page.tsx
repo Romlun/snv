@@ -255,7 +255,9 @@ export default function LanguageSchoolDetailPage({ params }: { params: Promise<{
             <NotesLog
               entityType="language_school"
               entityId={school.id}
+              entityLabel={school.name}
               onNextStepSaved={next_step => setSchool(prev => prev ? { ...prev, next_step } : prev)}
+              onFollowUpDateSaved={next_follow_up_date => setSchool(prev => prev ? { ...prev, next_follow_up_date } : prev)}
             />
           </section>
 

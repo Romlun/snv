@@ -439,7 +439,9 @@ export default function DonorDetailPage({ params }: { params: Promise<{ id: stri
             <NotesLog
               entityType="donor"
               entityId={donor.id}
+              entityLabel={donor.name}
               onNextStepSaved={next_step => setDonor(prev => prev ? { ...prev, next_step } : prev)}
+              onFollowUpDateSaved={next_follow_up_date => setDonor(prev => prev ? { ...prev, next_follow_up_date } : prev)}
             />
           </section>
 
