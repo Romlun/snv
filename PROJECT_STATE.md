@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v1.0 Auto-task-from-note across Donors/Churches/Schools`
+`snv Mission CRM — v1.1 Inventory Available auto-decrements on sale/giveaway`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -275,6 +275,24 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   spreadsheet funnel sheet — inferred from the guide's explicit "if refused"
   section. If the operator wants different weighting/values here, flag it —
   this whole module is new and less battle-tested than churches/donors.
+- **D9 — Inventory `quantity_available` fix (session 14, operator-reported
+  bug, operator-approved fix):** was documented as intentionally manual
+  since the original MVP build — a sale/giveaway transaction never
+  decremented it, only `quantity_sold`/`quantity_given` did. Operator
+  correctly flagged this as broken in practice (Inventory tab showed stale
+  Available numbers after real transactions). Two options were presented:
+  (A) make it fully derived via a new `total_received` baseline field,
+  matching every other derived field in this project, or (B) keep the field
+  and its current manual-edit behavior exactly as-is, just have sale/
+  giveaway transactions decrement it automatically. Operator chose B —
+  lower workflow disruption, no relabeling, no data migration. Implemented
+  as an incremental running-balance trigger (reverse OLD's effect, apply
+  NEW's effect, on INSERT/UPDATE/DELETE) rather than the sum-recompute
+  pattern used everywhere else, since there's no persisted baseline to
+  recompute from. Live-tested through insert, quantity update, and delete
+  before shipping. No app code changes needed — the Inventory pages already
+  read/write this column directly, so the fix took effect immediately on
+  migration, no Code Agent dispatch or deploy required.
 
 ## 6. PRECEDENTS (banked principles — apply automatically, don't re-litigate)
 - **P1 — Next 16 docs first.** Every directive touching framework code: read
@@ -359,9 +377,12 @@ Auth via Supabase Auth. Every table with PII has RLS ON from creation.
   `churches.engagement_score` (BEFORE trigger on churches' own next_visit_date
   reading NEW directly + AFTER triggers on both `gifts` and `contact_logs` —
   same P9-safe pattern as donors, see D7 for the formula).
-  `resources.quantity_available` is the ONE manual exception (on-hand
-  stock, deliberately not auto-decremented). Every prototype-era stat column
-  in the app is now real and trigger-maintained — none left stale.
+  `resources.quantity_available` (session 14 — see D9: this is the ONE field
+  in this list that's an incremental running-balance adjustment, not a full
+  recompute-from-sum like everything else here. Still directly editable by
+  staff for restocks; sale/giveaway transactions decrement it automatically
+  now). Every prototype-era stat column in the app is now real and
+  trigger-maintained — none left stale.
 - ⚠️ **Vercel deploy-skip pattern (recurring, has a known fix — P8):** pushing a
   branch and merging to main within seconds can make Vercel's GitHub webhook skip
   the production build. STANDARD PROCEDURE: push branch → wait ~10s → merge to
@@ -406,11 +427,12 @@ chat earlier in this project and is COMPROMISED — a fresh one must be generate
 and never pasted in chat; (2) verify what the MCP actually accesses before
 connecting it to a repo holding donor PII.
 
-## 10. INFRA STATUS (verified live, session 13)
+## 10. INFRA STATUS (verified live, session 14)
 - Supabase `snv` (`eriflhdyylssjnxygseq`) ACTIVE_HEALTHY, us-east-1, Postgres 17.6.
-- **19 migrations applied and verified against live state** (0000 through 0018):
-  ...through churches.next_step column (P10 fix) → notes.follow_up_date column
-  (auto-task-from-note, session 13). All tables have full RLS coverage.
+- **20 migrations applied and verified against live state** (0000 through 0019):
+  ...through notes.follow_up_date column (auto-task-from-note, session 13) →
+  resources_available_auto_decrement (D9, session 14). All tables have full
+  RLS coverage.
 - `Supabase:execute_sql` had a brief transient failure streak (3 calls) mid
   session 13, unrelated to any real DB issue — other MCP calls (list_migrations)
   succeeded in between, and a retry succeeded. Same "transient, retry once"
@@ -434,18 +456,16 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: nothing mid-flight.** Auto-task-from-note (session 13) is merged,
-  deployed, and verified — Director read the diff, live-tested the full
-  write path (note insert -> parent column sync -> task creation) on a
-  temporary church, cleaned up after, deploy SHA matches merge commit.
-  Awaiting operator's click-test on production.
+- **NOW: nothing mid-flight.** Inventory `quantity_available` fix (D9) is
+  live — pure DB-side, no app deploy needed, verified with a full live test
+  cycle (insert/update/delete) on a temporary resource before shipping.
 - **NEXT (ready, not dispatched):** the Dashboard "Reminders" panel directive
   is fully written (see §4 item 1) but the operator wants to hand it to the
-  Code Agent later, not immediately. Don't re-derive it — the directive text
-  from this session is ready to relay as-is when the operator's ready.
+  Code Agent when ready. Don't re-derive it — the directive text from
+  session 13 is ready to relay as-is.
 - **STILL OPEN, LOWER PRIORITY:**
   - stale `src/types/database.ts` + the ~15 null-safety errors regeneration
-    surfaces (§ discovered session 12, not yet dispatched)
+    surfaces (discovered session 12, not yet dispatched)
   - churches' older "Log Visit" form doesn't sync church.next_step/
     next_visit_date, unlike the donor/language-school equivalents and unlike
     NotesLog (discovered session 13, not urgent)
