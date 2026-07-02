@@ -4,7 +4,6 @@ import {
   Briefcase,
   TrendingUp,
   AlertTriangle,
-  Clock,
   ListTodo,
   BookOpen,
   Bell,
@@ -239,29 +238,60 @@ export default async function Dashboard() {
             <Bell className="h-5 w-5 text-red-500" />
             <h2 className="font-semibold">Reminders</h2>
           </div>
-          <div className="divide-y dark:divide-zinc-800">
-            {reminders.length === 0 ? (
-              <p className="p-4 text-sm text-zinc-500">Nothing due right now.</p>
-            ) : (
-              reminders.map((reminder) => {
-                const config = reminderTypeConfig[reminder.type];
-                return (
-                  <div key={`${reminder.type}-${reminder.id}`} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className={cn("p-1.5 rounded-lg", config.bg)}>
-                        <config.icon className={cn("h-4 w-4", config.color)} />
+
+          <div>
+            <h3 className="px-4 pt-4 pb-1 text-xs font-semibold uppercase tracking-wide text-zinc-500">Overdue / Due Today</h3>
+            <div className="divide-y dark:divide-zinc-800">
+              {reminders.length === 0 ? (
+                <p className="p-4 text-sm text-zinc-500">Nothing due right now.</p>
+              ) : (
+                reminders.map((reminder) => {
+                  const config = reminderTypeConfig[reminder.type];
+                  return (
+                    <div key={`${reminder.type}-${reminder.id}`} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className={cn("p-1.5 rounded-lg", config.bg)}>
+                          <config.icon className={cn("h-4 w-4", config.color)} />
+                        </div>
+                        <div>
+                          <Link href={reminder.href} className="font-medium hover:underline">{reminder.label}</Link>
+                          <p className="text-sm text-zinc-500">{config.label}</p>
+                        </div>
                       </div>
-                      <div>
-                        <Link href={reminder.href} className="font-medium hover:underline">{reminder.label}</Link>
-                        <p className="text-sm text-zinc-500">{config.label}</p>
-                      </div>
+                      <span className="text-sm font-medium text-red-600 dark:text-red-400 whitespace-nowrap">{reminderDueLabel(reminder.dueDate)}</span>
                     </div>
-                    <span className="text-sm font-medium text-red-600 dark:text-red-400 whitespace-nowrap">{reminderDueLabel(reminder.dueDate)}</span>
-                  </div>
-                );
-              })
-            )}
+                  );
+                })
+              )}
+            </div>
           </div>
+
+          <div className="border-t dark:border-zinc-800">
+            <h3 className="px-4 pt-4 pb-1 text-xs font-semibold uppercase tracking-wide text-zinc-500">Upcoming</h3>
+            <div className="divide-y dark:divide-zinc-800">
+              {upcomingTasks.length === 0 ? (
+                <p className="p-4 text-sm text-zinc-500">No pending tasks.</p>
+              ) : (
+                upcomingTasks.map((task) => (
+                  <div key={task.id} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                    <div>
+                      <p className="font-medium">{task.title}</p>
+                      <p className="text-sm text-zinc-500">Due: {formatDate(task.due_date)}</p>
+                    </div>
+                    <div>
+                      <span className={cn(
+                        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                        task.priority === 'High' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                      )}>
+                        {task.priority}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
           <div className="p-4 border-t dark:border-zinc-800">
             <Link href="/tasks" className="text-sm text-blue-600 font-medium hover:underline">View all tasks</Link>
           </div>
@@ -294,39 +324,6 @@ export default async function Dashboard() {
           </div>
           <div className="p-4 border-t dark:border-zinc-800">
             <Link href="/donors" className="text-sm text-blue-600 font-medium hover:underline">View all donors</Link>
-          </div>
-        </div>
-
-        {/* Upcoming Tasks */}
-        <div className="bg-white rounded-xl border overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
-          <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800 flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-500" />
-            <h2 className="font-semibold">Upcoming Tasks</h2>
-          </div>
-          <div className="divide-y dark:divide-zinc-800">
-            {upcomingTasks.length === 0 ? (
-              <p className="p-4 text-sm text-zinc-500">No pending tasks.</p>
-            ) : (
-              upcomingTasks.map((task) => (
-                <div key={task.id} className="p-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                  <div>
-                    <p className="font-medium">{task.title}</p>
-                    <p className="text-sm text-zinc-500">Due: {formatDate(task.due_date)}</p>
-                  </div>
-                  <div>
-                    <span className={cn(
-                      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
-                      task.priority === 'High' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
-                    )}>
-                      {task.priority}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-          <div className="p-4 border-t dark:border-zinc-800">
-            <Link href="/tasks" className="text-sm text-blue-600 font-medium hover:underline">View all tasks</Link>
           </div>
         </div>
       </div>
