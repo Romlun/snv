@@ -69,10 +69,29 @@ of large headings per page, not general UI text.
 
 ## Elevation
 
-Tonal layers, not heavy drop-shadows — this is central to the "soft" feel:
-- Level 0 (page): cream surface
-- Level 1 (cards): white, very soft terracotta-tinted shadow
-  (`0px 4px 20px rgba(226, 123, 88, 0.08)`)
+Tonal layers, not heavy drop-shadows — this is central to the "soft" feel.
+
+**Correction (verified against the actual code, not just the written system
+doc):** cards are NOT pure white. They use a frosted-glass treatment:
+```css
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(137, 114, 107, 0.15);
+}
+```
+This applies to stat cards, the attention-list panel, and sidebar panels —
+it's a deliberate, consistent effect, not incidental. The top header bar
+uses the same idea (`bg-white/80 backdrop-blur-md`). Port this as an actual
+`backdrop-filter` utility, not a flat white background.
+
+- Level 0 (page): cream surface (`#fff8f6`)
+- Level 1 (cards): `.glass-card` as above, PLUS a hover lift — on hover,
+  translateY(-2px) and a soft terracotta shadow fades in
+  (`0 12px 30px -10px rgba(155, 68, 38, 0.12)`). This is done with a few
+  lines of JS in the mockup (mouseenter/mouseleave), but a CSS `:hover`
+  transition achieves the same thing more simply — no need to port the JS
+  approach, just the visual effect.
 - Level 2 (modals/dropdowns): white, slightly more defined navy-tinted shadow
 - Dividers: 1px solid, very light neutral — never a heavy border
 
@@ -89,6 +108,16 @@ Tonal layers, not heavy drop-shadows — this is central to the "soft" feel:
 - **Lists/tables:** generous 16px vertical row padding, subtle 2%-opacity
   hover state
 - **Icons:** light/regular-weight line icons, matching Inter's stroke weight
+- **Identity/quote block:** a full-width footer accent seen on the dashboard
+  mock — thin terracotta top border, large translucent quote-mark icon,
+  serif italic scripture quote, small-caps citation below. A tasteful,
+  low-cost identity touch appropriate for this mission org (unlike the
+  rejected GPT version's decorative illustration, this is small, text-based,
+  and doesn't compete with the actual data above it). Worth keeping as a
+  reusable component, not just a one-off on the dashboard.
+- **Mobile nav:** a fixed bottom bar (4 items: Home/Donors/Tasks/Budget)
+  replaces the sidebar below the `lg` breakpoint in the mock — confirms
+  responsive behavior was considered, not just a desktop-only mock.
 
 ---
 
