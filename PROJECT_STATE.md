@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v1.6 Design direction chosen (Soft Luminous, see DESIGN.md)`
+`snv Mission CRM — v1.7 DESIGN_SPEC.md approved (Gate 1 clear); logo pending`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -547,33 +547,59 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: design direction chosen, implementation not started.** Three
-  options were evaluated (GPT-generated, Claude Design, Stitch) — Stitch's
-  "Soft Luminous" system won: distinctive without being visually
-  overwhelming (unlike the GPT version, which used one accent color for
-  nearly everything) and a genuine refresh (unlike Claude Design's, which
-  read the codebase so faithfully it looked almost identical to the
-  current app). Full system documented in `DESIGN.md` (repo root),
-  including Tailwind v4 translation notes — the Stitch export's config is
-  written v3-style and needs porting, not copy-pasting.
-- **STILL NEEDED before implementation starts:** ~~the operator needs to
-  place the full Stitch export~~ DONE (session 18) — extracted to
-  `design/stitch-export/` (16 reference pages — corrected count, Director
-  initially miscounted as 15 in chat and in this file; verified by counting
-  actual `code.html` files: Dashboard, Donors list+profile, Churches
-  list+profile, Language Schools list+profile, Projects list+profile, Tasks
-  list+profile, Budget overview+new-entry, Literature/Inventory, Calendar,
-  Publication profile — full coverage, nothing missing). Ready to dispatch
-  to the Designer subagent now. Recommended implementation order once that
-  spec comes back: shared UI primitives first (Button/Card/Badge/StatCard/
-  Sidebar/Input), verified on one real page, THEN roll out page by page
-  reusing those primitives — not 16 independent copy-jobs, which would
-  produce visible inconsistency.
+- **NOW: DESIGN_SPEC.md is approved (Gate 1 cleared), Phase 0 not yet
+  dispatched.** Designer subagent produced `DESIGN_SPEC.md` (repo root) —
+  Director read it in full, independently verified its secondary-button-
+  color claim against the raw mock HTML, and it holds up well: it read the
+  actual `code.html` exports (not just DESIGN.md's prose), correctly found
+  the glass-card treatment is inconsistent across the Stitch export itself
+  (dashboard = true blur, donor-management/budget-form = opaque+shadow —
+  more than DESIGN.md's own earlier correction caught), and produced a
+  genuinely well-reasoned shape-based rollout order (foundations →
+  Dashboard as the deliberately-chosen proving page → list pages together →
+  profile pages together → forms/Budget → Calendar).
+- **Four flagged decisions, all approved as the Designer/Director
+  recommended:**
+  1. `.glass-card` = true frosted glass (translucent + blur) everywhere, not
+     the opaque+shadow variant seen on some mock pages.
+  2. Secondary buttons = terracotta outline (matches every real mock
+     instance — verified directly against pasted code), NOT navy as
+     DESIGN.md's prose incorrectly said.
+  3. Dark mode: DROPPED for this pass. The current app has `dark:` classes
+     throughout but the entire approved system is light-only by every
+     reference (DESIGN.md, all 16 mocks) — inventing an unreviewed dark
+     palette would violate "flag rather than improvise."
+  4. Mobile bottom nav: BUILD NOW, alongside the Sidebar restyle. The app
+     currently has zero mobile fallback (sidebar always rendered, no
+     responsive collapse) — a real functional gap, not just cosmetic.
+- **STILL OPEN — logo asset, blocking one piece of Phase 0 (Sidebar):** the
+  operator has real "Light in the East" logo files (3 PNGs — one full
+  lockup with the wordmark baked in, two near-identical icon-only sun-mark
+  crops). Correct one for the Sidebar is the icon-only mark (image 1),
+  since the Sidebar mock pairs a circular icon with LIVE text ("Light in
+  the East" in Playfair Display), not an image with text baked in.
+  Director attempted to relay the actual file into `public/logo-mark.png`
+  via a base64 chunked transfer through chat (Desktop Commander and
+  Director's sandbox are separate filesystems with no direct bridge) — this
+  was slow and error-prone (one silent corruption caught via byte-count
+  verification and fixed mid-transfer; ultimately abandoned incomplete,
+  33KB of ~41KB written, then deleted rather than leave a broken partial
+  file in the repo). **Simplest real fix, not yet done:** the operator
+  already has this file on their own machine (it was uploaded from there)
+  — just drag/save it to `snv/public/logo-mark.png` directly. Far more
+  reliable than a chat-relayed transfer. Once it's there, `DESIGN_SPEC.md`'s
+  Sidebar section can point at the real path instead of leaving it as an
+  open question, and Phase 0 is fully unblocked.
+- **NEXT (ready to dispatch once the logo is placed):** Phase 0 — port
+  DESIGN.md's tokens into the real Tailwind v4 `@theme` block, swap
+  Geist → Playfair Display + Inter, extract the six shared UI primitives
+  (Button/Card/Badge/StatCard/Input, restyle Sidebar in place), build the
+  mobile nav. Do NOT touch any page yet — foundations get reviewed on their
+  own first, per DESIGN_SPEC.md §9.
 - **ALSO STILL PENDING (relevant to the design phase):** the Notes / Log
-  Contact / Plan Visit tab-consolidation brief (2 tabs, not 3 — see prior
-  session history for the reasoning) was written and given to the operator
-  to relay, never confirmed dispatched. Worth folding into whatever comes
-  out of this design pass rather than building separately first.
+  Contact / Plan Visit tab-consolidation brief (2 tabs, not 3) was written
+  and given to the operator to relay, never confirmed dispatched. Worth
+  folding into the design-phase rollout rather than building separately.
 - **STILL OPEN, LOWER PRIORITY (unrelated to design, don't let these block
   it):**
   - stale `src/types/database.ts` + the ~15 null-safety errors regeneration
