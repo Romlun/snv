@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v1.5 Entering Design Phase (fresh Director chat)`
+`snv Mission CRM — v1.6 Design direction chosen (Soft Luminous, see DESIGN.md)`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -547,29 +547,33 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: entering the Design phase.** This is a deliberate, clean swap to a
-  fresh Director chat — driven by accumulated context length across many
-  sessions of feature work, NOT a mistake or stuck situation. Inherit
-  everything in this file verbatim.
-- **IMMEDIATE TASK for the new chat:** guide the operator through using
-  Claude Design (claude.ai/design) to explore a visual refresh of the CRM.
-  The operator has never used it before — walk through: linking/uploading
-  the snv codebase so it builds a design system from the ACTUAL current app
-  (zinc/blue palette, card/border patterns) rather than generating something
-  generic; iterating on a direction; and eventually using Claude Design's
-  "Handoff to Claude Code" feature to package an approved direction for the
-  Code Agent to build from. Do not build anything yet — this phase is
-  exploration and direction-setting, not implementation.
-- **ALSO STILL PENDING (relevant to the design phase, not yet actioned):** a
-  Designer-subagent brief for consolidating Notes / Log Contact / Plan Visit
-  into one tabbed section (2 tabs, not 3 — Plan Visit is redundant with
-  NotesLog's existing next_step + follow_up_date mechanism, see the
-  reasoning already worked out in prior session history) was written and
-  given to the operator to relay, but never confirmed as dispatched or
-  completed. Worth folding into whatever comes out of the Claude Design
-  exploration rather than building it separately beforehand.
+- **NOW: design direction chosen, implementation not started.** Three
+  options were evaluated (GPT-generated, Claude Design, Stitch) — Stitch's
+  "Soft Luminous" system won: distinctive without being visually
+  overwhelming (unlike the GPT version, which used one accent color for
+  nearly everything) and a genuine refresh (unlike Claude Design's, which
+  read the codebase so faithfully it looked almost identical to the
+  current app). Full system documented in `DESIGN.md` (repo root),
+  including Tailwind v4 translation notes — the Stitch export's config is
+  written v3-style and needs porting, not copy-pasting.
+- **STILL NEEDED before implementation starts:** the operator needs to
+  place the full Stitch export (15 pages, static HTML + screenshots) into
+  the repo, e.g. `design/stitch-export/`, so the Designer subagent and Code
+  Agent can see the actual mocked pages, not just the DESIGN.md token
+  summary. Then dispatch to the Designer subagent for a proper
+  `DESIGN_SPEC.md` (this qualifies as genuinely new/foundational visual
+  work, not incremental — full Designer pass is warranted here, not
+  skipped). Recommended implementation order once that's ready: shared UI
+  primitives first (Button/Card/Badge/StatCard/Sidebar/Input), verified on
+  one real page, THEN roll out page by page reusing those primitives — not
+  15 independent copy-jobs, which would produce visible inconsistency.
+- **ALSO STILL PENDING (relevant to the design phase):** the Notes / Log
+  Contact / Plan Visit tab-consolidation brief (2 tabs, not 3 — see prior
+  session history for the reasoning) was written and given to the operator
+  to relay, never confirmed dispatched. Worth folding into whatever comes
+  out of this design pass rather than building separately first.
 - **STILL OPEN, LOWER PRIORITY (unrelated to design, don't let these block
-  the design phase):**
+  it):**
   - stale `src/types/database.ts` + the ~15 null-safety errors regeneration
     surfaces (discovered session 12, not yet dispatched)
   - churches' older "Log Visit" form doesn't sync church.next_step/
