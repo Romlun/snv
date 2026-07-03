@@ -9,10 +9,10 @@ Design's stayed too close to the current app to represent a real refresh.
 This system solves both: one warm accent used sparingly, calm whitespace,
 and a real point of view (editorial serif headlines + functional sans data).
 
-Reference material (full Stitch export — 15 pages, static HTML + screenshots)
-should live alongside this file, e.g. `design/stitch-export/`, so the
-Designer subagent and Code Agent can see the actual mocked pages, not just
-this token summary.
+Reference material (full Stitch export — 16 pages, static HTML + screenshots)
+lives alongside this file at `design/stitch-export/`, so the Designer
+subagent and Code Agent can see the actual mocked pages, not just this
+token summary.
 
 ---
 

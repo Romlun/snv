@@ -558,14 +558,17 @@ effective gate. Continue this pattern.
   written v3-style and needs porting, not copy-pasting.
 - **STILL NEEDED before implementation starts:** ~~the operator needs to
   place the full Stitch export~~ DONE (session 18) — extracted to
-  `design/stitch-export/` (15 reference pages, code + screenshots). The
-  operator had placed the zip in the repo but it was still zipped and
-  unreadable to filesystem-based agents; Director unzipped it in place and
-  removed the redundant archive. Ready to dispatch to the Designer subagent
-  now. Recommended implementation order once that spec comes back: shared UI
-  primitives first (Button/Card/Badge/StatCard/Sidebar/Input), verified on
-  one real page, THEN roll out page by page reusing those primitives — not
-  15 independent copy-jobs, which would produce visible inconsistency.
+  `design/stitch-export/` (16 reference pages — corrected count, Director
+  initially miscounted as 15 in chat and in this file; verified by counting
+  actual `code.html` files: Dashboard, Donors list+profile, Churches
+  list+profile, Language Schools list+profile, Projects list+profile, Tasks
+  list+profile, Budget overview+new-entry, Literature/Inventory, Calendar,
+  Publication profile — full coverage, nothing missing). Ready to dispatch
+  to the Designer subagent now. Recommended implementation order once that
+  spec comes back: shared UI primitives first (Button/Card/Badge/StatCard/
+  Sidebar/Input), verified on one real page, THEN roll out page by page
+  reusing those primitives — not 16 independent copy-jobs, which would
+  produce visible inconsistency.
 - **ALSO STILL PENDING (relevant to the design phase):** the Notes / Log
   Contact / Plan Visit tab-consolidation brief (2 tabs, not 3 — see prior
   session history for the reasoning) was written and given to the operator
