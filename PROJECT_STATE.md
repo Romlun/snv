@@ -556,14 +556,13 @@ effective gate. Continue this pattern.
   current app). Full system documented in `DESIGN.md` (repo root),
   including Tailwind v4 translation notes — the Stitch export's config is
   written v3-style and needs porting, not copy-pasting.
-- **STILL NEEDED before implementation starts:** the operator needs to
-  place the full Stitch export (15 pages, static HTML + screenshots) into
-  the repo, e.g. `design/stitch-export/`, so the Designer subagent and Code
-  Agent can see the actual mocked pages, not just the DESIGN.md token
-  summary. Then dispatch to the Designer subagent for a proper
-  `DESIGN_SPEC.md` (this qualifies as genuinely new/foundational visual
-  work, not incremental — full Designer pass is warranted here, not
-  skipped). Recommended implementation order once that's ready: shared UI
+- **STILL NEEDED before implementation starts:** ~~the operator needs to
+  place the full Stitch export~~ DONE (session 18) — extracted to
+  `design/stitch-export/` (15 reference pages, code + screenshots). The
+  operator had placed the zip in the repo but it was still zipped and
+  unreadable to filesystem-based agents; Director unzipped it in place and
+  removed the redundant archive. Ready to dispatch to the Designer subagent
+  now. Recommended implementation order once that spec comes back: shared UI
   primitives first (Button/Card/Badge/StatCard/Sidebar/Input), verified on
   one real page, THEN roll out page by page reusing those primitives — not
   15 independent copy-jobs, which would produce visible inconsistency.
