@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v1.4 Contact Log vs Notes clarified; real-time chat on roadmap`
+`snv Mission CRM — v1.5 Entering Design Phase (fresh Director chat)`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -527,14 +527,29 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **NOW: nothing mid-flight.** Contact Log vs Notes helper copy (session 16)
-  is merged, deployed, and verified — Director read the diff directly, ran
-  the build, confirmed language-schools' copy correctly omits the
-  engagement-score mention, deploy SHA matches merge commit.
-- **NEXT (decided, not scoped):** real-time team communication, see §4 item
-  1. Direction is set (real-time chat, not just a thread) but this needs its
-  own design conversation before any directive — don't build reactively.
-- **STILL OPEN, LOWER PRIORITY:**
+- **NOW: entering the Design phase.** This is a deliberate, clean swap to a
+  fresh Director chat — driven by accumulated context length across many
+  sessions of feature work, NOT a mistake or stuck situation. Inherit
+  everything in this file verbatim.
+- **IMMEDIATE TASK for the new chat:** guide the operator through using
+  Claude Design (claude.ai/design) to explore a visual refresh of the CRM.
+  The operator has never used it before — walk through: linking/uploading
+  the snv codebase so it builds a design system from the ACTUAL current app
+  (zinc/blue palette, card/border patterns) rather than generating something
+  generic; iterating on a direction; and eventually using Claude Design's
+  "Handoff to Claude Code" feature to package an approved direction for the
+  Code Agent to build from. Do not build anything yet — this phase is
+  exploration and direction-setting, not implementation.
+- **ALSO STILL PENDING (relevant to the design phase, not yet actioned):** a
+  Designer-subagent brief for consolidating Notes / Log Contact / Plan Visit
+  into one tabbed section (2 tabs, not 3 — Plan Visit is redundant with
+  NotesLog's existing next_step + follow_up_date mechanism, see the
+  reasoning already worked out in prior session history) was written and
+  given to the operator to relay, but never confirmed as dispatched or
+  completed. Worth folding into whatever comes out of the Claude Design
+  exploration rather than building it separately beforehand.
+- **STILL OPEN, LOWER PRIORITY (unrelated to design, don't let these block
+  the design phase):**
   - stale `src/types/database.ts` + the ~15 null-safety errors regeneration
     surfaces (discovered session 12, not yet dispatched)
   - churches' older "Log Visit" form doesn't sync church.next_step/
@@ -542,6 +557,8 @@ effective gate. Continue this pattern.
     NotesLog (discovered session 13, not urgent)
   - 6 TEST DONOR / 5 TEST CHURCH records still in production, need a
     conscious removal decision before real end users see them
+- **ROADMAP (not started, see §4):** real-time team chat, decided direction
+  but deferred to next phase; reporting/AI features, not yet scoped.
 
 ## 13. SESSION NOTES
 Detailed session-by-session history (sessions 1–7) lives in **PROJECT_LOG.md**
