@@ -1,0 +1,328 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>School Partnerships - Mission CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=Work+Sans:wght@400;500;600&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary": "#9b4426",
+                "on-primary": "#ffffff",
+                "primary-container": "#e27b58",
+                "on-primary-container": "#ffffff",
+                "secondary": "#515f74",
+                "on-secondary": "#ffffff",
+                "secondary-container": "#d5e3fc",
+                "on-secondary-container": "#57657a",
+                "tertiary": "#516072",
+                "background": "#fff8f6",
+                "on-background": "#111c2d",
+                "surface": "#ffffff",
+                "on-surface": "#111c2d",
+                "surface-variant": "#f9f9ff",
+                "on-surface-variant": "#55423d",
+                "outline": "#89726b",
+                "outline-variant": "#dcc1b9",
+                "surface-container-low": "#fff1eb",
+                "surface-container": "#ffeae0",
+                "surface-container-high": "#fce3d9",
+                "paper-neutral": "#F5EFEF"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.5rem",
+                "lg": "0.75rem",
+                "xl": "1rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "stack-md": "16px",
+                "stack-lg": "32px",
+                "margin-safe": "32px",
+                "gutter": "24px",
+                "unit": "4px",
+                "stack-sm": "8px"
+            },
+            "fontFamily": {
+                "label-md": ["Inter"],
+                "headline-lg-mobile": ["Playfair Display"],
+                "body-md": ["Inter"],
+                "headline-lg": ["Playfair Display"],
+                "label-sm": ["Inter"],
+                "headline-md": ["Playfair Display"],
+                "display-lg": ["Playfair Display"],
+                "body-lg": ["\"Source Serif 4\""]
+            },
+            "fontSize": {
+                "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #fff8f6; color: #111c2d; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(137, 114, 107, 0.15);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-x-hidden">
+<!-- SIDEBAR NAVIGATION -->
+<aside class="h-full w-64 fixed left-0 top-0 bg-paper-neutral border-r border-outline-variant flex flex-col z-20">
+<div class="flex flex-col p-4 gap-stack-sm h-full">
+<!-- Brand Section -->
+<div class="flex flex-col items-center gap-2 mb-10 mt-4">
+<img alt="Light in the East Logo" class="w-16 h-16 rounded-full border-2 border-primary-container p-1 bg-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS-OAg3RHgyBd4TB7-6-xD9JEStlGdioFI-PJv8Td2SQaR8Il1-JfR4nWN4vHnpwErDPbnST7tcbYXcKZFl00S9NqMa_ONax7D8aE_M1TDs_W6U3V71IUzd23JCIGFs_btActsBXpiOBsRBZAqbfupu7IOUE4z_tDlsmZ9vAdB0ewUPHCyi57U33ZDpKGlThwt9CUjiCT4iuuC7t3PWPjbJVZpZg5W3zrgSBFUUMYCIFzjFeTxZ_BI81kDy0KOF7qrG89ksPT_Xx2pcnw">
+<div class="text-center">
+<h1 class="font-headline-md text-[20px] text-primary font-bold tracking-tight leading-tight">Light in the East</h1>
+<p class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest opacity-70">Mission CRM</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Donors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">church</span>
+<span class="font-label-md">Churches</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 hover:bg-surface-container transition-all rounded-xl text-primary bg-surface-container-high" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-md">Language Schools</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span class="font-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md">Calendar</span>
+</a>
+</nav>
+<!-- Footer Tabs -->
+<div class="pt-4 border-t border-outline-variant space-y-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- TOP BAR -->
+<header class="fixed top-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-outline-variant flex justify-between items-center px-gutter z-10 left-64">
+<div class="flex items-center flex-1 max-w-xl bg-paper-neutral rounded-full px-4 py-2 border-none focus-within:ring-2 focus-within:ring-primary-container/20 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant opacity-60 mr-3">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-label-md text-label-md text-on-surface" placeholder="Search schools, directors, or regions..." type="text">
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="flex items-center gap-3 border-l border-outline-variant pl-6">
+<div class="text-right">
+<p class="font-label-md text-on-surface">Elena Kozlova</p>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-70">Regional Coordinator</p>
+</div>
+<img alt="Elena Kozlova" class="w-8 h-8 rounded-full object-cover border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWdYpyuXG1irZlKG7YchbYBCUmPQMSPpjZClBwicPnQDyfsVEHbnnvZ3NhBt-BN8isGWN9JAfvPnv2JZshARJO5xeHLVrsBEj57u6YIkA0kCNPmS4Bc0ASDgNRBwaDbq0v-KxVTf_zLi1agjeHUmEomBXZ-SvkkwtNXLi8IE2Rs8qfK6Io9qWRtedutIIXV0E3gcKyUdQz5mOtyPbyR8NnKI4rJAllV2NWEToNffKLhKD1L7kT7Y0xGQ">
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT AREA -->
+<main class="mt-16 pb-24 px-gutter min-h-screen ml-64">
+<!-- Header & Primary Actions -->
+<section class="pt-stack-lg pb-stack-md flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h2 class="font-headline-lg text-primary mb-2">School Partnerships</h2>
+<nav class="flex text-label-sm text-on-surface-variant gap-2 items-center">
+<a class="hover:text-primary" href="#">Projects</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-primary font-bold uppercase tracking-wider">Educational Network</span>
+</nav>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2 border border-primary text-primary font-label-md rounded-lg hover:bg-primary/5 transition-all">
+<span class="material-symbols-outlined text-[20px] align-middle mr-1">file_download</span>
+                    Export Audit
+                </button>
+<button class="px-6 py-2 bg-primary-container text-on-primary font-label-md rounded-lg hover:brightness-110 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px] align-middle mr-1">add</span>
+                    Onboard New School
+                </button>
+</div>
+</section>
+<!-- Operational Oversight Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-stack-lg">
+<div class="glass-card p-stack-md rounded-xl">
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-4">Total Partner Schools</p>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-md text-[36px] text-on-surface font-bold leading-none">14</span>
+<span class="font-label-sm text-primary">+2 YTD</span>
+</div>
+</div>
+<div class="glass-card p-stack-md rounded-xl">
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-4">Upcoming Site Visits</p>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-md text-[36px] text-on-surface font-bold leading-none">5</span>
+<span class="font-label-sm text-primary">Next 30 Days</span>
+</div>
+</div>
+</div>
+<!-- Partnership Directory & Impact Area -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- School Partnership Directory -->
+<div class="lg:col-span-12 space-y-gutter">
+<div class="bg-white rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm">
+<div class="px-gutter py-4 border-b border-outline-variant/20 flex justify-between items-center bg-white">
+<div class="flex gap-6">
+<button class="font-label-md text-primary border-b-2 border-primary pb-1">Active</button>
+<button class="font-label-md text-on-surface-variant hover:text-on-surface pb-1">Leads</button>
+<button class="font-label-md text-on-surface-variant hover:text-on-surface pb-1">Archived</button>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-gutter py-4 font-label-sm text-on-surface-variant uppercase tracking-wider">School Name</th>
+<th class="px-4 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider">Location</th>
+<th class="px-4 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider">Primary Contact</th>
+<th class="px-4 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider">Regional Focus</th>
+<th class="px-gutter py-4 font-label-sm text-on-surface-variant uppercase tracking-wider text-right">Health Index</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="hover:bg-primary-container/5 transition-colors group cursor-pointer">
+<td class="px-gutter py-6">
+<div>
+<p class="font-bold text-on-surface">Kyiv Hope Academy</p>
+<p class="text-[12px] text-on-surface-variant">Joined Oct 2012</p>
+</div>
+</td>
+<td class="px-4 py-6 text-on-surface-variant">Kyiv, UA</td>
+<td class="px-4 py-6">
+<p class="font-bold text-on-surface text-label-md">Oleksandr V.</p>
+<p class="text-[12px] text-on-surface-variant">Director</p>
+</td>
+<td class="px-4 py-6">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-label-sm rounded-full">Central Ukraine</span>
+</td>
+<td class="px-gutter py-6 text-right">
+<div class="flex items-center justify-end gap-3">
+<span class="font-label-md text-on-surface font-bold">8.2</span>
+<div class="w-16 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-green-500 w-[82%]"></div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-primary-container/5 transition-colors group cursor-pointer">
+<td class="px-gutter py-6">
+<div>
+<p class="font-bold text-on-surface">Warsaw Literacy Hub</p>
+<p class="text-[12px] text-on-surface-variant">Joined Mar 2022</p>
+</div>
+</td>
+<td class="px-4 py-6 text-on-surface-variant">Warsaw, PL</td>
+<td class="px-4 py-6">
+<p class="font-bold text-on-surface text-label-md">Marta S.</p>
+<p class="text-[12px] text-on-surface-variant">Regional Lead</p>
+</td>
+<td class="px-4 py-6">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-label-sm rounded-full">Diaspora Support</span>
+</td>
+<td class="px-gutter py-6 text-right">
+<div class="flex items-center justify-end gap-3">
+<span class="font-label-md text-on-surface font-bold">9.1</span>
+<div class="w-16 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-green-500 w-[91%]"></div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary-container/5 transition-colors group cursor-pointer">
+<td class="px-gutter py-6">
+<div>
+<p class="font-bold text-on-surface">Odessa Maritime School</p>
+<p class="text-[12px] text-on-surface-variant">Joined Jan 2023</p>
+</div>
+</td>
+<td class="px-4 py-6 text-on-surface-variant">Odessa, UA</td>
+<td class="px-4 py-6">
+<p class="font-bold text-on-surface text-label-md">Ivan D.</p>
+<p class="text-[12px] text-on-surface-variant">Director</p>
+</td>
+<td class="px-4 py-6">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-label-sm rounded-full">Southern UA</span>
+</td>
+<td class="px-gutter py-6 text-right">
+<div class="flex items-center justify-end gap-3">
+<span class="font-label-md text-on-surface font-bold">5.4</span>
+<div class="w-16 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-amber-500 w-[54%]"></div>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FOOTER ANCHOR -->
+
+
+
+</body></html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>New Budget Entry - Light in the East</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#9b4426",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#e27b58",
+                        "on-primary-container": "#ffffff",
+                        "secondary": "#515f74",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#d5e3fc",
+                        "on-secondary-container": "#57657a",
+                        "tertiary": "#516072",
+                        "background": "#fff8f6",
+                        "on-background": "#111c2d",
+                        "surface": "#ffffff",
+                        "on-surface": "#111c2d",
+                        "surface-variant": "#f9f9ff",
+                        "on-surface-variant": "#55423d",
+                        "outline": "#89726b",
+                        "outline-variant": "#dcc1b9",
+                        "surface-container-low": "#fff1eb",
+                        "surface-container": "#ffeae0",
+                        "surface-container-high": "#fce3d9",
+                        "paper-neutral": "#F5EFEF"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "gutter": "24px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #fff8f6;
+            color: #111c2d;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #e27b58 !important;
+            box-shadow: 0 0 0 2px rgba(226, 123, 88, 0.1) !important;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dcc1b9;
+            border-radius: 10px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(137, 114, 107, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 h-full flex flex-col bg-paper-neutral border-r border-outline-variant shrink-0">
+<div class="flex flex-col p-md h-full">
+<!-- Brand Section -->
+<div class="flex flex-col items-center gap-2 mb-10 mt-4">
+<img alt="Light in the East Logo" class="w-16 h-16 rounded-full border-2 border-primary-container p-1 bg-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS-OAg3RHgyBd4TB7-6-xD9JEStlGdioFI-PJv8Td2SQaR8Il1-JfR4nWN4vHnpwErDPbnST7tcbYXcKZFl00S9NqMa_ONax7D8aE_M1TDs_W6U3V71IUzd23JCIGFs_btActsBXpiOBsRBZAqbfupu7IOUE4z_tDlsmZ9vAdB0ewUPHCyi57U33ZDpKGlThwt9CUjiCT4iuuC7t3PWPjbJVZpZg5W3zrgSBFUUMYCIFzjFeTxZ_BI81kDy0KOF7qrG89ksPT_Xx2pcnw">
+<div class="text-center">
+<h1 class="font-headline-md text-[20px] text-primary font-bold tracking-tight leading-tight">Light in the East</h1>
+<p class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest opacity-70">Mission CRM</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-1 custom-scrollbar overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Donors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">church</span>
+<span class="font-label-md">Churches</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md">Language Schools</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span class="font-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-label-md">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md">Calendar</span>
+</a>
+</nav>
+<!-- Sidebar Footer -->
+<div class="pt-4 border-t border-outline-variant space-y-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar">
+<!-- Top Bar -->
+<header class="w-full h-16 flex items-center sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-outline-variant shrink-0 px-gutter">
+<div class="flex-1 flex items-center gap-4">
+<button class="text-secondary hover:text-primary transition-colors lg:hidden">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="relative w-full max-w-md hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-paper-neutral border-none focus:ring-2 focus:ring-primary-container/20 text-label-md outline-none rounded-full" placeholder="Quick search..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">settings</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<span class="font-label-md text-label-md font-bold group-hover:text-primary transition-colors">Admin User</span>
+<img alt="Admin User" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw49h21t8cAuPsIPw4xVR4x2zAP-YHcw6pzXPii1N-Ub3JP-38RGKFVv_7AEM5FtP_e3-B0rqSOR-wgRCQxm3UjxD8UauD4WwvK8LhlDqfmJL0PRbkc_1iBE4smXYjnLRCNeKpcwI_WES-FpPgbywxlCGw3O1hjAWE9_1PqowS-YHAAJncbofqY8bKH-zErEd0BKb26p9cbSe_kKmqRVoiMqqRUUusBKQRy3q0VR-K-5XDvR9dh-Iddw">
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 p-gutter bg-background/50">
+<div class="max-w-4xl mx-auto flex flex-col items-center">
+<!-- Back Navigation -->
+<div class="w-full mb-6">
+<a class="inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors font-label-md group" href="#">
+<span class="material-symbols-outlined text-lg group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                        Back to Budget
+                    </a>
+</div>
+<!-- Form Card -->
+<div class="w-full bg-white border border-outline-variant/30 rounded-xl p-stack-lg shadow-sm relative overflow-hidden">
+<!-- Soft Luminous Accent -->
+<div class="absolute top-0 left-0 w-1.5 h-full bg-primary-container"></div>
+<div class="mb-10">
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">New Budget Entry</h3>
+<p class="font-body-md text-on-surface-variant mt-2">Allocate resources and track funding for mission activities.</p>
+</div>
+<form class="space-y-8">
+<!-- Row 1: Category & Name -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant opacity-70" for="category">Category</label>
+<div class="relative">
+<select class="w-full bg-paper-neutral border-0 border-b border-outline-variant py-3 px-2 font-body-md text-body-md appearance-none focus:border-primary-container transition-all" id="category">
+<option>General Operations</option>
+<option>Field Missions</option>
+<option>Relief Aid</option>
+<option>Community Development</option>
+<option>Educational Programs</option>
+</select>
+<span class="absolute right-2 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant opacity-60 pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant opacity-70" for="entry-name">Name</label>
+<input class="w-full bg-paper-neutral border-0 border-b border-outline-variant py-3 px-2 font-body-md text-body-md focus:border-primary-container transition-all" id="entry-name" placeholder="e.g. Winter Outreach 2024" type="text">
+</div>
+</div>
+<!-- Row 2: Needed & Raised -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant opacity-70" for="needed">Needed</label>
+<div class="relative">
+<span class="absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60 font-label-md">$</span>
+<input class="w-full bg-paper-neutral border-0 border-b border-outline-variant py-3 pl-6 pr-2 font-body-md text-body-md focus:border-primary-container transition-all" id="needed" placeholder="0.00" type="number">
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant opacity-70" for="raised">Raised</label>
+<div class="relative">
+<span class="absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60 font-label-md">$</span>
+<input class="w-full bg-paper-neutral border-0 border-b border-outline-variant py-3 pl-6 pr-2 font-body-md text-body-md focus:border-primary-container transition-all" id="raised" placeholder="0.00" type="number">
+</div>
+</div>
+</div>
+<!-- Project Based Checkbox -->
+<div class="flex items-center gap-3 p-4 bg-paper-neutral/40 border border-outline-variant/20 rounded-lg group hover:bg-surface-container-low transition-colors cursor-pointer" onclick="document.getElementById('project-based').click()">
+<div class="relative flex items-center">
+<input class="w-5 h-5 rounded-sm border-outline text-primary-container focus:ring-0 cursor-pointer" id="project-based" type="checkbox">
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold">Project based</p>
+<p class="text-[11px] text-on-surface-variant leading-tight">Link this entry to a specific mission project from the database.</p>
+</div>
+</div>
+<!-- Actions -->
+<div class="pt-6 border-t border-outline-variant/20 flex flex-col items-center gap-4">
+<button class="w-full md:w-auto md:min-w-[240px] px-8 py-3.5 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg shadow-sm hover:brightness-105 transition-all transform active:scale-[0.98] uppercase tracking-widest font-bold" type="submit">
+                                Create Budget Entry
+                            </button>
+<p class="text-[11px] text-on-surface-variant opacity-60 italic text-center max-w-sm">
+                                Submission will create a new ledger entry in the CRM and notify the finance administrator.
+                            </p>
+</div>
+</form>
+</div>
+<!-- Footer Decorative Element -->
+
+</div>
+</main>
+</div>
+<script>
+        // Micro-interaction for form focus
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('translate-x-1');
+                input.parentElement.style.transition = 'all 0.3s ease';
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('translate-x-1');
+            });
+        });
+
+        // Simple form validation visual cue
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerText = "Entry Created!";
+                btn.style.backgroundColor = '#16a34a';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.backgroundColor = '';
+                    btn.disabled = false;
+                }, 2000);
+            }, 1000);
+        });
+    </script>
+
+
+</body></html>

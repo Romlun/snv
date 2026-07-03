@@ -1,0 +1,539 @@
+<!DOCTYPE html><html class="light" lang="en"><head></head><body class="font-body-md min-h-screen flex">```html
+
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Churches &amp; Partners | Light in the East CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#9b4426",
+                    "on-primary": "#ffffff",
+                    "primary-container": "#e27b58",
+                    "on-primary-container": "#ffffff",
+                    "secondary": "#515f74",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#d5e3fc",
+                    "on-secondary-container": "#57657a",
+                    "tertiary": "#516072",
+                    "background": "#fff8f6",
+                    "on-background": "#111c2d",
+                    "surface": "#ffffff",
+                    "on-surface": "#111c2d",
+                    "surface-variant": "#f9f9ff",
+                    "on-surface-variant": "#55423d",
+                    "outline": "#89726b",
+                    "outline-variant": "#dcc1b9",
+                    "surface-container-low": "#fff1eb",
+                    "surface-container": "#ffeae0",
+                    "surface-container-high": "#fce3d9",
+                    "paper-neutral": "#F5EFEF"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "0.75rem",
+                    "xl": "1rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "gutter": "24px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "margin-safe": "32px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fff8f6;
+            color: #111c2d;
+            -webkit-font-smoothing: antialiased;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dcc1b9;
+            border-radius: 10px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(137, 114, 107, 0.15);
+        }
+        .partnership-table tr:hover {
+            background-color: rgba(226, 123, 88, 0.05);
+        }
+    </style>
+<!-- SIDE NAVIGATION BAR -->
+<aside class="h-screen w-64 sticky left-0 top-0 hidden lg:flex flex-col bg-paper-neutral border-r border-outline-variant z-40">
+<div class="flex flex-col p-md h-full">
+<!-- Brand Section -->
+<div class="flex flex-col items-center gap-2 mb-10 mt-4">
+<img alt="Light in the East Logo" class="w-16 h-16 rounded-full border-2 border-primary-container p-1 bg-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS-OAg3RHgyBd4TB7-6-xD9JEStlGdioFI-PJv8Td2SQaR8Il1-JfR4nWN4vHnpwErDPbnST7tcbYXcKZFl00S9NqMa_ONax7D8aE_M1TDs_W6U3V71IUzd23JCIGFs_btActsBXpiOBsRBZAqbfupu7IOUE4z_tDlsmZ9vAdB0ewUPHCyi57U33ZDpKGlThwt9CUjiCT4iuuC7t3PWPjbJVZpZg5W3zrgSBFUUMYCIFzjFeTxZ_BI81kDy0KOF7qrG89ksPT_Xx2pcnw">
+<div class="text-center">
+<h1 class="font-headline-md text-[20px] text-primary font-bold tracking-tight leading-tight">Light in the East</h1>
+<p class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest opacity-70">Mission CRM</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-1 custom-scrollbar overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Donors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">church</span>
+<span class="font-label-md">Churches</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md">Language Schools</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span class="font-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md">Calendar</span>
+</a>
+</nav>
+<!-- Sidebar Footer -->
+<div class="pt-4 border-t border-outline-variant space-y-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- TopAppBar -->
+<header class="w-full h-16 flex items-center sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-outline-variant">
+<div class="max-w-[1280px] mx-auto flex justify-between items-center px-gutter w-full">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-paper-neutral border-none focus:ring-2 focus:ring-primary-container/20 text-label-md outline-none rounded-full" placeholder="Search churches, leaders, or regions..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">settings</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<span class="font-label-md text-label-md font-bold group-hover:text-primary transition-colors">Admin User</span>
+<img alt="Admin User" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuV0IpnPsBaTtQPmqz9G_9lCzQKRQRognJAC1Ibu2mwCNQfU9I90fE__m2yINfN1C7_xDLl2jKIj1iAIVfRhEwa9aopnj9tiigG6JCrR6hF0CHimqF-FZWSpHr0wyupitgr6MSyx2uBXXc_oL4vcz1nsF-5ZOcC_ir3-LtEq3oZLvtI-ndf-AbvMBa0-DBb4hT87dobjFUs4NY9v_PXJL1hJOnYqhZqN2dSXH0aR6lrn2lWPsK8zUKQw">
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<main class="flex-1 p-gutter max-w-[1280px] mx-auto w-full">
+<div class="space-y-stack-lg">
+<!-- Page Header -->
+<section class="flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-primary">Churches &amp; Partners</h2>
+<p class="font-body-md text-on-surface-variant mt-1 italic">Managing global alliances and regional mission hubs.</p>
+</div>
+<div class="flex space-x-3">
+<button class="flex items-center px-4 py-2 bg-white border border-outline-variant rounded-lg font-label-md text-on-surface hover:bg-surface-container-low transition-colors shadow-sm">
+<span class="material-symbols-outlined mr-2">download</span>
+                        Export List
+                    </button>
+<button class="flex items-center px-4 py-2 bg-primary text-white rounded-lg font-label-md hover:bg-primary/90 transition-colors shadow-md">
+<span class="material-symbols-outlined mr-2">church</span>
+                        Add Partner
+                    </button>
+</div>
+</section>
+<!-- Strategic Oversight Metrics (Bento Style) -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="glass-card p-6 rounded-xl border-b-2 border-primary-container/20 flex flex-col justify-between hover:border-primary-container transition-colors group">
+<span class="text-on-surface-variant font-label-sm uppercase tracking-widest">Total Partner Churches</span>
+<div class="flex items-baseline mt-4">
+<span class="font-headline-lg text-primary">142</span>
+<span class="ml-2 font-label-sm text-green-700">+3 this month</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-xl border-b-2 border-primary-container/20 flex flex-col justify-between hover:border-primary-container transition-colors group">
+<span class="text-on-surface-variant font-label-sm uppercase tracking-widest">Active Regional Hubs</span>
+<div class="flex items-baseline mt-4">
+<span class="font-headline-lg text-on-surface">12</span>
+<span class="ml-2 font-label-sm text-on-surface-variant">Global centers</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-xl border-b-2 border-primary-container/20 flex flex-col justify-between hover:border-primary-container transition-colors group">
+<span class="text-on-surface-variant font-label-sm uppercase tracking-widest">Partnership Health</span>
+<div class="flex items-baseline mt-4">
+<span class="font-headline-lg text-on-surface">8.4</span>
+<span class="ml-2 font-label-sm text-on-surface-variant">/ 10 Avg</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-xl border-b-2 border-primary-container/20 flex flex-col justify-between hover:border-primary-container transition-colors group">
+<span class="text-on-surface-variant font-label-sm uppercase tracking-widest">Upcoming Visits</span>
+<div class="flex items-baseline mt-4">
+<span class="font-headline-lg text-primary-container">5</span>
+<span class="ml-2 font-label-sm text-on-surface-variant">Next 14 days</span>
+</div>
+</div>
+</section>
+<!-- Directory & Table -->
+<section class="bg-white rounded-xl shadow-sm overflow-hidden border border-outline-variant/30">
+<div class="px-6 py-4 bg-white flex justify-between items-center border-b border-outline-variant/20">
+<h3 class="font-headline-md text-[20px] font-bold text-on-surface">Partnership Directory</h3>
+<div class="flex items-center space-x-4">
+<div class="flex border border-outline-variant rounded-lg overflow-hidden bg-white">
+<button class="px-4 py-1.5 bg-surface-container-high text-primary font-label-md font-bold">Active</button>
+<button class="px-4 py-1.5 text-on-surface-variant font-label-md border-l border-outline-variant hover:bg-surface-container-low transition-colors">Leads</button>
+<button class="px-4 py-1.5 text-on-surface-variant font-label-md border-l border-outline-variant hover:bg-surface-container-low transition-colors">Archived</button>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full partnership-table border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50 text-left border-b border-outline-variant/20">
+<th class="px-6 py-4 font-label-sm uppercase tracking-widest text-on-surface-variant">Church Name</th>
+<th class="px-6 py-4 font-label-sm uppercase tracking-widest text-on-surface-variant">Location</th>
+<th class="px-6 py-4 font-label-sm uppercase tracking-widest text-on-surface-variant">Primary Contact</th>
+<th class="px-6 py-4 font-label-sm uppercase tracking-widest text-on-surface-variant">Regional Focus</th>
+<th class="px-6 py-4 font-label-sm uppercase tracking-widest text-on-surface-variant">Status</th>
+<th class="px-6 py-4 font-label-sm uppercase tracking-widest text-on-surface-variant text-center">Health</th>
+<th class="px-6 py-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Kyiv Food Pantry -->
+<tr>
+<td class="px-6 py-5">
+<div class="font-bold text-on-surface text-lg">Kyiv Food Pantry</div>
+<div class="font-label-sm text-on-surface-variant opacity-70">Joined Oct 2021</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mr-2 opacity-60">location_on</span>
+<span class="font-label-md">Kyiv, Ukraine</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="font-body-md font-semibold text-on-surface">Pastor Mykola</div>
+<div class="font-label-sm text-on-surface-variant">Humanitarian Coordinator</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-secondary-container/30 text-secondary font-label-sm rounded-lg">Eastern Europe</span>
+<span class="px-2 py-0.5 bg-primary-container/10 text-primary font-label-sm rounded-lg">Relief</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-label-md bg-green-50 text-green-700 border border-green-100">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600 mr-2"></span> Active
+                                    </span>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="inline-flex flex-col items-center">
+<span class="font-headline-md text-green-700">9.2</span>
+<div class="w-12 h-1 bg-surface-container-high rounded-full mt-1">
+<div class="h-full bg-green-500 rounded-full" style="width: 92%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Warsaw Bible Fellowship -->
+<tr>
+<td class="px-6 py-5">
+<div class="font-bold text-on-surface text-lg">Warsaw Bible Fellowship</div>
+<div class="font-label-sm text-on-surface-variant opacity-70">Joined Jan 2023</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mr-2 opacity-60">location_on</span>
+<span class="font-label-md">Warsaw, Poland</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="font-body-md font-semibold text-on-surface">Andrzej Kowalski</div>
+<div class="font-label-sm text-on-surface-variant">Lead Elder</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-secondary-container/30 text-secondary font-label-sm rounded-lg">Eastern Europe</span>
+<span class="px-2 py-0.5 bg-surface-container-high text-on-surface-variant font-label-sm rounded-lg">Publishing</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-label-md bg-green-50 text-green-700 border border-green-100">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600 mr-2"></span> Active
+                                    </span>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="inline-flex flex-col items-center">
+<span class="font-headline-md text-green-700">8.0</span>
+<div class="w-12 h-1 bg-surface-container-high rounded-full mt-1">
+<div class="h-full bg-green-500 rounded-full" style="width: 80%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Prague Community Church -->
+<tr>
+<td class="px-6 py-5">
+<div class="font-bold text-on-surface text-lg">Prague Community Church</div>
+<div class="font-label-sm text-on-surface-variant opacity-70">Inquiry July 2023</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mr-2 opacity-60">location_on</span>
+<span class="font-label-md">Prague, Czech Rep.</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="font-body-md font-semibold text-on-surface">Jan Novák</div>
+<div class="font-label-sm text-on-surface-variant">Pastor</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-surface-container-high text-on-surface-variant font-label-sm rounded-lg">Central Europe</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-label-md bg-blue-50 text-blue-700 border border-blue-100">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-600 mr-2"></span> Lead
+                                    </span>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="inline-flex flex-col items-center">
+<span class="font-headline-md text-on-surface-variant">5.4</span>
+<div class="w-12 h-1 bg-surface-container-high rounded-full mt-1">
+<div class="h-full bg-primary-container rounded-full" style="width: 54%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Grace Baptist Central Asia -->
+<tr>
+<td class="px-6 py-5">
+<div class="font-bold text-on-surface text-lg">Grace Baptist Central Asia</div>
+<div class="font-label-sm text-on-surface-variant opacity-70">Joined Mar 2019</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mr-2 opacity-60">location_on</span>
+<span class="font-label-md">Almaty, Kazakhstan</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="font-body-md font-semibold text-on-surface">Almaz Batyr</div>
+<div class="font-label-sm text-on-surface-variant">Regional Leader</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-secondary-container/30 text-secondary font-label-sm rounded-lg">Central Asia</span>
+<span class="px-2 py-0.5 bg-primary-container/10 text-primary font-label-sm rounded-lg">Discipleship</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-label-md bg-green-50 text-green-700 border border-green-100">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600 mr-2"></span> Active
+                                    </span>
+</td>
+<td class="px-6 py-5 text-center">
+<div class="inline-flex flex-col items-center">
+<span class="font-headline-md text-green-700">8.8</span>
+<div class="w-12 h-1 bg-surface-container-high rounded-full mt-1">
+<div class="h-full bg-green-500 rounded-full" style="width: 88%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 bg-white flex items-center justify-between border-t border-outline-variant/10">
+<span class="font-label-sm text-on-surface-variant">Showing 1-4 of 142 partners</span>
+<div class="flex space-x-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant bg-white disabled:opacity-50 hover:bg-surface-container-low transition-colors" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant bg-white hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Regional Impact Cards -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<div class="lg:col-span-2 glass-card p-margin-safe rounded-xl">
+<h3 class="font-headline-md text-[20px] font-bold text-on-surface mb-6">Regional Impact Distribution</h3>
+<div class="flex items-center space-x-12">
+<div class="relative h-48 w-48 flex items-center justify-center">
+<svg class="h-full w-full rotate-[-90deg]">
+<circle class="text-surface-container-high" cx="50%" cy="50%" fill="transparent" r="40%" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="50%" cy="50%" fill="transparent" r="40%" stroke="currentColor" stroke-dasharray="251" stroke-dashoffset="60" stroke-width="8"></circle>
+<circle class="text-surface-container-high" cx="50%" cy="50%" fill="transparent" r="30%" stroke="currentColor" stroke-width="6"></circle>
+<circle class="text-secondary" cx="50%" cy="50%" fill="transparent" r="30%" stroke="currentColor" stroke-dasharray="188" stroke-dashoffset="80" stroke-width="6"></circle>
+</svg>
+<div class="absolute text-center">
+<div class="font-headline-lg text-on-surface">76%</div>
+<div class="font-label-sm text-on-surface-variant opacity-60">Engagement</div>
+</div>
+</div>
+<div class="flex-1 space-y-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center">
+<div class="w-3 h-3 bg-primary rounded-sm mr-3"></div>
+<span class="font-label-md text-on-surface-variant">Eastern Europe</span>
+</div>
+<span class="font-body-md font-bold text-on-surface">68 Churches</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center">
+<div class="w-3 h-3 bg-secondary rounded-sm mr-3"></div>
+<span class="font-label-md text-on-surface-variant">Central Asia</span>
+</div>
+<span class="font-body-md font-bold text-on-surface">42 Churches</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center">
+<div class="w-3 h-3 bg-primary-container rounded-sm mr-3"></div>
+<span class="font-label-md text-on-surface-variant">Caucasus</span>
+</div>
+<span class="font-body-md font-bold text-on-surface">18 Churches</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center">
+<div class="w-3 h-3 bg-outline rounded-sm mr-3"></div>
+<span class="font-label-md text-on-surface-variant">Other</span>
+</div>
+<span class="font-body-md font-bold text-on-surface">14 Churches</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-primary-container/10 p-margin-safe rounded-xl border border-primary-container/20 relative overflow-hidden flex flex-col justify-between hover:border-primary-container transition-colors group">
+<div class="absolute -right-8 -top-8 w-32 h-32 opacity-10 border-4 border-primary rounded-full"></div>
+<div class="relative z-10">
+<span class="font-label-sm uppercase tracking-widest text-primary font-bold">Quick Action</span>
+<h3 class="font-headline-md text-[22px] font-bold text-primary mt-2">Generate Regional Partnership Report</h3>
+<p class="font-body-md mt-4 text-on-surface-variant italic">Detailed analysis of project funding and spiritual growth metrics across all Eastern European hubs.</p>
+</div>
+<button class="relative z-10 mt-8 w-full bg-primary text-white rounded-lg font-label-md py-3 hover:bg-primary/90 transition-all flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined mr-2">analytics</span>
+                        Run Strategy Report
+                    </button>
+</div>
+</section>
+</div>
+<!-- Footer Verse Section -->
+
+<!-- Footer -->
+
+</main>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        // Simple search bar focus interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        if(searchInput) {
+            searchInput.addEventListener('focus', () => {
+                searchInput.parentElement.classList.add('ring-primary-container/30');
+                searchInput.parentElement.classList.add('ring-2');
+            });
+            searchInput.addEventListener('blur', () => {
+                searchInput.parentElement.classList.remove('ring-primary-container/30');
+                searchInput.parentElement.classList.remove('ring-2');
+            });
+        }
+
+        // Card interactivity
+        document.querySelectorAll('.glass-card, .bg-primary-container\\/10').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.boxShadow = '0 12px 30px -10px rgba(155, 68, 38, 0.12)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = 'none';
+            });
+        });
+
+        // Dashboard interactivity - Row selection simulation
+        const rows = document.querySelectorAll('.partnership-table tbody tr');
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                rows.forEach(r => r.classList.remove('bg-primary-container/5'));
+                row.classList.add('bg-primary-container/5');
+            });
+        });
+    </script>
+
+
+```
+
+</body></html>

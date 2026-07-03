@@ -1,0 +1,467 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Mission CRM | Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#9b4426",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#e27b58",
+                        "on-primary-container": "#ffffff",
+                        "secondary": "#515f74",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#d5e3fc",
+                        "on-secondary-container": "#57657a",
+                        "tertiary": "#516072",
+                        "background": "#fff8f6",
+                        "on-background": "#111c2d",
+                        "surface": "#ffffff",
+                        "on-surface": "#111c2d",
+                        "surface-variant": "#f9f9ff",
+                        "on-surface-variant": "#55423d",
+                        "outline": "#89726b",
+                        "outline-variant": "#dcc1b9",
+                        "surface-container-low": "#fff1eb",
+                        "surface-container": "#ffeae0",
+                        "surface-container-high": "#fce3d9",
+                        "paper-neutral": "#F5EFEF"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "gutter": "24px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #fff8f6;
+            color: #111c2d;
+            -webkit-font-smoothing: antialiased;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dcc1b9;
+            border-radius: 10px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(137, 114, 107, 0.15);
+        }
+    </style>
+</head>
+<body class="font-body-md min-h-screen flex">
+<!-- SIDE NAVIGATION BAR (Desktop Only) -->
+<aside class="h-screen w-64 sticky left-0 top-0 hidden lg:flex flex-col bg-paper-neutral border-r border-outline-variant z-40">
+<div class="flex flex-col p-md h-full">
+<!-- Brand Section -->
+<div class="flex flex-col items-center gap-2 mb-10 mt-4">
+<img alt="Light in the East Logo" class="w-16 h-16 rounded-full border-2 border-primary-container p-1 bg-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS-OAg3RHgyBd4TB7-6-xD9JEStlGdioFI-PJv8Td2SQaR8Il1-JfR4nWN4vHnpwErDPbnST7tcbYXcKZFl00S9NqMa_ONax7D8aE_M1TDs_W6U3V71IUzd23JCIGFs_btActsBXpiOBsRBZAqbfupu7IOUE4z_tDlsmZ9vAdB0ewUPHCyi57U33ZDpKGlThwt9CUjiCT4iuuC7t3PWPjbJVZpZg5W3zrgSBFUUMYCIFzjFeTxZ_BI81kDy0KOF7qrG89ksPT_Xx2pcnw">
+<div class="text-center">
+<h1 class="font-headline-md text-[20px] text-primary font-bold tracking-tight leading-tight">Light in the East</h1>
+<p class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest opacity-70">Mission CRM</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-1 custom-scrollbar overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Donors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">church</span>
+<span class="font-label-md">Churches</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md">Language Schools</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span class="font-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md">Calendar</span>
+</a>
+</nav>
+<!-- Sidebar Footer -->
+<div class="pt-4 border-t border-outline-variant space-y-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- MAIN CONTENT AREA -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- TOP BAR -->
+<header class="w-full h-16 flex items-center sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-outline-variant">
+<div class="max-w-[1280px] mx-auto flex justify-between items-center px-gutter w-full">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-paper-neutral border-none focus:ring-2 focus:ring-primary-container/20 text-label-md outline-none rounded-full" placeholder="Search mission records..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">settings</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<span class="font-label-md text-label-md font-bold group-hover:text-primary transition-colors">Admin User</span>
+<img alt="Admin User" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARm0AgjMqvnnu-KOVPZaTkVsm2GOiCYPwcmL8l2Viu6t-2gyMJ1C2Mm9swOyaZJyW-o38Zj6N3pNEZ6Fah-Wm7W90lId7nyOL-0chytq_T4px4rfl3aZzWyoPFFxgwktwlG3u3PZaXCHovogkwT_rTQ_9_PJrQuYQwihMSeabDVVe-diSXTb00TZMsz6jMxPYuXS2I5HNNWZFW6Q4t9PPeDXXXiwNW-sGHd-5Gca-tGf4chj7uWUbbDFTwma3j4vA3LvhQfVTb5Igv">
+</div>
+</div>
+</div>
+</header>
+<!-- PAGE CONTENT -->
+<main class="flex-1">
+<div class="max-w-[1280px] mx-auto p-gutter space-y-stack-lg">
+<!-- HEADER SECTION -->
+<section>
+<h2 class="font-headline-lg text-primary mb-1">Good morning, Director</h2>
+<p class="font-body-md text-on-surface-variant max-w-2xl">Your mission efforts are reaching far today. Here is the 'Mission Pulse' for Light in the East operations.</p>
+</section>
+<!-- MISSION PULSE: METRICS GRID -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Active Donors -->
+<div class="glass-card p-md rounded-xl hover:border-primary-container transition-colors group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary-container/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">group</span>
+</span>
+<span class="text-label-sm font-bold text-primary">+5.2%</span>
+</div>
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Active Donors</p>
+<h3 class="font-headline-md text-on-surface font-bold">182</h3>
+</div>
+<!-- Active Churches -->
+<div class="glass-card p-md rounded-xl hover:border-primary-container transition-colors group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary-container/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">church</span>
+</span>
+<span class="text-label-sm font-bold text-primary">+2.1%</span>
+</div>
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Active Churches</p>
+<h3 class="font-headline-md text-on-surface font-bold">64</h3>
+</div>
+<!-- Active Projects -->
+<div class="glass-card p-md rounded-xl hover:border-primary-container transition-colors group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary-container/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">rocket_launch</span>
+</span>
+<span class="text-label-sm font-bold text-on-surface-variant">On Track</span>
+</div>
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Active Projects</p>
+<h3 class="font-headline-md text-on-surface font-bold">23 Live</h3>
+</div>
+<!-- Budget Progress -->
+<div class="glass-card p-md rounded-xl hover:border-primary-container transition-colors group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary-container/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">analytics</span>
+</span>
+<span class="text-label-sm font-bold text-on-surface-variant">82%</span>
+</div>
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Budget Progress</p>
+<div class="w-full bg-surface-container-high h-2 rounded-full mt-4">
+<div class="bg-primary-container h-full rounded-full" style="width: 82%"></div>
+</div>
+</div>
+</section>
+<!-- TWO COLUMN LAYOUT -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Attention Registry (Main Column) -->
+<section class="lg:col-span-2">
+<div class="glass-card rounded-xl overflow-hidden border border-outline-variant/30">
+<div class="px-6 py-4 border-b border-outline-variant/20 bg-white flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">notification_important</span>
+<h4 class="font-headline-md text-[20px] font-bold text-on-surface">Today's Attention Registry</h4>
+</div>
+<button class="text-label-md text-primary font-bold hover:underline">View all</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50 border-b border-outline-variant/20">
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider">Item</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider">Attention Reason</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider">Next Step</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider">Due</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Elena Rostova</span>
+<span class="text-[12px] text-on-surface-variant">Major Donor</span>
+</div>
+</td>
+<td class="px-6 py-4 text-label-md text-on-surface-variant">Last contact 6 months ago</td>
+<td class="px-6 py-4"><button class="px-4 py-1.5 border border-primary text-primary rounded-lg font-label-sm hover:bg-primary/5 transition-all">Plan visit</button></td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-label-sm">Jul 11, 2026</span>
+<span class="text-[10px] text-primary font-bold uppercase tracking-tighter">Due soon</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Marcus Sterling</span>
+<span class="text-[12px] text-on-surface-variant">Corporate Sponsor</span>
+</div>
+</td>
+<td class="px-6 py-4 text-label-md text-on-surface-variant">Renewal in 14 days</td>
+<td class="px-6 py-4"><button class="px-4 py-1.5 border border-primary text-primary rounded-lg font-label-sm hover:bg-primary/5 transition-all">Log contact</button></td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-label-sm">Aug 30, 2026</span>
+<span class="text-[10px] text-red-600 font-bold uppercase tracking-tighter">Overdue</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">David Chen</span>
+<span class="text-[12px] text-on-surface-variant">Individual Giver</span>
+</div>
+</td>
+<td class="px-6 py-4 text-label-md text-on-surface-variant">No contact in 60+ days</td>
+<td class="px-6 py-4"><button class="px-4 py-1.5 border border-primary text-primary rounded-lg font-label-sm hover:bg-primary/5 transition-all">Send email</button></td>
+<td class="px-6 py-4"><span class="text-label-sm">Sep 05, 2026</span></td>
+</tr>
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Kyiv Food Pantry</span>
+<span class="text-[12px] text-on-surface-variant">Active Project</span>
+</div>
+</td>
+<td class="px-6 py-4 text-label-md text-on-surface-variant">Budget below target</td>
+<td class="px-6 py-4"><button class="px-4 py-1.5 border border-primary text-primary rounded-lg font-label-sm hover:bg-primary/5 transition-all">Review funds</button></td>
+<td class="px-6 py-4"><span class="text-label-sm">Sep 02, 2026</span></td>
+</tr>
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Maria Garcia</span>
+<span class="text-[12px] text-on-surface-variant">Legacy Donor</span>
+</div>
+</td>
+<td class="px-6 py-4 text-label-md text-on-surface-variant">Follow-up overdue</td>
+<td class="px-6 py-4"><button class="px-4 py-1.5 border border-primary text-primary rounded-lg font-label-sm hover:bg-primary/5 transition-all">Call now</button></td>
+<td class="px-6 py-4"><span class="text-[10px] text-red-600 font-bold uppercase tracking-tighter">Priority</span></td>
+</tr>
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Isaac Newton</span>
+<span class="text-[12px] text-on-surface-variant">New Contact</span>
+</div>
+</td>
+<td class="px-6 py-4 text-label-md text-on-surface-variant">First-time donor</td>
+<td class="px-6 py-4"><button class="px-4 py-1.5 border border-primary text-primary rounded-lg font-label-sm hover:bg-primary/5 transition-all">Send welcome</button></td>
+<td class="px-6 py-4"><span class="text-label-sm">Sep 10, 2026</span></td>
+</tr>
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">Warsaw Warehouse</span>
+<span class="text-[12px] text-on-surface-variant">Inventory Hub</span>
+</div>
+</td>
+<td class="px-6 py-4 text-label-md text-on-surface-variant">Action required</td>
+<td class="px-6 py-4"><button class="px-4 py-1.5 border border-primary text-primary rounded-lg font-label-sm hover:bg-primary/5 transition-all">Confirm delivery</button></td>
+<td class="px-6 py-4"><span class="text-[10px] text-primary font-bold uppercase tracking-tighter">Critical</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Sidebar (Right Column) -->
+<aside class="space-y-gutter">
+<!-- Engagement Needs Attention -->
+<div class="glass-card p-md rounded-xl border border-outline-variant/30">
+<div class="flex justify-between items-center mb-4">
+<h4 class="font-label-md text-[16px] font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">person_search</span>
+                                Engagement Needs Attention
+                            </h4>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-3 bg-white rounded-lg border border-outline-variant/20 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary font-bold text-sm">AK</div>
+<div>
+<p class="font-bold text-on-surface text-label-md">Anna Kowalski</p>
+<p class="text-[11px] text-on-surface-variant">Score below 40</p>
+</div>
+</div>
+<span class="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded-full border border-red-100">12/100</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-white rounded-lg border border-outline-variant/20 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary font-bold text-sm">DC</div>
+<div>
+<p class="font-bold text-on-surface text-label-md">David Chen</p>
+<p class="text-[11px] text-on-surface-variant">Score below 40</p>
+</div>
+</div>
+<span class="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded-full border border-red-100">28/100</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-white rounded-lg border border-outline-variant/20 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary font-bold text-sm">MG</div>
+<div>
+<p class="font-bold text-on-surface text-label-md">Maria Garcia</p>
+<p class="text-[11px] text-on-surface-variant">No contact in 60+ days</p>
+</div>
+</div>
+<span class="px-2 py-1 bg-primary-container/10 text-primary text-[10px] font-bold rounded-full border border-primary-container/20">At risk</span>
+</div>
+</div>
+<button class="w-full mt-4 text-label-sm text-primary font-bold hover:underline">View all donors →</button>
+</div>
+<!-- Book Distribution Metrics -->
+<div class="glass-card p-md rounded-xl border border-outline-variant/30">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">menu_book</span>
+<h4 class="font-label-md text-[16px] font-bold text-on-surface">Book Distribution Metrics</h4>
+</div>
+<div class="space-y-3">
+<div class="p-3 bg-white rounded-lg border border-outline-variant/20 shadow-sm">
+<p class="text-label-sm text-on-surface-variant uppercase tracking-wider">Sold</p>
+<p class="text-headline-md text-[20px] font-bold text-on-surface">12,450</p>
+</div>
+<div class="p-3 bg-white rounded-lg border border-outline-variant/20 shadow-sm">
+<p class="text-label-sm text-on-surface-variant uppercase tracking-wider">Given</p>
+<p class="text-headline-md text-[20px] font-bold text-on-surface">25,791</p>
+</div>
+<div class="p-3 bg-primary-container/5 rounded-lg border border-primary-container/20 shadow-sm">
+<p class="text-label-sm text-primary uppercase tracking-wider">Revenue</p>
+<p class="text-headline-md text-[20px] font-bold text-primary">$18,675</p>
+</div>
+</div>
+</div>
+</aside>
+</div>
+<!-- BIBLE VERSE ANCHOR (Full Width) -->
+<div class="bg-primary-container/5 p-stack-lg rounded-xl border border-primary-container/10 text-center italic relative overflow-hidden mt-stack-lg">
+<div class="absolute top-0 left-0 w-full h-1 bg-primary-container"></div>
+<div class="relative z-10 py-6 max-w-4xl mx-auto">
+<span class="material-symbols-outlined text-primary opacity-20 text-[48px] absolute -top-4 -left-4" style="font-variation-settings: 'FILL' 1;">format_quote</span>
+<p class="font-headline-md text-[28px] text-primary mb-3 leading-tight">"The Lord is my light and my salvation; whom shall I fear?"</p>
+<p class="font-label-md font-bold text-primary/70 tracking-widest uppercase">— Psalm 27:1</p>
+</div>
+</div>
+<!-- FOOTER -->
+
+</div>
+</main>
+</div>
+<!-- MOBILE NAVIGATION (Bottom Bar - Hidden on Desktop) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 lg:hidden h-16 bg-white border-t border-outline-variant flex justify-around items-center px-4 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center text-primary" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Donors</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Tasks</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Budget</span>
+</a>
+</nav>
+<script>
+    // Micro-interactions
+    document.querySelectorAll('.glass-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-2px)';
+            card.style.boxShadow = '0 12px 30px -10px rgba(155, 68, 38, 0.12)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = 'none';
+        });
+    });
+</script>
+
+
+</body></html>

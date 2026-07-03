@@ -1,0 +1,394 @@
+<!DOCTYPE html><html class="light" lang="en"><head></head><body class="font-body-md text-body-md">```html
+
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Task Profile | Mission CRM</title>
+<!-- Fonts: Playfair Display (Serif), Source Serif 4 (Body), Work Sans (Labels) -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;family=Work+Sans:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#9b4426",
+                    "on-primary": "#ffffff",
+                    "primary-container": "#e27b58",
+                    "on-primary-container": "#ffffff",
+                    "secondary": "#515f74",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#d5e3fc",
+                    "on-secondary-container": "#57657a",
+                    "tertiary": "#516072",
+                    "background": "#fff8f6",
+                    "on-background": "#111c2d",
+                    "surface": "#ffffff",
+                    "on-surface": "#111c2d",
+                    "surface-variant": "#f9f9ff",
+                    "on-surface-variant": "#55423d",
+                    "outline": "#89726b",
+                    "outline-variant": "#dcc1b9",
+                    "surface-container-low": "#fff1eb",
+                    "surface-container": "#ffeae0",
+                    "surface-container-high": "#fce3d9",
+                    "paper-neutral": "#F5EFEF",
+                    "ink-black": "#0F172A",
+                    "sunset-gold": "#FB923C",
+                    "warm-surface": "#FDFCFB",
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "0.75rem",
+                    "xl": "1rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-lg": "32px",
+                    "unit": "4px",
+                    "stack-sm": "8px",
+                    "stack-md": "16px",
+                    "gutter": "24px",
+                    "margin-safe": "32px"
+            },
+            "fontFamily": {
+                    "body-md": ["\"Source Serif 4\""],
+                    "headline-md": ["Playfair Display"],
+                    "label-md": ["Work Sans"],
+                    "body-lg": ["\"Source Serif 4\""],
+                    "display-lg": ["Playfair Display"],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "headline-lg": ["Playfair Display"],
+                    "label-sm": ["Work Sans"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #fff8f6;
+            color: #111c2d;
+            -webkit-font-smoothing: antialiased;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        .paper-card {
+            border: 1px solid rgba(137, 114, 107, 0.15);
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .paper-card:hover {
+            border-color: #e27b58;
+            box-shadow: 0 12px 30px -10px rgba(155, 68, 38, 0.12);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dcc1b9;
+            border-radius: 10px;
+        }
+    </style>
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-paper-neutral border-r border-outline-variant z-40">
+<div class="flex flex-col p-stack-md h-full">
+<!-- Brand Section -->
+<div class="flex flex-col items-center gap-2 mb-10 mt-4">
+<img alt="Light in the East Logo" class="w-16 h-16 rounded-full border-2 border-primary-container p-1 bg-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS-OAg3RHgyBd4TB7-6-xD9JEStlGdioFI-PJv8Td2SQaR8Il1-JfR4nWN4vHnpwErDPbnST7tcbYXcKZFl00S9NqMa_ONax7D8aE_M1TDs_W6U3V71IUzd23JCIGFs_btActsBXpiOBsRBZAqbfupu7IOUE4z_tDlsmZ9vAdB0ewUPHCyi57U33ZDpKGlThwt9CUjiCT4iuuC7t3PWPjbJVZpZg5W3zrgSBFUUMYCIFzjFeTxZ_BI81kDy0KOF7qrG89ksPT_Xx2pcnw">
+<div class="text-center">
+<h1 class="font-headline-md text-[20px] text-primary font-bold tracking-tight leading-tight">Light in the East</h1>
+<p class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest opacity-70">Mission CRM</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-1 custom-scrollbar overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Donors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">church</span>
+<span class="font-label-md">Churches</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md">Language Schools</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span class="font-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
+<span class="font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md">Calendar</span>
+</a>
+</nav>
+<!-- Footer Tabs -->
+<div class="pt-4 border-t border-outline-variant space-y-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Top App Bar -->
+<header class="fixed top-0 right-0 left-64 bg-white/80 backdrop-blur-md border-b border-outline-variant z-40 h-16 flex items-center">
+<div class="flex justify-between items-center w-full px-gutter max-w-[1280px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-[20px] font-bold text-primary">Mission CRM</span>
+<nav class="hidden md:flex gap-6">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Tasks</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Donors</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Churches</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Projects</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:text-primary cursor-pointer"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-on-surface-variant hover:text-primary cursor-pointer"><span class="material-symbols-outlined">settings</span></button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<span class="font-label-md text-label-md font-bold group-hover:text-primary transition-colors">Admin User</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUui41O_CRq0nsQ2gSlIduOx4VuaDWiKnZ32o502HUP8Slrh1JAZsCFqoTLFbeOnACJ0MBsSnjMQRwrqjL0luei0p_MEr-U4ynOG8yLfhH0JBN2HRiuI_0gR_kkPpSur6l55Pkz6eOjpAT8LQpm9xRnMDdIKMsRZt3EMIURE3sD8aLKd_ijH59c9xo4MiijwRGIzcfsveGX-jcSdGIZaxpy3-hAH1Ia3PKZ3KaxAHw8m5nc5yNOt1e4Q">
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 min-h-screen px-margin-safe pb-margin-safe max-w-[1280px] mx-auto">
+<!-- Task Header Section -->
+<div class="mb-gutter flex flex-col md:flex-row md:items-end justify-between gap-gutter">
+<div class="max-w-3xl">
+<div class="flex items-center gap-3 mb-2">
+<span class="bg-primary/10 text-primary px-3 py-0.5 rounded-full font-label-sm text-label-sm uppercase tracking-wider font-bold">In Progress</span>
+<span class="bg-red-50 text-red-600 border border-red-100 px-3 py-0.5 rounded-full font-label-sm text-label-sm uppercase tracking-wider font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">priority_high</span> High Priority
+                    </span>
+</div>
+<h1 class="font-display-lg text-display-lg text-ink-black leading-tight mb-2">Call James Wilson about Well Project.</h1>
+<div class="flex items-center gap-6 text-on-surface-variant font-label-md text-label-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container">event</span>
+                        Due Today, July 11, 2026
+                    </div>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full overflow-hidden bg-primary-container">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_MNdHDLsQQurEoq8MJo4ufYDWlZucj_L43J5o21ZXi6n8NB_P6-7U_Sgahk87w8cNaddrAt-8R2PjgO4TcttMHXx8rKpM5H1_objyaUmb7sSdj6pVvTgXF1UumismqwFIxeAf9dsEq_jtWXKn04Dvp8-uZQUH_zkbwd4h37W4u7LxASXtG0Cmyaauqe6ykDRuCRQ3dtUtOb2NVGrsUi7biBOaOEDCpu0EC90vC2QVG8Sx0ZP7IPpwig">
+</div>
+                        Assignee: <span class="font-bold text-on-surface">Anna S. (Director)</span>
+</div>
+</div>
+</div>
+<div class="flex gap-stack-md">
+<button class="bg-white border border-outline px-6 py-2.5 rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined">edit</span> Edit Task
+                </button>
+<button class="bg-primary-container text-white px-6 py-2.5 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined">check</span> Complete Task
+                </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="bento-grid">
+<!-- Main Content Area (Column 1-8) -->
+<div class="col-span-12 lg:col-span-8 space-y-gutter">
+<!-- Section 1: Overview -->
+<section class="paper-card p-gutter rounded-xl shadow-[0px_4px_20px_rgba(155,68,38,0.04)]">
+<div class="flex items-center gap-2 mb-stack-md">
+<span class="material-symbols-outlined text-primary">description</span>
+<h3 class="font-headline-md text-headline-md">Task Overview</h3>
+</div>
+<div class="space-y-4 font-body-lg text-body-lg text-on-surface leading-relaxed">
+<p class="">
+                            Follow up on infrastructure grant for the Central Asia well drilling project. James Wilson expressed interest during the last gala in funding the secondary phase of the aquifer extraction program.
+                        </p>
+<p class="">
+                            We need to verify the logistical constraints of the new drilling equipment recently cleared by the regional authorities. Ensure James understands the direct impact: 12,000 villagers gaining permanent access to potable water.
+                        </p>
+</div>
+</section>
+<!-- Section 4: Sub-tasks / Checklist -->
+<section class="paper-card p-gutter rounded-xl">
+<div class="flex items-center justify-between mb-stack-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">checklist</span>
+<h3 class="font-headline-md text-headline-md">Action Items</h3>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">1 / 3 COMPLETE</span>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-4 p-4 bg-primary-container/5 border border-primary-container/10 rounded group cursor-pointer transition-all">
+<div class="w-6 h-6 border-2 border-primary-container rounded flex items-center justify-center bg-primary-container text-white">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<span class="font-body-md text-body-md line-through text-on-surface-variant flex-1">Prepare infrastructure grant documentation</span>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
+</div>
+<div class="flex items-center gap-4 p-4 border border-outline-variant/30 hover:border-primary-container/20 rounded group cursor-pointer transition-all">
+<div class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center"></div>
+<span class="font-body-md text-body-md text-on-surface flex-1">Call donor to discuss secondary phase funding</span>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
+</div>
+<div class="flex items-center gap-4 p-4 border border-outline-variant/30 hover:border-primary-container/20 rounded group cursor-pointer transition-all">
+<div class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center"></div>
+<span class="font-body-md text-body-md text-on-surface flex-1">Log outcome and schedule follow-up board meeting</span>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-opacity">drag_indicator</span>
+</div>
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 mt-2 hover:underline">
+<span class="material-symbols-outlined text-sm">add</span> Add another item
+                        </button>
+</div>
+</section>
+</div>
+<!-- Sidebar Info Area (Column 9-12) -->
+<div class="col-span-12 lg:col-span-4 space-y-gutter">
+<!-- Section 2: Connected Entities -->
+<section class="paper-card p-gutter rounded-xl">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-stack-md">Connected Entities</h3>
+<div class="space-y-stack-md">
+<!-- Entity 1: Donor -->
+<div class="flex items-start gap-4 p-3 bg-white rounded-lg border border-outline-variant/20 shadow-sm hover:border-primary-container/30 transition-all">
+<div class="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Donor</p>
+<a class="font-headline-md text-[18px] text-on-surface hover:text-primary transition-colors" href="#">James Wilson</a>
+<p class="font-label-md text-label-md text-secondary">Major Gifts • Lead Prospect</p>
+</div>
+</div>
+<!-- Entity 2: Project -->
+<div class="flex items-start gap-4 p-3 bg-white rounded-lg border border-outline-variant/20 shadow-sm hover:border-primary-container/30 transition-all">
+<div class="w-10 h-10 rounded-lg bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Project</p>
+<a class="font-headline-md text-[18px] text-on-surface hover:text-primary transition-colors" href="#">Well Drilling: Central Asia</a>
+<p class="font-label-md text-label-md text-secondary">Active • Infrastructure</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Activity Timeline -->
+<section class="paper-card p-gutter rounded-xl">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-stack-md">Activity Timeline</h3>
+<div class="relative space-y-6 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-outline-variant/40">
+<!-- Log Item 1 -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-white border border-primary-container flex items-center justify-center z-10">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+<p class="font-label-md text-label-md text-on-surface">Email sent to James Wilson</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Today, 9:15 AM • Anna S.</p>
+</div>
+<!-- Log Item 2 -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-white border border-outline-variant flex items-center justify-center z-10">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+</div>
+<p class="font-label-md text-label-md text-on-surface">Status changed to <span class="text-primary-container font-bold italic">In Progress</span></p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">July 10, 2026 • System</p>
+</div>
+<!-- Log Item 3 -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-white border border-outline-variant flex items-center justify-center z-10">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+</div>
+<p class="font-label-md text-label-md text-on-surface">Task created from Project Board</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">July 09, 2026 • Marcus L.</p>
+</div>
+</div>
+<button class="w-full mt-6 py-2 border-t border-outline-variant/20 text-primary font-bold text-label-md text-center hover:bg-paper-neutral transition-colors rounded-b">
+                        View Full History
+                    </button>
+</section>
+<!-- Quick Actions -->
+<div class="grid grid-cols-2 gap-4">
+<button class="paper-card flex flex-col items-center justify-center p-4 rounded-xl hover:border-primary-container/30 transition-all">
+<span class="material-symbols-outlined text-primary-container mb-1">mail</span>
+<span class="font-label-sm text-label-sm text-on-surface">Email Donor</span>
+</button>
+<button class="paper-card flex flex-col items-center justify-center p-4 rounded-xl hover:border-primary-container/30 transition-all">
+<span class="material-symbols-outlined text-primary-container mb-1">event_repeat</span>
+<span class="font-label-sm text-label-sm text-on-surface">Reschedule</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer Verse Area -->
+
+</main>
+<script>
+        // Micro-interaction for checklist
+        document.querySelectorAll('.checklist-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const check = this.querySelector('.check-mark');
+                const text = this.querySelector('.task-text');
+                
+                if (check.classList.contains('bg-primary-container')) {
+                    check.classList.remove('bg-primary-container', 'text-white');
+                    check.classList.add('border-outline-variant');
+                    text.classList.remove('line-through', 'text-on-surface-variant');
+                    text.classList.add('text-on-surface');
+                } else {
+                    check.classList.add('bg-primary-container', 'text-white');
+                    check.classList.remove('border-outline-variant');
+                    text.classList.add('line-through', 'text-on-surface-variant');
+                    text.classList.remove('text-on-surface');
+                }
+            });
+        });
+    </script>
+
+
+```
+
+</body></html>

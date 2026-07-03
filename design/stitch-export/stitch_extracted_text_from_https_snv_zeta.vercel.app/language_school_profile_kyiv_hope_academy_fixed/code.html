@@ -1,0 +1,415 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Kyiv Hope Academy - Language School Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#9d4300",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#f97316",
+                        "on-primary-container": "#582200",
+                        "secondary": "#545f73",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#d5e0f8",
+                        "on-secondary-container": "#586377",
+                        "tertiary": "#006398",
+                        "background": "#fff8f6",
+                        "on-background": "#251913",
+                        "surface": "#fff8f6",
+                        "on-surface": "#251913",
+                        "surface-variant": "#f6ded3",
+                        "on-surface-variant": "#584237",
+                        "outline": "#8c7164",
+                        "outline-variant": "#e0c0b1",
+                        "surface-container-low": "#fff1eb",
+                        "surface-container": "#ffeae0",
+                        "surface-container-high": "#fce3d9",
+                        "paper-neutral": "#F5EFEF",
+                        "ink-black": "#0F172A",
+                        "sunset-gold": "#FB923C"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "gutter": "24px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "margin-safe": "32px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Work Sans"],
+                        "body-md": ["Source Serif 4"],
+                        "body-lg": ["Source Serif 4"],
+                        "headline-md": ["Playfair Display"],
+                        "label-sm": ["Work Sans"],
+                        "headline-lg": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-lg-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #fff8f6; color: #251913; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e0c0b1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface">
+<div class="flex min-h-screen">
+<!-- SIDE NAVIGATION BAR -->
+<aside class="h-screen w-64 sticky left-0 top-0 hidden lg:flex flex-col bg-paper-neutral border-r border-outline-variant z-40">
+<div class="flex flex-col p-4 h-full">
+<!-- Brand Section -->
+<div class="flex flex-col items-center gap-2 mb-10 mt-4">
+<img alt="Light in the East Logo" class="w-16 h-16 rounded-full border-2 border-primary-container p-1 bg-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS-OAg3RHgyBd4TB7-6-xD9JEStlGdioFI-PJv8Td2SQaR8Il1-JfR4nWN4vHnpwErDPbnST7tcbYXcKZFl00S9NqMa_ONax7D8aE_M1TDs_W6U3V71IUzd23JCIGFs_btActsBXpiOBsRBZAqbfupu7IOUE4z_tDlsmZ9vAdB0ewUPHCyi57U33ZDpKGlThwt9CUjiCT4iuuC7t3PWPjbJVZpZg5W3zrgSBFUUMYCIFzjFeTxZ_BI81kDy0KOF7qrG89ksPT_Xx2pcnw">
+<div class="text-center">
+<h1 class="font-headline-md text-[20px] text-primary font-bold tracking-tight leading-tight">Light in the East</h1>
+<p class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest opacity-70">Mission CRM</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-1 custom-scrollbar overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Donors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">church</span>
+<span class="font-label-md">Churches</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-md">Language Schools</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span class="font-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md">Calendar</span>
+</a>
+</nav>
+<!-- Sidebar Footer -->
+<div class="pt-4 border-t border-outline-variant space-y-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<main class="flex-1 min-h-screen flex flex-col bg-background overflow-y-auto">
+<!-- TopAppBar -->
+<header class="w-full h-16 flex items-center sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-outline-variant px-gutter">
+<div class="max-w-[1200px] mx-auto w-full flex justify-between items-center">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-paper-neutral border-none focus:ring-2 focus:ring-primary-container/20 text-label-md outline-none rounded-full" placeholder="Search schools, projects, or students..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">settings</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right">
+<p class="font-label-md text-label-md font-bold group-hover:text-primary transition-colors">Admin User</p>
+<p class="font-label-sm text-[10px] text-secondary uppercase tracking-tighter">Headquarters</p>
+</div>
+<img alt="Admin User" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMbEdTb0NTqBqyqH1hp-lVwUIF-MVFvqykbdrwEhiCRSozWLrlz3JBGQgWzLuGLvR-6TQ9VTACnJ0mi_avYQOSu555777Q4RlCBNTc2_Bnzoz28bRsN2776-JLyKjP6PuL2kcyWcyCQAP2AY2CUatsDhWEAVwnNTTeIDSZtaNxvDRnC9KcA5Zk6W3pCbBSB6v3bHM24xB6XMW_LkJnM3kEZtWzzomNoGV0ZEiOmwToto_3qvJw6YhdVA">
+</div>
+</div>
+</div>
+</header>
+<div class="max-w-[1200px] mx-auto w-full p-gutter flex-1">
+<!-- School Header Section -->
+<section class="mb-stack-lg flex flex-col md:flex-row justify-between items-end gap-gutter border-b border-outline-variant pb-8">
+<div class="flex items-start gap-6">
+<div class="w-24 h-24 bg-white rounded-xl flex items-center justify-center border border-outline-variant/30 shadow-sm overflow-hidden">
+<img alt="Kyiv Hope Academy Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARTwsLEc4XnnXXgqC5iT-e9AHU1JJ6Xu6yt_fStTWVch27kERignsebE0ey3dZTkkr-CLHtmRuEAimINXBMWvQ3Rlp2KlSDwCaJfJtM_9oiL2L59Op4ql5hr9zRGDfQWSpLALjDQbt8WKZFknuNNqSiFyaSEe1vIGuzFYAa0DwTmj3rt35rKWBpkhXuua_LhWZYKv3fR7Kx6fqz-axa5OcZft0eMPtdlkrfiZE2QdAyqQ2w1yU-4r2yw">
+</div>
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Kyiv Hope Academy</h2>
+<span class="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Active Partner</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span class="font-label-sm">Kyiv, Ukraine</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">person</span>
+<span class="font-label-sm">Oleksandr V. — Director</span>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container-high rounded-full font-label-sm text-primary">Language School</span>
+<span class="px-3 py-1 bg-surface-container-high rounded-full font-label-sm text-primary">Literacy Center</span>
+</div>
+</div>
+</div>
+<div class="flex gap-stack-sm mb-1">
+<button class="bg-primary px-6 py-2 text-white font-label-md rounded-lg flex items-center gap-2 hover:bg-primary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-sm">mail</span>
+                            Contact School
+                        </button>
+<button class="border border-outline px-6 py-2 text-secondary font-label-md rounded-lg flex items-center gap-2 hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-sm">more_horiz</span>
+</button>
+</div>
+</section>
+<!-- Metrics Row -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-stack-lg">
+<div class="bg-white p-6 rounded-xl border border-outline-variant/30 shadow-sm">
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Academic Health</p>
+<div class="flex items-baseline gap-2">
+<h3 class="font-headline-md text-primary font-bold">8.2</h3>
+<span class="text-on-surface-variant font-label-sm">/ 10</span>
+</div>
+<div class="mt-4 w-full bg-surface-container-high rounded-full h-1.5">
+<div class="bg-primary-container h-1.5 rounded-full" style="width: 82%"></div>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl border border-outline-variant/30 shadow-sm">
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Total Students</p>
+<div class="flex items-baseline gap-2">
+<h3 class="font-headline-md text-on-surface font-bold">342</h3>
+<span class="text-green-600 font-label-sm flex items-center">
+<span class="material-symbols-outlined text-sm">trending_up</span> 12%
+                            </span>
+</div>
+<p class="text-on-surface-variant font-label-sm mt-2 italic">Growth vs Last Year</p>
+</div>
+<div class="bg-white p-6 rounded-xl border border-outline-variant/30 shadow-sm">
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Years of Partnership</p>
+<div class="flex items-baseline gap-2">
+<h3 class="font-headline-md text-on-surface font-bold">11</h3>
+<span class="text-on-surface-variant font-label-sm">years</span>
+</div>
+<p class="text-on-surface-variant font-label-sm mt-2">Active since Oct 2012</p>
+</div>
+</section>
+<!-- Main Body Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<!-- Left Column (wider) -->
+<div class="lg:col-span-8 space-y-stack-lg">
+<!-- Educational Pulse -->
+<div class="bg-white p-gutter rounded-xl shadow-sm border border-outline-variant/20">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold">Educational Pulse</h3>
+<button class="text-primary font-label-sm font-bold hover:underline">View All History</button>
+</div>
+<div class="relative pl-8 space-y-stack-lg">
+<!-- Timeline Line -->
+<div class="absolute left-[11px] top-2 bottom-2 w-[2px] bg-outline-variant opacity-40"></div>
+<!-- Timeline Item 1 -->
+<div class="relative">
+<div class="absolute -left-[27px] top-1.5 w-4 h-4 rounded-full bg-primary-container border-4 border-white shadow-sm"></div>
+<p class="font-label-sm text-on-surface-variant mb-1">Oct 12, 2023</p>
+<h4 class="font-label-md font-bold text-on-surface mb-2">New Semester Launch</h4>
+<p class="text-on-surface-variant font-body-md leading-relaxed">Enrollment reached capacity with 150 new students in the English program. The high demand signals a need for additional evening slots.</p>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative">
+<div class="absolute -left-[27px] top-1.5 w-4 h-4 rounded-full bg-primary-container border-4 border-white shadow-sm opacity-70"></div>
+<p class="font-label-sm text-on-surface-variant mb-1">Sep 20, 2023</p>
+<h4 class="font-label-md font-bold text-on-surface mb-2">Teacher Training Workshop</h4>
+<p class="text-on-surface-variant font-body-md leading-relaxed">12 faculty members completed the new curriculum certification. Feedback on the digital integration was exceptionally positive.</p>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative">
+<div class="absolute -left-[27px] top-1.5 w-4 h-4 rounded-full bg-outline-variant border-4 border-white shadow-sm"></div>
+<p class="font-label-sm text-on-surface-variant mb-1">Aug 15, 2023</p>
+<h4 class="font-label-md font-bold text-on-surface mb-2">Annual Facility Audit</h4>
+<p class="text-on-surface-variant font-body-md leading-relaxed">All classrooms upgraded with new digital learning tools. Facility structural integrity verified for another academic year.</p>
+</div>
+</div>
+</div>
+<!-- Project Alignment -->
+<div class="bg-white p-gutter rounded-xl border border-outline-variant/30 shadow-sm">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold mb-6">Project Alignment</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<div class="bg-surface-variant/50 p-stack-md rounded-lg border border-outline-variant/20 hover:shadow-md transition-shadow cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary-container bg-primary-container/10 p-2 rounded">menu_book</span>
+<span class="font-label-sm text-primary font-bold">$45,000 Allocated</span>
+</div>
+<h4 class="font-label-md font-bold text-on-surface mb-1">Linguistic Fluency Program</h4>
+<p class="font-label-sm text-on-surface-variant mb-4">Humanitarian / Educational</p>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-gray-200 border border-white"></div>
+<div class="w-6 h-6 rounded-full bg-gray-300 border border-white"></div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">arrow_forward</span>
+</div>
+</div>
+<div class="bg-surface-variant/50 p-stack-md rounded-lg border border-outline-variant/20 hover:shadow-md transition-shadow cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary-container bg-primary-container/10 p-2 rounded">auto_stories</span>
+<span class="font-label-sm text-primary font-bold">850 Students/mo</span>
+</div>
+<h4 class="font-label-md font-bold text-on-surface mb-1">Bible-Based Literacy</h4>
+<p class="font-label-sm text-on-surface-variant mb-4">Literacy &amp; Faith</p>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-gray-200 border border-white"></div>
+<div class="w-6 h-6 rounded-full bg-gray-300 border border-white"></div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (narrower) -->
+<div class="lg:col-span-4 space-y-stack-lg">
+<!-- Quick Actions -->
+<div class="bg-white p-6 rounded-xl border border-outline-variant/20 shadow-sm">
+<h3 class="font-label-sm text-on-surface-variant uppercase mb-4 tracking-wider">Quick Actions</h3>
+<div class="space-y-2">
+<button class="w-full text-left px-4 py-3 bg-surface-container-low rounded-lg font-label-md text-on-surface flex items-center justify-between group hover:bg-primary-container hover:text-white transition-all">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined text-xl">event</span>
+                                        Schedule Visit
+                                    </span>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100">chevron_right</span>
+</button>
+<button class="w-full text-left px-4 py-3 bg-surface-container-low rounded-lg font-label-md text-on-surface flex items-center justify-between group hover:bg-primary-container hover:text-white transition-all">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined text-xl">edit</span>
+                                        Edit Profile
+                                    </span>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100">chevron_right</span>
+</button>
+<button class="w-full text-left px-4 py-3 bg-surface-container-low rounded-lg font-label-md text-on-surface flex items-center justify-between group hover:bg-primary-container hover:text-white transition-all">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined text-xl">description</span>
+                                        Generate Academic Report
+                                    </span>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Leadership Contact -->
+<div class="bg-white p-6 rounded-xl border border-outline-variant/20 shadow-sm">
+<h3 class="font-label-sm text-on-surface-variant uppercase mb-4 tracking-wider">Leadership</h3>
+<div class="space-y-4 mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center font-bold text-primary border border-outline-variant/30">OV</div>
+<div>
+<p class="font-label-md font-bold text-on-surface">Oleksandr V. Kovalenko</p>
+<p class="font-label-sm text-on-surface-variant">Director</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center font-bold text-primary border border-outline-variant/30">MV</div>
+<div>
+<p class="font-label-md font-bold text-on-surface">Marta S. Voloshyna</p>
+<p class="font-label-sm text-on-surface-variant">Operations Manager</p>
+</div>
+</div>
+</div>
+<div class="border-t border-outline-variant/20 pt-4">
+<p class="font-label-sm text-on-surface-variant uppercase mb-2">Location</p>
+<div class="h-32 bg-paper-neutral rounded-lg mb-2 overflow-hidden border border-outline-variant/30">
+<img alt="Map Location" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDbhzDhFLUlGs3KK5f-jOM_0KZTnLIx6UrNrgX_cp39FNhQhVTfyM2hHzlmSzeWJnzP4gkhf5dKWnFzM6qnw5AJ2NUhLCTAQPm6dujFpZrGmPRmGE1A8ZkT7yXR5Hb7rBPxZsmiaCJKp8HbZ4WUO-MJ4NKb2r3X0ZnBFyzCBUXHbWiEJL4R_uIHy_GrBBCPoN9hOq7oqPnV9hVqHm2lLwzR7y3Y4c5tK0hYfr8SKrkZXvdkJfD9ZYv5g">
+</div>
+<p class="font-label-sm text-on-surface leading-snug">Vulytsya Khreschatyk, 22,<br>Kyiv, 01001, Ukraine</p>
+</div>
+</div>
+<!-- Mission Insight Card (In Right Column) -->
+<div class="bg-primary-container/10 p-6 rounded-xl border border-primary-container/20">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<h3 class="font-label-sm text-primary font-bold uppercase tracking-widest">Mission Insight</h3>
+</div>
+<p class="font-body-md text-primary italic leading-relaxed">
+                                "Kyiv Hope Academy remains our flagship educational partner in Central Ukraine. Current focus: expanding the 'Intro to English' evening classes to accommodate the surge in adult enrollment."
+                            </p>
+</div>
+</div>
+</div>
+<!-- Footer (Verse Anchor) -->
+
+</div>
+</main>
+</div>
+<script>
+        // Micro-interactions: Hover effects for cards
+        document.querySelectorAll('.bg-white.rounded-xl.border').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.boxShadow = '0 12px 30px -10px rgba(157, 67, 0, 0.12)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = 'none';
+            });
+        });
+    </script>
+
+
+</body></html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Project Profile | MissionCRM</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;500;600&amp;family=Work+Sans:wght@400;500;600&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#bcc7de",
+                    "secondary-container": "#d5e0f8",
+                    "paper-neutral": "#F5EFEF",
+                    "primary-container": "#e27b58",
+                    "on-tertiary-fixed-variant": "#004b74",
+                    "ink-black": "#0F172A",
+                    "surface-tint": "#9b4426",
+                    "outline-variant": "#dcc1b9",
+                    "on-primary-fixed": "#341100",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "sunset-gold": "#FB923C",
+                    "error": "#ba1a1a",
+                    "inverse-surface": "#3c2d26",
+                    "surface-dim": "#edd5cb",
+                    "on-background": "#111c2d",
+                    "warm-surface": "#fff8f6",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed": "#111c2d",
+                    "primary-fixed": "#ffdbca",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#ffb690",
+                    "on-tertiary-fixed": "#001d32",
+                    "surface-container-high": "#fce3d9",
+                    "primary-fixed-dim": "#ffb690",
+                    "secondary": "#515f74",
+                    "on-secondary-container": "#57657a",
+                    "tertiary": "#516072",
+                    "on-primary-fixed-variant": "#783200",
+                    "tertiary-container": "#00a2f4",
+                    "surface-bright": "#ffffff",
+                    "on-tertiary-container": "#003554",
+                    "background": "#fff8f6",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#3c475a",
+                    "tertiary-fixed": "#cde5ff",
+                    "surface": "#ffffff",
+                    "surface-container-highest": "#f6ded3",
+                    "surface-container": "#ffeae0",
+                    "primary": "#9b4426",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#93ccff",
+                    "on-primary-container": "#ffffff",
+                    "surface-variant": "#f9f9ff",
+                    "secondary-fixed": "#d8e3fb",
+                    "inverse-on-surface": "#ffede6",
+                    "on-surface": "#111c2d",
+                    "outline": "#89726b",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#55423d",
+                    "surface-container-low": "#fff1eb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "0.75rem",
+                    "xl": "1rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "unit": "4px",
+                    "gutter": "24px",
+                    "margin-safe": "32px",
+                    "stack-sm": "8px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Playfair Display"],
+                    "label-md": ["Inter"],
+                    "display-lg": ["Playfair Display"],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "headline-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(137, 114, 107, 0.15);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dcc1b9;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-warm-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container font-body-md overflow-x-hidden min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="bg-white/80 backdrop-blur-md flex justify-between items-center w-full px-gutter h-16 sticky top-0 z-40 border-b border-outline-variant">
+<div class="flex items-center gap-stack-md">
+<span class="font-headline-md text-[20px] text-primary font-bold">MissionCRM</span>
+</div>
+<div class="flex items-center gap-stack-md">
+<div class="flex items-center gap-6 mr-6">
+<span class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary-container pb-1 cursor-pointer">Projects</span>
+<span class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 cursor-pointer">Donors</span>
+<span class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 cursor-pointer">Tasks</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors p-2">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors p-2">settings</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<span class="font-label-md text-label-md font-bold group-hover:text-primary transition-colors">Admin User</span>
+<img class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A sophisticated professional headshot of a middle-aged woman with silver hair and warm eyes, wearing an elegant cream-colored blazer." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6ntXUzHrTB5B_Ci5UFrZQ5wi50OhZfsjTqmwizI_7EanpqsK42zSKZXBw9W1-zXiWfdRLBcuzZymxBlqr4e0T3YHmu_hRSxZQlUy8OxLyhXbLosOiQyUk2Ej60pN7ooyl2M5y3b-QPzCX4ylpGU_M6eKT8kG3zMWr8Kc61cpeRag3o3PJFskBnUbAe3OahfWDu-R11PWaVNxezjXRH_UE4ZvmSB9YqLqXKWkxNBID8QyFTtKfk1ph6A">
+</div>
+</div>
+</header>
+<div class="flex">
+<!-- Side Navigation Bar (Standardized Soft Luminous) -->
+<aside class="h-screen w-64 sticky left-0 top-0 hidden lg:flex flex-col bg-paper-neutral border-r border-outline-variant z-40">
+<div class="flex flex-col p-md h-full">
+<!-- Brand Section -->
+<div class="flex flex-col items-center gap-2 mb-10 mt-4">
+<img alt="Light in the East Logo" class="w-16 h-16 rounded-full border-2 border-primary-container p-1 bg-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS-OAg3RHgyBd4TB7-6-xD9JEStlGdioFI-PJv8Td2SQaR8Il1-JfR4nWN4vHnpwErDPbnST7tcbYXcKZFl00S9NqMa_ONax7D8aE_M1TDs_W6U3V71IUzd23JCIGFs_btActsBXpiOBsRBZAqbfupu7IOUE4z_tDlsmZ9vAdB0ewUPHCyi57U33ZDpKGlThwt9CUjiCT4iuuC7t3PWPjbJVZpZg5W3zrgSBFUUMYCIFzjFeTxZ_BI81kDy0KOF7qrG89ksPT_Xx2pcnw">
+<div class="text-center">
+<h1 class="font-headline-md text-[20px] text-primary font-bold tracking-tight leading-tight">Light in the East</h1>
+<p class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest opacity-70">Mission CRM</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-1 custom-scrollbar overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Donors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">church</span>
+<span class="font-label-md">Churches</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md">Language Schools</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+<span class="font-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md">Calendar</span>
+</a>
+</nav>
+<!-- Sidebar Footer -->
+<div class="pt-4 border-t border-outline-variant space-y-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full min-h-screen px-margin-safe py-stack-lg max-w-[1280px]">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-stack-lg">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<h1 class="font-display-lg text-display-lg text-on-surface">Well Drilling: Central Asia</h1>
+<span class="bg-primary-container/10 text-primary-container px-3 py-1 rounded-full text-label-sm uppercase tracking-widest font-bold border border-primary-container/20">On Track</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Ensuring sustainable access to life-giving water for rural desert communities.</p>
+</div>
+<div class="flex gap-4">
+<button class="bg-white border border-outline px-6 py-2 rounded-lg transition-all hover:bg-surface-container-low font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">edit</span> Edit Project
+                    </button>
+<button class="bg-primary-container text-white px-6 py-2 rounded-lg transition-all hover:opacity-90 shadow-sm font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">description</span> Generate Report
+                    </button>
+</div>
+</div>
+<!-- Top Metrics Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-stack-lg">
+<!-- Card 1: Funding -->
+<div class="glass-card p-gutter rounded-xl hover:border-primary-container transition-all">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Total Funding</p>
+<div class="flex items-baseline gap-2 mb-4">
+<span class="font-headline-lg text-headline-lg text-primary">$12,400</span>
+<span class="font-body-md text-body-md text-on-surface-variant">/ $19,000 goal</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<!-- Card 2: Communities -->
+<div class="glass-card p-gutter rounded-xl hover:border-primary-container transition-all">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Villages Reached</p>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-on-surface">12</span>
+<span class="font-body-md text-body-md text-on-surface-variant">communities</span>
+</div>
+<div class="mt-4 flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-primary-container border-2 border-white shadow-sm"></div>
+<div class="w-6 h-6 rounded-full bg-sunset-gold border-2 border-white shadow-sm"></div>
+<div class="w-6 h-6 rounded-full bg-tertiary-container border-2 border-white shadow-sm"></div>
+<div class="w-6 h-6 rounded-full bg-outline border-2 border-white flex items-center justify-center text-[8px] text-white shadow-sm">+9</div>
+</div>
+</div>
+<!-- Card 3: Time -->
+<div class="glass-card p-gutter rounded-xl hover:border-primary-container transition-all">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Days Active</p>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-on-surface">142</span>
+<span class="font-body-md text-body-md text-on-surface-variant">days since launch</span>
+</div>
+<p class="mt-4 font-label-md text-label-md text-primary flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[16px]">event_repeat</span> Next site visit: Oct 24
+                    </p>
+</div>
+</div>
+<!-- Split Content Area -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Main Column (2/3) -->
+<div class="lg:col-span-2 space-y-stack-lg">
+<!-- Project Narrative -->
+<section class="glass-card p-gutter rounded-xl border-l-4 border-l-primary">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-md">Project Narrative</h2>
+<div class="prose max-w-none text-on-surface-variant leading-relaxed">
+<p class="font-body-lg text-body-lg first-letter:text-4xl first-letter:font-headline-lg first-letter:text-primary first-letter:mr-2 first-letter:float-left">Providing clean, sustainable water access is the cornerstone of community resilience in the remote nomadic regions of Central Asia. This project focuses on the strategic deployment of modern drilling technologies to reach deep aquifers that have remained untapped for generations.</p>
+<p class="font-body-md text-body-md mt-4">By partnering with local leadership and employing geological surveys, we ensure that every well location serves the maximum number of families while minimizing the impact on the delicate arid landscape. Beyond the hardware, we provide technical training to community members, ensuring the long-term maintenance and sovereignty of their water resources.</p>
+</div>
+</section>
+<!-- Impact Timeline -->
+<section>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-md">Impact Timeline</h2>
+<div class="relative space-y-gutter before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-outline-variant">
+<!-- Timeline Item 1 -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-primary-container border-4 border-white flex items-center justify-center shadow-sm"></div>
+<div class="glass-card p-4 rounded-xl">
+<p class="font-label-sm text-label-sm text-primary uppercase font-bold mb-1">Coming Soon</p>
+<h4 class="font-body-md text-body-md font-bold text-on-surface">Phase 1 Completion</h4>
+<p class="font-label-md text-label-md text-on-surface-variant">Scheduled for October 2023. Final inspection of first 5 well sites.</p>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-outline-variant border-4 border-white flex items-center justify-center shadow-sm"></div>
+<div class="glass-card p-4 rounded-xl">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">Aug 2023</p>
+<h4 class="font-body-md text-body-md font-bold text-on-surface">Equipment Transport</h4>
+<p class="font-label-md text-label-md text-on-surface-variant">Drilling rigs and support vehicles cleared customs and arrived at regional hub.</p>
+</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-outline-variant border-4 border-white flex items-center justify-center shadow-sm"></div>
+<div class="glass-card p-4 rounded-xl">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">June 2023</p>
+<h4 class="font-body-md text-body-md font-bold text-on-surface">Site Selection</h4>
+<p class="font-label-md text-label-md text-on-surface-variant">Hydrogeological surveys completed across 3 provinces to identify high-yield locations.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar (1/3) -->
+<div class="space-y-stack-lg">
+<!-- Local Lead Card -->
+<div class="glass-card p-6 rounded-xl">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-4 tracking-wider font-bold">Local Lead</h3>
+<div class="flex items-center gap-4 mb-4">
+<img class="w-12 h-12 rounded-full object-cover grayscale border border-outline-variant" data-alt="A portrait of a weathered, dignified Central Asian man in his late 50s." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbAD3bFfIZNyzAlmivdmRdTnbTV-8xV1GR2ZDPgvvw2-ewgoh1h3vP9auHfyCmkgz_TCgUVpt9n4PCedW2B1Btm6wyTRWBrr6fXGKZIkqTPB8RX02F-rvT7opR1V8k2s4az4-Dfjse_m-lxGlak5mq7coc8cavy39KoIP1NSa3BihNILWTUHiotzTgJfPF3Jv6gJd_TTbm86YsaEBkGrahMcOvpPlh34LOJSVVepl-vfIxhDnKLFHFdg">
+<div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface">Alisher Karimova</h4>
+<p class="font-label-sm text-label-sm text-primary font-bold">Regional Director</p>
+</div>
+</div>
+<div class="space-y-2 border-t border-outline-variant/30 pt-4">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+<span class="font-label-md text-label-md">a.karimova@mission.org</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">phone_iphone</span>
+<span class="font-label-md text-label-md">+998 90 123 45 67</span>
+</div>
+</div>
+</div>
+<!-- Resources Allocated -->
+<div class="glass-card p-6 rounded-xl">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-4 tracking-wider font-bold">Resources Allocated</h3>
+<ul class="space-y-4">
+<li class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">precision_manufacturing</span>
+<span class="font-body-md text-body-md text-on-surface">Drill Rigs</span>
+</div>
+<span class="font-bold text-primary">2</span>
+</li>
+<li class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+<span class="font-body-md text-body-md text-on-surface">Maint. Truck</span>
+</div>
+<span class="font-bold text-primary">1</span>
+</li>
+<li class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">engineering</span>
+<span class="font-body-md text-body-md text-on-surface">Technical Staff</span>
+</div>
+<span class="font-bold text-primary">4</span>
+</li>
+</ul>
+</div>
+<!-- Location Card -->
+<div class="glass-card rounded-xl overflow-hidden border border-outline-variant/30">
+<div class="p-4 border-b border-outline-variant/20 flex items-center justify-between bg-white">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-bold">Regional Hub</h3>
+<span class="font-label-md text-label-md text-on-surface font-bold">Tashkent, UZ</span>
+</div>
+<div class="h-48 w-full relative">
+<img class="w-full h-full object-cover opacity-80 mix-blend-multiply bg-paper-neutral" data-alt="A stylized, minimalist map illustration of the Central Asia region." data-location="Uzbekistan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyr6Hdjfoj8BBrPi9yHAult5bECeoCWtISQR9vkwDpR-vQsGnPbjmIcQvP6Q_Ar4TG51uhTh6WnPjjirD_p1JZAFR2oKyV3Ew1jW7cm54hPoj83Dj_hK_6BprvU_Bb1YBgsblIlRRAQDf8C5A6kGHsnBthlat2P7FEEE6JGU7JJaZC1nRMEqirADg0nJk5tH0REaD7DsIhhBB7lYet7PFoz0fTCa3GG7A2_asBpBBxROygxRRlWfvIsg">
+<div class="absolute inset-0 bg-primary/5 flex items-center justify-center pointer-events-none">
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+
+<script>
+        // Micro-interactions for hovering over cards
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.boxShadow = '0 12px 30px -10px rgba(155, 68, 38, 0.12)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = 'none';
+            });
+        });
+
+        // Sidebar interactions
+        const navItems = document.querySelectorAll('aside nav a');
+        navItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                const icon = item.querySelector('.material-symbols-outlined');
+                if (icon && !item.classList.contains('text-primary')) {
+                    icon.style.fontVariationSettings = "'FILL' 1";
+                }
+            });
+            item.addEventListener('mouseleave', () => {
+                const icon = item.querySelector('.material-symbols-outlined');
+                if (icon && !item.classList.contains('text-primary')) {
+                    icon.style.fontVariationSettings = "'FILL' 0";
+                }
+            });
+        });
+    </script>
+
+
+</body></html>

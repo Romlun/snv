@@ -1,0 +1,364 @@
+<!DOCTYPE html><html class="light" lang="en"><head></head><body class="font-body-md min-h-screen flex">```html
+
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Budget Overview | Light in the East</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter, Playfair Display -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#9b4426",
+                    "on-primary": "#ffffff",
+                    "primary-container": "#e27b58",
+                    "on-primary-container": "#ffffff",
+                    "secondary": "#515f74",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#d5e3fc",
+                    "on-secondary-container": "#57657a",
+                    "tertiary": "#516072",
+                    "background": "#fff8f6",
+                    "on-background": "#111c2d",
+                    "surface": "#ffffff",
+                    "on-surface": "#111c2d",
+                    "surface-variant": "#f9f9ff",
+                    "on-surface-variant": "#55423d",
+                    "outline": "#89726b",
+                    "outline-variant": "#dcc1b9",
+                    "surface-container-low": "#fff1eb",
+                    "surface-container": "#ffeae0",
+                    "surface-container-high": "#fce3d9",
+                    "paper-neutral": "#F5EFEF"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "0.75rem",
+                    "xl": "1rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "gutter": "24px",
+                    "stack-md": "16px",
+                    "stack-sm": "8px",
+                    "stack-lg": "32px",
+                    "margin-safe": "32px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "display-lg": ["Playfair Display"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fff8f6;
+            color: #111c2d;
+            -webkit-font-smoothing: antialiased;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dcc1b9;
+            border-radius: 10px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(137, 114, 107, 0.15);
+        }
+    </style>
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-64 sticky left-0 top-0 hidden lg:flex flex-col bg-paper-neutral border-r border-outline-variant z-40">
+<div class="flex flex-col p-md h-full">
+<!-- Brand Section -->
+<div class="flex flex-col items-center gap-2 mb-10 mt-4">
+<img alt="Light in the East Logo" class="w-16 h-16 rounded-full border-2 border-primary-container p-1 bg-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS-OAg3RHgyBd4TB7-6-xD9JEStlGdioFI-PJv8Td2SQaR8Il1-JfR4nWN4vHnpwErDPbnST7tcbYXcKZFl00S9NqMa_ONax7D8aE_M1TDs_W6U3V71IUzd23JCIGFs_btActsBXpiOBsRBZAqbfupu7IOUE4z_tDlsmZ9vAdB0ewUPHCyi57U33ZDpKGlThwt9CUjiCT4iuuC7t3PWPjbJVZpZg5W3zrgSBFUUMYCIFzjFeTxZ_BI81kDy0KOF7qrG89ksPT_Xx2pcnw">
+<div class="text-center">
+<h1 class="font-headline-md text-[20px] text-primary font-bold tracking-tight leading-tight">Light in the East</h1>
+<p class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest opacity-70">Mission CRM</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-1 custom-scrollbar overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Donors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">church</span>
+<span class="font-label-md">Churches</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md">Language Schools</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span class="font-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-label-md">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md">Calendar</span>
+</a>
+</nav>
+<!-- Sidebar Footer -->
+<div class="pt-4 border-t border-outline-variant space-y-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- Top App Bar -->
+<header class="w-full h-16 flex items-center sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-outline-variant">
+<div class="max-w-[1280px] mx-auto flex justify-between items-center px-gutter w-full">
+<div class="flex items-center space-x-4">
+<h1 class="font-headline-md text-headline-md font-semibold text-on-surface">Budget Overview</h1>
+</div>
+<div class="flex items-center space-x-6">
+<div class="relative w-full max-w-md hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-paper-neutral border-none focus:ring-2 focus:ring-primary-container/20 text-label-md outline-none rounded-full" placeholder="Search budget entries..." type="text">
+</div>
+<div class="flex items-center space-x-4">
+<button class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">notifications</button>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<button class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">account_circle</button>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1">
+<div class="max-w-[1280px] mx-auto p-gutter space-y-stack-lg">
+<!-- Welcome & Primary CTA -->
+<div class="flex justify-between items-end">
+<div>
+<p class="font-body-md text-on-surface-variant max-w-2xl italic">Track planned budget lines across the organization with stewardship and clarity.</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 font-label-md text-label-md rounded-lg flex items-center transition-all shadow-sm">
+<span class="material-symbols-outlined mr-2">add_circle</span> New budget entry
+            </button>
+</div>
+<!-- Metric Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<div class="glass-card p-md rounded-xl hover:border-primary-container transition-colors group h-32 flex flex-col justify-between">
+<span class="font-label-sm text-on-surface-variant uppercase tracking-wider">Total Needed</span>
+<span class="font-headline-lg text-on-surface">$79,500.00</span>
+</div>
+<div class="glass-card p-md rounded-xl hover:border-primary-container transition-colors group h-32 flex flex-col justify-between">
+<span class="font-label-sm text-on-surface-variant uppercase tracking-wider">Total Raised</span>
+<span class="font-headline-lg text-primary">$40,450.00</span>
+</div>
+<div class="glass-card p-md rounded-xl hover:border-primary-container transition-colors group h-32 flex flex-col justify-between">
+<span class="font-label-sm text-on-surface-variant uppercase tracking-wider">Remaining</span>
+<span class="font-headline-lg text-secondary">$39,050.00</span>
+</div>
+<div class="glass-card p-md rounded-xl hover:border-primary-container transition-colors group h-32 relative overflow-hidden">
+<div class="z-10 flex flex-col justify-between h-full">
+<span class="font-label-sm text-on-surface-variant uppercase tracking-wider">Overall Funded</span>
+<div class="flex items-baseline space-x-2">
+<span class="font-headline-lg text-on-surface">51%</span>
+<span class="text-[10px] text-on-surface-variant font-label-sm font-bold uppercase">target reached</span>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 w-full h-1.5 bg-surface-container-high">
+<div class="h-full bg-primary-container" style="width: 51%"></div>
+</div>
+</div>
+</div>
+<!-- Budget Tables -->
+<div class="space-y-gutter">
+<!-- Church Visits Section -->
+<section class="glass-card rounded-xl overflow-hidden border border-outline-variant/30">
+<div class="px-6 py-4 border-b border-outline-variant/20 bg-white flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">church</span>
+<h3 class="font-headline-md text-[20px] font-bold text-on-surface">Church Visits</h3>
+</div>
+<span class="font-label-sm text-on-surface-variant italic">2 entries</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50 border-b border-outline-variant/20">
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider">Name</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider">Needed</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider">Raised</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider w-1/3">Progress</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-primary-container/5 transition-colors group">
+<td class="px-6 py-4">
+<span class="font-bold text-on-surface">Transportation costs</span>
+</td>
+<td class="px-6 py-4 text-label-md text-on-surface-variant">$1,500.00</td>
+<td class="px-6 py-4 text-label-md text-primary font-bold">$0.00</td>
+<td class="px-6 py-4">
+<div class="flex flex-col space-y-1">
+<div class="flex justify-between text-[10px] font-label-sm font-bold text-on-surface-variant">
+<span class="">0%</span>
+<span class="">$1,500.00 left</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 0%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary font-label-md hover:underline">Edit</button>
+</td>
+</tr>
+<tr class="hover:bg-primary-container/5 transition-colors group">
+<td class="px-6 py-4">
+<span class="font-bold text-on-surface">Printing &amp; Literature</span>
+</td>
+<td class="px-6 py-4 text-label-md text-on-surface-variant">$2,000.00</td>
+<td class="px-6 py-4 text-label-md text-primary font-bold">$1,200.00</td>
+<td class="px-6 py-4">
+<div class="flex flex-col space-y-1">
+<div class="flex justify-between text-[10px] font-label-sm font-bold text-on-surface-variant">
+<span class="">60%</span>
+<span class="">$800.00 left</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 60%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary font-label-md hover:underline">Edit</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- General Operations Section -->
+<section class="glass-card rounded-xl overflow-hidden border border-outline-variant/30">
+<div class="px-6 py-4 border-b border-outline-variant/20 bg-white flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">corporate_fare</span>
+<h3 class="font-headline-md text-[20px] font-bold text-on-surface">General Operations</h3>
+</div>
+<span class="font-label-sm text-on-surface-variant italic">1 entry</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50 border-b border-outline-variant/20">
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider">Name</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider">Needed</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider">Raised</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider w-1/3">Progress</th>
+<th class="px-6 py-3 font-label-sm text-on-surface-variant uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-primary-container/5 transition-colors group">
+<td class="px-6 py-4">
+<span class="font-bold text-on-surface">Salary</span>
+</td>
+<td class="px-6 py-4 text-label-md text-on-surface-variant">$78,000.00</td>
+<td class="px-6 py-4 text-label-md text-primary font-bold">$40,450.00</td>
+<td class="px-6 py-4">
+<div class="flex flex-col space-y-1">
+<div class="flex justify-between text-[10px] font-label-sm font-bold text-on-surface-variant">
+<span class="">52%</span>
+<span class="">$37,550.00 left</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary-container shadow-[0_0_8px_rgba(226,123,88,0.3)]" style="width: 52%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary font-label-md hover:underline">Edit</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Bible Verse Footer -->
+
+<!-- Footer -->
+
+</div>
+</main>
+</div>
+<script>
+    // Micro-interactions
+    document.querySelectorAll('.glass-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-2px)';
+            card.style.boxShadow = '0 12px 30px -10px rgba(155, 68, 38, 0.12)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = 'none';
+        });
+    });
+</script>
+
+
+```
+
+</body></html>

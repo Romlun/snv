@@ -1,0 +1,397 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Literature Inventory | Light in the East</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=Work+Sans:wght@400;500;600&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(137, 114, 107, 0.15);
+        }
+        .bento-inner {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .bento-inner:hover {
+            transform: translateY(-4px);
+        }
+        /* Custom scrollbar for literary feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FDFCFB;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e0c0b1;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#9b4426",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#e27b58",
+                        "on-primary-container": "#ffffff",
+                        "secondary": "#515f74",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#d5e3fc",
+                        "on-secondary-container": "#57657a",
+                        "tertiary": "#516072",
+                        "background": "#fff8f6",
+                        "on-background": "#111c2d",
+                        "surface": "#ffffff",
+                        "on-surface": "#111c2d",
+                        "surface-variant": "#f9f9ff",
+                        "on-surface-variant": "#55423d",
+                        "outline": "#89726b",
+                        "outline-variant": "#dcc1b9",
+                        "surface-container-low": "#fff1eb",
+                        "surface-container": "#ffeae0",
+                        "surface-container-high": "#fce3d9",
+                        "paper-neutral": "#F5EFEF",
+                        "warm-surface": "#FDFCFB",
+                        "sunset-gold": "#FB923C",
+                        "ink-black": "#0F172A"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "margin-safe": "32px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "body-lg": ["\"Source Serif 4\""]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden min-h-screen">
+<!-- SIDEBAR NAVIGATION -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-paper-neutral border-r border-outline-variant z-40">
+<div class="flex flex-col p-md gap-stack-sm h-full">
+<!-- Brand Section -->
+<div class="flex flex-col items-center gap-2 mb-10 mt-4">
+<img alt="Light in the East Logo" class="w-16 h-16 rounded-full border-2 border-primary-container p-1 bg-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS-OAg3RHgyBd4TB7-6-xD9JEStlGdioFI-PJv8Td2SQaR8Il1-JfR4nWN4vHnpwErDPbnST7tcbYXcKZFl00S9NqMa_ONax7D8aE_M1TDs_W6U3V71IUzd23JCIGFs_btActsBXpiOBsRBZAqbfupu7IOUE4z_tDlsmZ9vAdB0ewUPHCyi57U33ZDpKGlThwt9CUjiCT4iuuC7t3PWPjbJVZpZg5W3zrgSBFUUMYCIFzjFeTxZ_BI81kDy0KOF7qrG89ksPT_Xx2pcnw">
+<div class="text-center">
+<h1 class="font-headline-md text-[20px] text-primary font-bold tracking-tight leading-tight">Light in the East</h1>
+<p class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest opacity-70">Mission CRM</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Donors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">church</span>
+<span class="font-label-md">Churches</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md">Language Schools</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span class="font-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md">Calendar</span>
+</a>
+</nav>
+<!-- Footer Tabs -->
+<div class="pt-4 border-t border-outline-variant space-y-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- TOP APP BAR -->
+<header class="w-full h-16 ml-64 flex items-center justify-between px-gutter sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-outline-variant">
+<div class="max-w-[1280px] w-full flex items-center justify-between mx-auto">
+<div>
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface">Literature Inventory</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+<input class="w-64 pl-10 pr-4 py-2 bg-paper-neutral border-none focus:ring-2 focus:ring-primary-container/20 text-label-md outline-none rounded-full transition-all" placeholder="Search publications..." type="text">
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-3 cursor-pointer group">
+<span class="font-label-md text-label-md font-bold group-hover:text-primary transition-colors">Admin User</span>
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a professional woman with a kind expression, wearing a minimalist cream-colored sweater, captured in warm, golden-hour natural lighting. The style is soft-focus editorial photography, conveying wisdom and dedication in a modern mission-driven office environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7_AVWk_2I4ZdbMPqb2D_-ZSUFkbFTbSdqGjpm5KJYl1e69oxmW6qNv9D-EGthUae7IsyGJn1zl_lcqb4FAOGJQkMqBL-8BdsJyqkS4KjkywO-kW5BNXmI7XGk_AKmqTfCbkijqv8Pz2-vwCa3m24u4Ct7D4PUe6BVJTUlAzqG1aOeqwYKTErGtct3OWPznuQ3vL7c49xSZ4oRGL8dWZlgmcfI4qpBIWUZTs53JSVCwSA3mJhTs8lS2Q">
+</div>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT AREA -->
+<main class="ml-64 p-gutter">
+<div class="max-w-[1280px] mx-auto space-y-stack-lg">
+<!-- BENTO OVERVIEW -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Total Books -->
+<div class="glass-card p-6 rounded-xl bento-inner flex flex-col justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">Books Sold</p>
+<h3 class="font-display-lg text-4xl text-on-surface">12,450</h3>
+</div>
+<div class="mt-4 flex items-center text-primary gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span class="font-label-sm">+8% vs last month</span>
+</div>
+</div>
+<!-- Total Given -->
+<div class="glass-card p-6 rounded-xl bento-inner flex flex-col justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">Books Given</p>
+<h3 class="font-display-lg text-4xl text-on-surface">25,791</h3>
+</div>
+<div class="mt-4 flex items-center text-primary gap-1">
+<span class="material-symbols-outlined text-sm">volunteer_activism</span>
+<span class="font-label-sm">Mission distribution</span>
+</div>
+</div>
+<!-- Total Revenue -->
+<div class="glass-card p-6 rounded-xl bento-inner flex flex-col justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">Total Revenue</p>
+<h3 class="font-display-lg text-4xl text-on-surface">$18,675</h3>
+</div>
+<div class="mt-4 flex items-center text-primary gap-1">
+<span class="material-symbols-outlined text-sm">payments</span>
+<span class="font-label-sm">YTD Earnings</span>
+</div>
+</div>
+</section>
+<!-- TABLE SECTION -->
+<section class="bg-white border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm">
+<div class="px-6 py-5 border-b border-outline-variant/20 flex items-center justify-between bg-white">
+<h4 class="font-headline-md text-on-surface text-[20px] font-bold">Literature Repository</h4>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-4 py-2 border border-primary text-primary rounded-lg font-label-sm hover:bg-primary/5 transition-all">
+<span class="material-symbols-outlined text-sm">filter_list</span> Filter
+</button>
+<button class="flex items-center gap-2 px-4 py-2 border border-primary text-primary rounded-lg font-label-sm hover:bg-primary/5 transition-all">
+<span class="material-symbols-outlined text-sm">download</span> Export
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50 border-b border-outline-variant/20">
+<th class="px-6 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider text-xs">Publication Name</th>
+<th class="px-6 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider text-xs">Category</th>
+<th class="px-6 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider text-xs">Language</th>
+<th class="px-6 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider text-xs">Stock Count</th>
+<th class="px-6 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider text-xs">Warehouse</th>
+<th class="px-6 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider text-xs">Unit Cost</th>
+<th class="px-6 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider text-xs">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-14 bg-surface-variant flex-shrink-0 border border-outline-variant rounded-sm overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A vintage-style book cover for a Russian Bible with elegant gold foil lettering and deep burgundy textures, set against a backdrop of soft parchment. The visual style is classic, editorial, and sophisticated, reflecting a high-quality mission publication." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjcFfjoqypMRFouUybyTlcvLFBSgHZjIlfTkxDhYB4ENuBtzmHzPqK_bJn27p2CeCZl59rU8sLDdZ5gi-RSWPRbqGocLs64Gsri-hN5k2kpK0U1dytOLUo4DjBS5FnPKK-TAGNUr7MZJ1luziUuBMr5nMuEvFs71o1suKX_klpSmVYjKwM6dTGI2ST-TW_rGIj7Df1oyLf77GueJD06JABxI0b-BzYQIIV58Nxw_NSPOkLIUTA3nSGGQ">
+</div>
+<div>
+<p class="font-bold text-on-surface leading-tight">Russian Standard Bible</p>
+<p class="text-[12px] text-on-surface-variant">Synodal Translation, Hardcover</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-label-md text-on-surface-variant">Bibles</td>
+<td class="px-6 py-5 text-label-md">Russian</td>
+<td class="px-6 py-5 text-label-md">
+<span class="font-bold">1,240</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
+<span class="text-label-md">Warsaw Central</span>
+</div>
+</td>
+<td class="px-6 py-5 text-label-md">$12.50</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<span class="px-2 py-1 bg-primary-container/10 text-primary text-[10px] font-bold rounded-full border border-primary-container/20 uppercase tracking-wider">In Stock</span>
+<a class="text-primary font-bold text-[10px] uppercase hover:underline" href="#">View</a>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-14 bg-surface-variant flex-shrink-0 border border-outline-variant rounded-sm overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A brightly colored children's magazine cover titled 'Tropinka' in Russian, featuring joyful, hand-drawn illustrations of forest animals and nature in a classic 1980s Eastern European storybook style. The aesthetic is nostalgic, warm, and whimsical." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXUudIzD6D5re-m5gb93ucaXZNuofKUTbELdpw0JTbGffo4pr_G5RGe2TJecefYh_Fxf8b_rvVznHMF4QLs_FYf3urxTBrkGZUAXquzeRlbb_5LqVUijdfaAhtu3YWUtrD_IHIVezjKNs-EOW1UCqwGVaWnZncCZxMyy3OcJ8YU2qgnjCPuafFdaRY7HIWze57CkHV9KDRrk6qUgYfLeOAydxKEqKHqrvG3ci7rZaoZPNsn0gSZXUvXw">
+</div>
+<div>
+<p class="font-bold text-on-surface leading-tight">Tropinka Magazine</p>
+<p class="text-[12px] text-on-surface-variant">Children's Issue #42</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-label-md text-on-surface-variant">Magazines</td>
+<td class="px-6 py-5 text-label-md">Ukrainian</td>
+<td class="px-6 py-5 text-label-md">
+<span class="font-bold text-red-600">85</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
+<span class="text-label-md">Kyiv Regional</span>
+</div>
+</td>
+<td class="px-6 py-5 text-label-md">$3.20</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<span class="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded-full border border-red-100 uppercase tracking-wider">Low Stock</span>
+<a class="text-primary font-bold text-[10px] uppercase hover:underline" href="#">View</a>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-14 bg-surface-variant flex-shrink-0 border border-outline-variant rounded-sm overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A minimalist, modern book cover for a German New Testament featuring clean serif typography and a subtle geometric cross graphic. The colors are muted navy and cream, evoking intellectual clarity and liturgical tradition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9CnRb3MAL1lG9fp1sHrvafH0Rg92eaMVYF-DlzpvjST1dMyj9ZMh-TtYzaHDtrdkGKHpXGrVBSxKqwnW2QmwCROt32ujo_-kSAOGUkNdO_2UahqKp-tw_YZ32t1la22MRtea0DVFvSfVuqDDTS7MD9hdlWORZQUmsBwgTu4Qn2hQnaQ19EYHGqPFyRWKqBgekoXreRSFa0whX4Hf8jM5qVTKmH3nydWglIfyWzVIyumEjdzqi6inibw">
+</div>
+<div>
+<p class="font-bold text-on-surface leading-tight">German New Testament</p>
+<p class="text-[12px] text-on-surface-variant">Luther Translation 2017</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-label-md text-on-surface-variant">Bibles</td>
+<td class="px-6 py-5 text-label-md">German</td>
+<td class="px-6 py-5 text-label-md">
+<span class="font-bold">3,500</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
+<span class="text-label-md">Main Archive (DE)</span>
+</div>
+</td>
+<td class="px-6 py-5 text-label-md">$8.00</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<span class="px-2 py-1 bg-primary-container/10 text-primary text-[10px] font-bold rounded-full border border-primary-container/20 uppercase tracking-wider">In Stock</span>
+<a class="text-primary font-bold text-[10px] uppercase hover:underline" href="#">View</a>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-outline-variant/20 bg-white flex items-center justify-between">
+<p class="text-label-sm text-on-surface-variant">Showing 1-10 of 428 publications</p>
+<div class="flex gap-2">
+<button class="px-3 py-1 border border-outline-variant/30 rounded-lg hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[20px]">chevron_left</span></button>
+<button class="px-3 py-1 border border-outline-variant/30 rounded-lg hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[20px]">chevron_right</span></button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- FOOTER -->
+
+<script>
+    // Micro-interactions
+    document.querySelectorAll('.bento-inner').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-2px)';
+            card.style.boxShadow = '0 12px 30px -10px rgba(155, 68, 38, 0.12)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = 'none';
+        });
+    });
+
+    // Search bar focus effect
+    const searchInput = document.querySelector('input[type="text"]');
+    searchInput.addEventListener('focus', () => {
+        searchInput.parentElement.classList.add('scale-105');
+    });
+    searchInput.addEventListener('blur', () => {
+        searchInput.parentElement.classList.remove('scale-105');
+    });
+</script>
+
+
+</body></html>

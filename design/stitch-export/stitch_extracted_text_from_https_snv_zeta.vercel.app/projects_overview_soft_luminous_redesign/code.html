@@ -1,0 +1,399 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Mission Projects | Light in the East</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=Work+Sans:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fff8f6;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Custom scrollbar for literary feel */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dcc1b9; border-radius: 10px; }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(137, 114, 107, 0.15);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#9b4426",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#e27b58",
+                        "on-primary-container": "#ffffff",
+                        "secondary": "#515f74",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#d5e3fc",
+                        "on-secondary-container": "#57657a",
+                        "tertiary": "#516072",
+                        "background": "#fff8f6",
+                        "on-background": "#111c2d",
+                        "surface": "#ffffff",
+                        "on-surface": "#111c2d",
+                        "surface-variant": "#f9f9ff",
+                        "on-surface-variant": "#55423d",
+                        "outline": "#89726b",
+                        "outline-variant": "#dcc1b9",
+                        "surface-container-low": "#fff1eb",
+                        "surface-container": "#ffeae0",
+                        "surface-container-high": "#fce3d9",
+                        "paper-neutral": "#F5EFEF",
+                        "ink-black": "#0F172A",
+                        "sunset-gold": "#FB923C"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "margin-safe": "32px",
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "headline-lg": ["Playfair Display"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- Sidebar Navigation -->
+<aside class="h-full w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-paper-neutral border-r border-outline-variant z-40">
+<div class="flex flex-col p-stack-md h-full">
+<!-- Brand Section -->
+<div class="flex flex-col items-center gap-2 mb-10 mt-4">
+<img alt="Light in the East Logo" class="w-16 h-16 rounded-full border-2 border-primary-container p-1 bg-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS-OAg3RHgyBd4TB7-6-xD9JEStlGdioFI-PJv8Td2SQaR8Il1-JfR4nWN4vHnpwErDPbnST7tcbYXcKZFl00S9NqMa_ONax7D8aE_M1TDs_W6U3V71IUzd23JCIGFs_btActsBXpiOBsRBZAqbfupu7IOUE4z_tDlsmZ9vAdB0ewUPHCyi57U33ZDpKGlThwt9CUjiCT4iuuC7t3PWPjbJVZpZg5W3zrgSBFUUMYCIFzjFeTxZ_BI81kDy0KOF7qrG89ksPT_Xx2pcnw">
+<div class="text-center">
+<h1 class="font-headline-md text-[20px] text-primary font-bold tracking-tight leading-tight">Light in the East</h1>
+<p class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest opacity-70">Mission CRM</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md">Donors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="church">church</span>
+<span class="font-label-md">Churches</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="font-label-md">Language Schools</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="rocket_launch" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+<span class="font-label-md">Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-label-md">Tasks</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-label-md">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md">Calendar</span>
+</a>
+</nav>
+<!-- Footer Tabs -->
+<div class="pt-4 border-t border-outline-variant space-y-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-container transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+<span class="font-label-md">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 min-h-screen">
+<!-- Top App Bar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-white/80 backdrop-blur-md border-b border-outline-variant flex items-center justify-between px-gutter z-40">
+<h2 class="font-headline-md text-headline-md text-primary">Projects Overview</h2>
+<div class="flex items-center gap-6">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60 text-lg">search</span>
+<input class="bg-paper-neutral border-none text-label-md py-2 pl-10 pr-4 focus:ring-2 focus:ring-primary-container/20 w-64 transition-all rounded-full outline-none" placeholder="Search mission projects..." type="text">
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">settings</span></button>
+<div class="h-8 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<span class="font-label-md text-label-md font-bold group-hover:text-primary transition-colors">Admin User</span>
+<img class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A portrait of a professional middle-aged man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2duzza9VVJs_XjvDsqwBswp5O4O8B8z-pWZvgDGnBXQGWGoGfd32PduPiabceKf5CCRcilwDU2uCzT8AQpXp2fBo0q1QfOYUeskpsngDEUC5Tcx8erKGYI6L6JnmPv94OH3KiBVS0wFEj_jsXwIe02YrYtO8GcTlV3FyuWDlHnQperRIGq1_1M3-BrPN3w_N9xwsi9vHJW1HIA_0osYDMlcEr_h8OmtvQQOiMSLn7KIUWwpuTsSRM6Q">
+</div>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<div class="pt-24 px-gutter pb-stack-lg max-w-[1280px]">
+<!-- Strategic Snapshot Metrics -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-12">
+<!-- Metric Card 1 -->
+<div class="glass-card p-6 rounded-xl hover:border-primary-container transition-all group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary-container/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">rocket_launch</span>
+</span>
+<span class="text-label-sm font-bold text-primary">+2 this month</span>
+</div>
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Active Projects</p>
+<h3 class="font-headline-md text-on-surface font-bold">23</h3>
+</div>
+<!-- Metric Card 3 -->
+<div class="glass-card p-6 rounded-xl hover:border-primary-container transition-all group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary-container/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">priority_high</span>
+</span>
+<span class="text-label-sm font-bold text-red-600">Immediate Priority</span>
+</div>
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Needs Funding</p>
+<h3 class="font-headline-md text-on-surface font-bold">7</h3>
+</div>
+<!-- Metric Card 4 -->
+<div class="glass-card p-6 rounded-xl hover:border-primary-container transition-all group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary-container/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">analytics</span>
+</span>
+<span class="text-label-sm font-bold text-on-surface-variant">92%</span>
+</div>
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Completion Rate</p>
+<div class="w-full bg-surface-container-high h-2 rounded-full mt-4">
+<div class="bg-primary-container h-full rounded-full" style="width: 92%"></div>
+</div>
+</div>
+</section>
+<!-- Dashboard Content Area (Bento-style Grid) -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Regional Distribution & Controls (Top Row) -->
+<div class="col-span-12 flex flex-wrap items-center justify-between mb-2">
+<div class="flex items-center gap-4">
+<button class="bg-primary-container text-white px-6 py-2.5 flex items-center gap-2 rounded-lg shadow-sm hover:opacity-90 transition-all font-label-md active:scale-95">
+<span class="material-symbols-outlined text-lg">add</span>
+                            New Mission Project
+                        </button>
+<div class="flex items-center gap-2 border-l border-outline-variant pl-4 ml-2">
+<span class="font-label-sm text-on-surface-variant">Filter by:</span>
+<select class="text-label-md bg-transparent border-none focus:ring-0 cursor-pointer text-primary font-bold">
+<option>All Categories</option>
+<option>Humanitarian</option>
+<option>Spiritual</option>
+<option>Educational</option>
+</select>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-on-surface-variant border border-outline-variant hover:bg-white transition-colors rounded-lg"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="p-2 text-primary border border-primary-container bg-primary-container/10 rounded-lg"><span class="material-symbols-outlined">list</span></button>
+</div>
+</div>
+<!-- Main Project Directory (Left/Center Column) -->
+<div class="col-span-12 lg:col-span-12 space-y-gutter">
+<div class="glass-card rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50 border-b border-outline-variant/20">
+<th class="px-6 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider font-bold">Project</th>
+<th class="px-6 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider font-bold">Funding</th>
+<th class="px-6 py-4 font-label-sm text-on-surface-variant uppercase tracking-wider font-bold text-right">Health</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="hover:bg-primary-container/5 transition-colors cursor-pointer group">
+<td class="px-6 py-6">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1">water_drop</span>
+<div>
+<h4 class="font-bold text-lg font-headline-md leading-tight group-hover:text-primary">Well Drilling: Central Asia</h4>
+<span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 bg-primary-container/10 text-primary rounded-full mt-1 inline-block">Humanitarian</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 w-48">
+<div class="space-y-1.5">
+<div class="flex justify-between text-[11px] font-label-md uppercase tracking-tight">
+<span class="font-bold">65%</span>
+<span class="text-on-surface-variant/70">$12,400 / $19,000</span>
+</div>
+<div class="h-1.5 bg-outline-variant/20 rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 65%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 text-right">
+<span class="inline-flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                            On Track
+                                        </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-primary-container/5 transition-colors cursor-pointer group">
+<td class="px-6 py-6">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1">auto_stories</span>
+<div>
+<h4 class="font-bold text-lg font-headline-md leading-tight group-hover:text-primary">Bible Translation: South Caucasus</h4>
+<span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 bg-secondary-container/30 text-secondary rounded-full mt-1 inline-block">Spiritual</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 w-48">
+<div class="space-y-1.5">
+<div class="flex justify-between text-[11px] font-label-md uppercase tracking-tight">
+<span class="font-bold">20%</span>
+<span class="text-on-surface-variant/70">$4,000 / $20,000</span>
+</div>
+<div class="h-1.5 bg-outline-variant/20 rounded-full overflow-hidden">
+<div class="h-full bg-sunset-gold" style="width: 20%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 text-right">
+<span class="inline-flex items-center gap-1.5 text-xs font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-100">
+<span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                                            At Risk
+                                        </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary-container/5 transition-colors cursor-pointer group">
+<td class="px-6 py-6">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1">school</span>
+<div>
+<h4 class="font-bold text-lg font-headline-md leading-tight group-hover:text-primary">Teacher Training: Altai Republic</h4>
+<span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 bg-primary-container/10 text-primary rounded-full mt-1 inline-block">Educational</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 w-48">
+<div class="space-y-1.5">
+<div class="flex justify-between text-[11px] font-label-md uppercase tracking-tight">
+<span class="font-bold">95%</span>
+<span class="text-on-surface-variant/70">$8,550 / $9,000</span>
+</div>
+<div class="h-1.5 bg-outline-variant/20 rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 95%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 text-right">
+<span class="inline-flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                            On Track
+                                        </span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-primary-container/5 transition-colors cursor-pointer group">
+<td class="px-6 py-6">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1">medical_services</span>
+<div>
+<h4 class="font-bold text-lg font-headline-md leading-tight group-hover:text-primary">Medical Supply Chain: Eastern Steppes</h4>
+<span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 bg-primary-container/10 text-primary rounded-full mt-1 inline-block">Humanitarian</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 w-48">
+<div class="space-y-1.5">
+<div class="flex justify-between text-[11px] font-label-md uppercase tracking-tight">
+<span class="font-bold">10%</span>
+<span class="text-on-surface-variant/70">$1,500 / $15,000</span>
+</div>
+<div class="h-1.5 bg-outline-variant/20 rounded-full overflow-hidden">
+<div class="h-full bg-red-600" style="width: 10%"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 text-right">
+<span class="inline-flex items-center gap-1.5 text-xs font-bold text-red-700 bg-red-50 px-2.5 py-1 rounded-full border border-red-100">
+<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                            Delayed
+                                        </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+
+</main>
+<script>
+    // Micro-interactions for table rows and cards
+    document.querySelectorAll('.glass-card, tr').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            if (el.tagName === 'DIV') {
+                el.style.transform = 'translateY(-2px)';
+                el.style.boxShadow = '0 12px 30px -10px rgba(155, 68, 38, 0.12)';
+            }
+        });
+        el.addEventListener('mouseleave', () => {
+            if (el.tagName === 'DIV') {
+                el.style.transform = 'translateY(0)';
+                el.style.boxShadow = 'none';
+            }
+        });
+    });
+</script>
+
+
+</body></html>
