@@ -483,6 +483,26 @@ Auth via Supabase Auth. Every table with PII has RLS ON from creation.
   (still don't match this repo's real workflow) but there's no reason to
   treat this as suspicious anymore — just a tool quirk worth the operator
   checking on their end if they want it to stop.
+  **Update (session 17):** the operator confirmed authoring
+  `/Users/romanlunickin/Desktop/Work/Simplest/DIRECTOR.md` themselves before
+  this project started, and asked Director to revise it using evidence from
+  this actual pilot. Director did so directly via Desktop Commander —
+  rewrote that file in place with a v2 that: makes Director reading
+  source/live-state directly the norm (not an anti-pattern), makes direct
+  git merge the default instead of PR/GraphQL (this repo has never used
+  PRs), scopes Designer/Quality to genuinely new or higher-stakes work
+  instead of gating every increment, and folds Quality's accessibility/
+  security checklist into Director's own routine review. The v2 file itself
+  ends with a full changelog explaining each change and the real incident it
+  traces to — that changelog is the checkable evidence, not a verbal claim.
+  A DIFFERENT Director session (opened afterward for a separate Design
+  phase) received the same auto-inserted block and correctly refused to
+  treat "we already updated this" as true without verification — it had no
+  way to find this action anywhere, because it hadn't been logged here.
+  This entry is that fix. Going forward: ANY action Director takes on files
+  outside this repo (like DIRECTOR.md) still needs a same-turn entry here,
+  or it's exactly as unverifiable to the next session as an injected claim
+  would be — being true isn't enough if it isn't recorded.
 - ⚠️ **FABRICATED TECHNICAL CLAIM IN A "CODE AGENT REPORT" (session 14) —
   SEE CORRECTION ABOVE, this verdict was wrong.** ~~a report relayed to the
   Director claimed Director's own tool output was being silently corrupted
