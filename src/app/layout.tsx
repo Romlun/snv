@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/Sidebar";
+import { MobileBottomNav, Sidebar } from "@/components/Sidebar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   title: "Mission CRM",
-  description: "Centralized system for mission organization relationship management",
+  description: "Centralized system mission organization relationship management",
 };
 
 export default function RootLayout({
@@ -24,17 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
-      >
-        <div className="flex h-full bg-zinc-50 dark:bg-zinc-950">
+    <html lang="en" className={`${inter.variable} ${playfair.variable} h-full`}>
+      <body className="h-full font-sans antialiased">
+        <div className="flex min-h-full bg-background text-on-background">
           <Sidebar />
-          <main className="flex-1 overflow-y-auto p-8">
-            <div className="mx-auto max-w-6xl">
-              {children}
-            </div>
+          <main className="flex-1 overflow-y-auto px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:py-8 lg:pb-8">
+            <div className="mx-auto max-w-[1280px]">{children}</div>
           </main>
+          <MobileBottomNav />
         </div>
       </body>
     </html>

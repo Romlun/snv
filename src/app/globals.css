@@ -1,26 +1,110 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --background: #fff8f6;
+  --foreground: #111c2d;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-primary: #9b4426;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #e27b58;
+  --color-on-primary-container: #ffffff;
+  --color-secondary: #515f74;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d5e3fc;
+  --color-on-secondary-container: #57657a;
+  --color-tertiary: #516072;
+  --color-background: #fff8f6;
+  --color-foreground: #111c2d;
+  --color-on-background: #111c2d;
+  --color-surface: #ffffff;
+  --color-on-surface: #111c2d;
+  --color-surface-variant: #f9f9ff;
+  --color-on-surface-variant: #55423d;
+  --color-outline-variant: #89726b;
+  --color-surface-container-low: #fdf4f0;
+  --color-surface-container: #f9ece7;
+  --color-surface-container-high: #f3dfd8;
+  --color-paper-neutral: #f5efef;
+  --color-error: #ba1a1a;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", "Playfair Display Fallback", ui-serif, Georgia, serif;
+  --font-headline: "Playfair Display", "Playfair Display Fallback", ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-gutter: 24px;
+  --spacing-stack-md: 16px;
+  --spacing-stack-lg: 32px;
+
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --text-headline-xl: 48px;
+  --text-headline-xl--line-height: 1.2;
+  --text-headline-xl--font-weight: 700;
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 1.2;
+  --text-headline-lg--font-weight: 600;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 1.25;
+  --text-headline-md--font-weight: 600;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.55;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.5;
+  --text-label-md: 14px;
+  --text-label-md--line-height: 20px;
+  --text-label-md--font-weight: 600;
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 16px;
+  --text-label-sm--font-weight: 500;
 }
 
 body {
+  min-height: 100vh;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+}
+
+.glass-card {
+  border: 1px solid rgb(137 114 107 / 15%);
+  border-radius: var(--radius-xl);
+  background: rgb(255 255 255 / 70%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-card:hover {
+  box-shadow: 0 12px 30px -10px rgb(155 68 38 / 12%);
+  transform: translateY(-2px);
+}
+
+.focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-card {
+    transition: none;
+  }
+
+  .glass-card:hover {
+    box-shadow: none;
+    transform: none;
+  }
 }
