@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v1.9 Phase 0 shipped and live, Dashboard rollout next`
+`snv Mission CRM — v2.0 Dashboard shipped and live, list pages next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -547,6 +547,26 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 20): Dashboard restyle SHIPPED and LIVE (first page of
+  DESIGN_SPEC.md rollout order). Code Agent restyled src/app/page.tsx only
+  (commits `a9361ee`, `92143aa`) -- Director verified directly before
+  merging: read the full diff (485 insertions/224 deletions, page.tsx only,
+  confirmed zero data-fetching/query changes), ran `npm run build`
+  personally (compiled clean). Kept all 5 real stats (mock showed only 4
+  with fabricated trend percentages -- did not invent trend data); restyled
+  the real Reminders panel as the mock's Attention Registry table using
+  real data, not the mock's fictional names; kept the real Overdue/Upcoming
+  split rather than flattening to the mock's single table; mapped real
+  Inventory Snapshot data into the Book Distribution Metrics card; static
+  quote-block footer (Psalm 27:1, per DESIGN.md correction fe9047b). Minor
+  known gap, not a blocker: action links (Plan follow-up, Review task, etc.)
+  are hand-styled rather than reusing the Button primitive -- visually
+  identical, worth a small cleanup later. Merged to main (`e29824c`),
+  pushed, Vercel deploy confirmed READY on the exact merge SHA
+  (dpl_Af3B4YJGUvpsyzLix5sPYhkpsdx4, live on snv-zeta.vercel.app). Dashboard
+  is the proving page per DESIGN_SPEC.md §9 -- next up per that rollout
+  order: list pages together (Donors/Churches/Language Schools/Projects/
+  Tasks/Budget/Inventory list views).**
 - **UPDATE (session 19): Phase 0 SHIPPED and LIVE. Code Agent built tokens
   (true frosted glass, terracotta secondary buttons, dark mode dropped),
   Inter+Playfair fonts, 6 primitives (Button/Card/Badge/StatCard/Input/
