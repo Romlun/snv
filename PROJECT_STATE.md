@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.1 List pages batch 1 live, batch 2 (Projects/Tasks) next`
+`snv Mission CRM — v2.2 List batch 2 live, batch 3 (Budget/Inventory) next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -547,6 +547,31 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 22): List pages batch 2 SHIPPED and LIVE (Projects,
+  Tasks). Code Agent restyled 2 files only (commits `639aafb`, `7e3c494`) --
+  Director verified directly: read both files in full. Projects correctly
+  reinterprets the mock's ambiguous "Completion Rate 92%" as a REAL metric
+  (completed/total, not a fabricated number) and computes "Needs Funding"
+  from real Active+underfunded logic, dropping the mock's fake "+2 this
+  month" trend entirely. Tasks correctly computes all 5 metrics from real
+  data (Total/Overdue/Due Today/Completed This Week/High Priority) and
+  correctly SKIPPED the mock's "My Tasks/All Tasks/Delegated" tab control
+  as directed (new filtering functionality, not a restyle) -- kept existing
+  native-select filter/sort, just re-skinned. Confirmed Badge's
+  success/warning/error/info variants were pre-existing from Phase 0, not
+  silently added. Ran `npm run build` personally -- clean. Merged to main
+  (`5b64ede`), pushed, Vercel confirmed READY on the exact merge SHA
+  (dpl_2VfY4AedFnech48Qe3HUqanby8Rp), live on snv-zeta.vercel.app. List
+  pages are now fully done (all 7: Donors/Churches/Language Schools/
+  Projects/Tasks/Budget/Inventory -- wait, Budget/Inventory not yet done,
+  see below). Operator confirmed detail/profile pages (donor/church/school
+  etc.) intentionally still on old styling -- expected, per rollout order,
+  not a bug. Next per DESIGN_SPEC.md rollout order: list pages batch 3
+  (Budget, Inventory), then profile/detail pages, then forms (Budget's
+  "new_budget_entry_unified_layout" mock is the only form mock -- template
+  for extrapolating the rest), then Login/Settings/Calendar last (no
+  dedicated mocks for Login/Settings -- extrapolate from established
+  system).**
 - **UPDATE (session 21): List pages batch 1 SHIPPED and LIVE (Donors,
   Churches, Language Schools). Code Agent restyled 3 files only (commits
   `bfab784`, `6c9fb24`) -- Director verified directly: read all 3 files in
