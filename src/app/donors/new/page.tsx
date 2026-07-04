@@ -17,6 +17,8 @@ interface FormData {
   name: string;
   email: string;
   phone: string;
+  birthday: string;
+  address: string;
   stage: DonorStage;
   relationship_status: RelationshipStatus;
   assigned_staff_id: string;
@@ -38,6 +40,8 @@ export default function NewDonorPage() {
     name: "",
     email: "",
     phone: "",
+    birthday: "",
+    address: "",
     stage: "New contact",
     relationship_status: "Steady",
     assigned_staff_id: "",
@@ -72,6 +76,8 @@ export default function NewDonorPage() {
         name: formData.name,
         email: formData.email || null,
         phone: formData.phone || null,
+        birthday: formData.birthday || null,
+        address: formData.address || null,
         stage: formData.stage,
         relationship_status: formData.relationship_status,
         notes: formData.notes || null,
@@ -131,6 +137,15 @@ export default function NewDonorPage() {
               />
             </div>
             <div className="space-y-2">
+              <label className="text-sm font-medium">Birthday</label>
+              <input
+                type="date"
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.birthday}
+                onChange={e => setFormData({ ...formData, birthday: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
               <label className="text-sm font-medium">Relationship Stage</label>
               <select
                 className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
@@ -170,6 +185,14 @@ export default function NewDonorPage() {
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-medium">Address</label>
+              <textarea
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-24"
+                value={formData.address}
+                onChange={e => setFormData({ ...formData, address: e.target.value })}
+              />
             </div>
           </div>
           <div className="space-y-4 rounded-lg border p-4 dark:border-zinc-800">
