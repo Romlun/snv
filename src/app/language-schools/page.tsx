@@ -1,10 +1,16 @@
 "use client";
 
+import {
+  SchoolStatusSelect,
+  type SchoolStatus,
+} from "@/components/SchoolStatusSelect";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
-import { SchoolStatusSelect, type SchoolStatus } from "@/components/SchoolStatusSelect";
+import { Filter, Loader2, Plus, Search } from "lucide-react";
 import Link from "next/link";
-import { Search, Plus, Filter, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface LanguageSchool {
   id: string;
@@ -26,6 +32,11 @@ interface LanguageSchool {
   updated_at: string;
 }
 
+function formatDate(value: string | null) {
+  if (!value) return "—";
+  return new Date(value).toLocaleDateString();
+}
+
 export default function LanguageSchoolsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [schools, setSchools] = useState<LanguageSchool[]>([]);
@@ -39,9 +50,9 @@ export default function LanguageSchoolsPage() {
       try {
         setLoading(true);
         const { data, error } = await supabase
-          .from('language_schools')
-          .select('*')
-          .order('name');
+          .from("language_schools")
+          .select("*")
+          .order("name");
 
         if (error) throw error;
         setSchools((data || []) as LanguageSchool[]);
@@ -55,101 +66,197 @@ export default function LanguageSchoolsPage() {
     fetchSchools();
   }, [supabase]);
 
-  const filteredSchools = schools.filter(school =>
-    school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    school.contact_person?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    school.city?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredSchools = schools.filter(
+    (school) =>
+      school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      school.contact_person
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      school.city?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Language Schools</h1>
-          <p className="text-zinc-500">Track outreach for the free magazine subscription program.</p>
-        </div>
-        <Link href="/language-schools/new" className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          <Plus className="h-4 w-4" />
-          Add School
-        </Link>
-      </div>
+  const today = new Date().toISOString().split("T")[0];
+  const acquisitionSignal = schools.filter(
+    (school) => school.status === "Interested" || school.status === "Follow-up",
+  ).length;
+  const followUpsRequired = schools.filter(
+    (school) =>
+      school.next_follow_up_date && school.next_follow_up_date <= today,
+  ).length;
 
-      <div className="flex items-center gap-4">
+  const metrics = [
+    {
+      label: "Total Schools",
+      value: schools.length.toLocaleString(),
+      detail: "Language school leads",
+    },
+    {
+      label: "Interested / Follow-up",
+      value: acquisitionSignal.toLocaleString(),
+      detail: "Active acquisition signal",
+    },
+    {
+      label: "Follow-ups Required",
+      value: followUpsRequired.toLocaleString(),
+      detail: "Due today or overdue",
+    },
+  ];
+
+  return (
+    <div className="space-y-stack-lg">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-2">
+          <p className="text-label-sm font-semibold uppercase tracking-wider text-primary">
+            Outreach Pipeline
+          </p>
+          <div>
+            <h1 className="font-headline text-headline-lg font-semibold text-on-surface">
+              Language Schools
+            </h1>
+            <p className="text-body-md text-on-surface-variant">
+              Track schools receiving Tropinka outreach.
+            </p>
+          </div>
+        </div>
+        <Button
+          type="button"
+          icon={Plus}
+          onClick={() => {
+            window.location.href = "/language-schools/new";
+          }}
+        >
+          Add School
+        </Button>
+      </section>
+
+      <section className="grid grid-cols-1 gap-md md:grid-cols-3">
+        {metrics.map((metric) => (
+          <Card key={metric.label} padding="md" className="space-y-3">
+            <span className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+              {metric.label}
+            </span>
+            <p className="font-headline text-headline-md font-bold tabular-nums text-on-surface">
+              {metric.value}
+            </p>
+            <p className="text-sm text-on-surface-variant">{metric.detail}</p>
+          </Card>
+        ))}
+      </section>
+
+      <section className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-          <input
-            type="text"
-            placeholder="Search language schools..."
-            className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-zinc-900 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant/70" />
+          <Input
+            variant="search"
+            placeholder="Search schools..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            className="pl-11"
           />
         </div>
-        <button className="inline-flex items-center gap-2 border px-4 py-2 rounded-lg hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:bg-zinc-800 transition-colors text-sm font-medium">
-          <Filter className="h-4 w-4" />
+        <Button type="button" variant="secondary" icon={Filter}>
           Filters
-        </button>
-      </div>
+        </Button>
+      </section>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white border rounded-xl dark:bg-zinc-900 dark:border-zinc-800">
-          <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-          <p className="mt-4 text-zinc-500">Loading language schools...</p>
-        </div>
+        <Card className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="mt-4 text-on-surface-variant">
+            Loading language schools...
+          </p>
+        </Card>
       ) : error ? (
-        <div className="p-8 text-center bg-red-50 border border-red-100 rounded-xl">
-          <p className="text-red-600">Error loading language schools: {error}</p>
-          <button onClick={() => window.location.reload()} className="mt-4 text-sm font-bold text-red-700 underline">Try again</button>
-        </div>
+        <Card className="border-red-100 bg-red-50 p-8 text-center">
+          <p className="text-red-600">
+            Error loading language schools: {error}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 text-sm font-bold text-red-700 underline"
+          >
+            Try again
+          </button>
+        </Card>
       ) : filteredSchools.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white border rounded-xl dark:bg-zinc-900 dark:border-zinc-800">
-          <p className="text-zinc-500">No language schools found.</p>
-          {searchTerm && <button onClick={() => setSearchTerm("")} className="mt-2 text-blue-600 hover:underline">Clear search</button>}
-        </div>
+        <Card className="flex flex-col items-center justify-center py-20">
+          <p className="text-on-surface-variant">No language schools found.</p>
+          {searchTerm ? (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="mt-2 text-sm font-semibold text-primary hover:underline"
+            >
+              Clear search
+            </button>
+          ) : null}
+        </Card>
       ) : (
-        <div className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-50 border-b dark:bg-zinc-800/50 dark:border-zinc-800 text-zinc-500 font-medium">
-              <tr>
-                <th className="px-6 py-4">Name</th>
-                <th className="px-6 py-4">Contact</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Next Follow-up</th>
-                <th className="px-6 py-4 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y dark:divide-zinc-800">
-              {filteredSchools.map((school) => (
-                <tr key={school.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div>
-                      <Link href={`/language-schools/${school.id}`} className="font-semibold text-zinc-900 dark:text-zinc-50 hover:underline">
-                        {school.name}
-                      </Link>
-                      <p className="text-zinc-500 text-xs">{[school.city, school.state].filter(Boolean).join(", ") || "No location listed"}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">{school.contact_person || "Not listed"}</td>
-                  <td className="px-6 py-4">
-                    <SchoolStatusSelect
-                      id={school.id}
-                      value={school.status}
-                      onSaved={status => setSchools(prev => prev.map(row => (
-                        row.id === school.id ? { ...row, status } : row
-                      )))}
-                    />
-                  </td>
-                  <td className="px-6 py-4">
-                    {school.next_follow_up_date || "Not scheduled"}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Link href={`/language-schools/${school.id}`} className="text-blue-600 hover:underline font-medium">View</Link>
-                  </td>
+        <Card padding="none" className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[820px] text-left text-sm">
+              <thead className="border-b border-outline-variant/15 bg-surface-container-low text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+                <tr>
+                  <th className="px-6 py-4">Name</th>
+                  <th className="px-6 py-4">Contact</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Next Follow-up</th>
+                  <th className="px-6 py-4 text-right">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filteredSchools.map((school) => (
+                  <tr
+                    key={school.id}
+                    className="border-t border-outline-variant/10 transition-colors hover:bg-primary-container/5"
+                  >
+                    <td className="px-6 py-4">
+                      <div>
+                        <Link
+                          href={`/language-schools/${school.id}`}
+                          className="font-bold text-on-surface hover:text-primary"
+                        >
+                          {school.name}
+                        </Link>
+                        <p className="text-xs text-on-surface-variant">
+                          {[school.city, school.state]
+                            .filter(Boolean)
+                            .join(", ") || "No location listed"}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-on-surface">
+                      {school.contact_person || "Not listed"}
+                    </td>
+                    <td className="px-6 py-4">
+                      <SchoolStatusSelect
+                        id={school.id}
+                        value={school.status}
+                        onSaved={(status) =>
+                          setSchools((prev) =>
+                            prev.map((row) =>
+                              row.id === school.id ? { ...row, status } : row,
+                            ),
+                          )
+                        }
+                      />
+                    </td>
+                    <td className="px-6 py-4 text-on-surface">
+                      {formatDate(school.next_follow_up_date)}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <Link
+                        href={`/language-schools/${school.id}`}
+                        className="font-semibold text-primary hover:underline"
+                      >
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
     </div>
   );
