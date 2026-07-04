@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.4 Donor profile live, Church profile next`
+`snv Mission CRM — v2.5 Church profile live, Language School profile next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,28 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 25): Church profile page SHIPPED and LIVE. Code Agent
+  restyled src/app/churches/[id]/page.tsx only (commit `3a5e83f`) --
+  Director verified schema first (churches has no hidden extra columns like
+  donors.card_expiry -- full column list checked, all accounted for),
+  then read the full diff. Dropped every fabricated element from the mock
+  (fake "Partnership Health 9.2/10" score, fake Partner ID, fake YoY trend,
+  fully invented Mission Pulse timeline narrative with fake photos,
+  fabricated Project Alignment dollar figures). Kept/added real equivalents:
+  "Partner since" from created_at, real Visit History timeline from
+  contact_logs, and a real "Projects Supported" section derived from gift
+  history (same pattern as Donor's Mission Projects Supported). Correctly
+  added a new Quick Actions sidebar card WITHOUT duplicating logic -- reuses
+  the existing Plan Visit toggle state and Log Visit route rather than
+  reimplementing them. All real functionality preserved: RelationshipStatusSelect,
+  ChurchEngagementScore, Add Gift, Plan Visit (writes next_visit_date +
+  creates task), Log Visit, NotesLog, Internal Details. Ran `npm run build`
+  personally -- clean, no gaps this time (unlike Donor's initial New-form
+  miss). Merged to main (`b04f06a`), pushed, Vercel confirmed READY on the
+  exact merge SHA (dpl_BW9vGsL4Y8BfV336AeF23p7n9qTZ), live on
+  snv-zeta.vercel.app. Next per DESIGN_SPEC.md rollout order: remaining
+  profile pages -- Language School, Project, Task, and the Inventory item
+  detail -- then forms, then Login/Settings/Calendar last.**
 - **UPDATE (session 24): Donor profile page SHIPPED and LIVE (first
   profile/detail page done, plus a real schema addition). Code Agent
   restyled src/app/donors/[id]/page.tsx and added birthday/address fields
