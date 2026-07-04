@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v1.7 DESIGN_SPEC.md approved (Gate 1 clear); logo pending`
+`snv Mission CRM — v1.8 Logo placed, Phase 0 ready to dispatch`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -547,6 +547,12 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 18): logo placed, DESIGN_SPEC.md + logo-mark.png
+  committed (`ddca187`), pushed to main. Director verified the source logo
+  file directly (viewed the actual image via Desktop Commander before
+  copying -- confirmed icon-only sun mark, no baked-in text, matches the
+  Sidebar spec) rather than trusting the claimed path at face value. Phase
+  0 is now FULLY unblocked, nothing left pending on the design-asset side.**
 - **NOW: DESIGN_SPEC.md is approved (Gate 1 cleared), Phase 0 not yet
   dispatched.** Designer subagent produced `DESIGN_SPEC.md` (repo root) —
   Director read it in full, independently verified its secondary-button-
