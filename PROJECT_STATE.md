@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.2 List batch 2 live, batch 3 (Budget/Inventory) next`
+`snv Mission CRM — v2.3 All list pages live, profile pages next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -547,6 +547,26 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 23): List pages batch 3 SHIPPED and LIVE (Budget,
+  Inventory) -- ALL 7 LIST PAGES NOW COMPLETE. Code Agent restyled 2 files
+  only (commits `d1b577c`, `1567959`) -- Director verified directly: read
+  both files in full. Both pages already had entirely real, computed
+  metrics (no fabrication needed this batch). Inventory correctly uses a
+  dynamic `selectedRangeLabel` caption reflecting the actual selected time
+  range instead of the mock's hardcoded (and wrong) "YTD Earnings" label,
+  and correctly dropped the mock's fake "+8% vs last month" trend and
+  skipped the "Export" button (new functionality, not requested). Budget's
+  category-grouped table structure preserved exactly, reused Card.Header.
+  Ran `npm run build` personally -- clean. Merged to main (`10ac14e`),
+  pushed, Vercel confirmed READY on the exact merge SHA
+  (dpl_E7h7Rg8Ry1iPBMDs9p1kDkGCDX1d), live on snv-zeta.vercel.app.
+  **ALL LIST PAGES DONE: Donors, Churches, Language Schools, Projects,
+  Tasks, Budget, Inventory.** Next per DESIGN_SPEC.md rollout order:
+  profile/detail pages (Donor, Church, Language School, Project, Task
+  profiles all have dedicated Stitch mocks; Inventory item detail maps to
+  the "publication_profile" mock), then forms (only Budget's new-entry form
+  has a dedicated mock -- extrapolate for the rest), then Login/Settings/
+  Calendar last (no dedicated mocks for Login/Settings).**
 - **UPDATE (session 22): List pages batch 2 SHIPPED and LIVE (Projects,
   Tasks). Code Agent restyled 2 files only (commits `639aafb`, `7e3c494`) --
   Director verified directly: read both files in full. Projects correctly
