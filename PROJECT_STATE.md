@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.0 Dashboard shipped and live, list pages next`
+`snv Mission CRM — v2.1 List pages batch 1 live, batch 2 (Projects/Tasks) next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -547,6 +547,21 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 21): List pages batch 1 SHIPPED and LIVE (Donors,
+  Churches, Language Schools). Code Agent restyled 3 files only (commits
+  `bfab784`, `6c9fb24`) -- Director verified directly: read all 3 files in
+  full, confirmed real metrics only (no fabricated Annual Giving Goal card
+  that the Donor mock showed -- correctly dropped), churches correctly uses
+  next_visit_date not next_follow_up_date (P10), Language Schools correctly
+  has NO engagement-score metric (D8) and uses a real acquisition-funnel
+  metric instead (Interested/Follow-up count). Confirmed Button/Card/Input
+  primitives properly reused (search variant on Input already existed from
+  Phase 0, not silently added). Ran `npm run build` personally -- clean.
+  Merged to main (`35b4677`), pushed, Vercel confirmed READY on the exact
+  merge SHA (dpl_F7r4yn2XW2N532hynB7Z99ekXZVX), live on snv-zeta.vercel.app.
+  Next per DESIGN_SPEC.md rollout order: list pages batch 2 (Projects,
+  Tasks), then batch 3 (Budget, Inventory), then profile/detail pages,
+  then forms, then Calendar last.**
 - **UPDATE (session 20): Dashboard restyle SHIPPED and LIVE (first page of
   DESIGN_SPEC.md rollout order). Code Agent restyled src/app/page.tsx only
   (commits `a9361ee`, `92143aa`) -- Director verified directly before
