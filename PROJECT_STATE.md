@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v1.8 Logo placed, Phase 0 ready to dispatch`
+`snv Mission CRM — v1.9 Phase 0 shipped and live, Dashboard rollout next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -547,6 +547,19 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 19): Phase 0 SHIPPED and LIVE. Code Agent built tokens
+  (true frosted glass, terracotta secondary buttons, dark mode dropped),
+  Inter+Playfair fonts, 6 primitives (Button/Card/Badge/StatCard/Input/
+  Sidebar), and mobile bottom nav on the feature branch (commits `72dd994`,
+  `2962428`). Director independently verified before merging -- read
+  globals.css/Button.tsx/Sidebar.tsx/layout.tsx directly (not just the
+  report), ran `npm run build` personally (compiled clean), confirmed diff
+  scope stayed within tokens/fonts/primitives/nav (no page files touched).
+  Merged to main (`6122216`), pushed, Vercel deploy confirmed READY on the
+  exact merge SHA via `Vercel:get_deployment` (dpl_EWTv88VvJbztqZYJPUBrnyWW1YsG,
+  live on snv-zeta.vercel.app). Foundations proven; ready for operator
+  click-test, then Dashboard is next per DESIGN_SPEC.md rollout order --
+  do NOT touch any other page yet.**
 - **UPDATE (session 18): logo placed, DESIGN_SPEC.md + logo-mark.png
   committed (`ddca187`), pushed to main. Director verified the source logo
   file directly (viewed the actual image via Desktop Commander before
