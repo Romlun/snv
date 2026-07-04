@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.3 All list pages live, profile pages next`
+`snv Mission CRM — v2.4 Donor profile live, Church profile next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -395,6 +395,14 @@ Auth via Supabase Auth. Every table with PII has RLS ON from creation.
 ---
 
 ## 8. ACTIVE CONSTRAINTS / HAZARDS
+- ⚠️ **UNVERIFIED: donors.card_expiry (discovered session 24).** A text
+  column exists on donors that isn't referenced anywhere in the app code or
+  in this file's history. Nobody currently knows if it's ever populated with
+  real card data. If it is, storing raw card info in plaintext on a table
+  with no PCI scoping would be a real compliance/security issue. NOT yet
+  investigated or acted on -- operator needs to check whether this column
+  has real data and decide what to do (drop it if unused, or handle properly
+  if it's live). Flag this as open until resolved.
 - ⚠️ Next 16 is non-standard — see P1.
 - ⚠️ Donor + church + gift + contact-log records are PII/financial. RLS before
   exposure, always. Volunteers must never gain access to these.
@@ -547,6 +555,45 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 24): Donor profile page SHIPPED and LIVE (first
+  profile/detail page done, plus a real schema addition). Code Agent
+  restyled src/app/donors/[id]/page.tsx and added birthday/address fields
+  to src/app/donors/[id]/edit/page.tsx and src/app/donors/new/page.tsx
+  (commit `b870b17`). Director applied and verified a new migration first
+  (`add_donor_birthday_and_address` -- donors.birthday date nullable,
+  donors.address text nullable, both genuinely optional, collected
+  opportunistically) before directing the Code Agent, confirmed live via
+  schema query. Donor mock fabricated much more than any list-page mock
+  (fake Partner-style ID, fake "Donor since" date, a bio quote, fully
+  invented interaction narratives, a fictional "Related Entities" section)
+  -- Director checked live schema before writing the directive and
+  corrected all of it: dropped every fabricated element, kept/added only
+  real fields (added Communication via the previously-unsurfaced real
+  donors.preferred_contact_method column), and derived "Mission Projects
+  Supported" from real distinct projects in gift history with real
+  projects.status pulled via join, not invented captions. Also discovered
+  (not yet acted on, needs operator attention separately): donors has an
+  unused `card_expiry` text column not referenced anywhere in this file's
+  hazards -- worth checking whether it's ever populated with real card
+  data, which would be a PII/compliance concern on a non-PCI-scoped table.
+  First pass caught a real gap Director flagged before merging: Code Agent
+  initially skipped the New Donor form entirely despite the directive
+  asking for it there too -- follow-up directive closed it, all three
+  files (detail/edit/new) verified and committed together in one commit.
+  Ran `npm run build` personally -- clean. Merged to main (`2f912d4`),
+  pushed, Vercel confirmed READY on the exact merge SHA
+  (dpl_7r9rfb11J31peDjpRSzGPqEvVL8T), live on snv-zeta.vercel.app. Director
+  also did a broader review across the Church/Task/Project profile mocks
+  (not yet dispatched) and found the SAME fabrication pattern is
+  consistent across every profile mock -- apply the same
+  check-schema-first, drop-fabricated, keep-real discipline to each
+  remaining one rather than re-deriving it from scratch each time. One
+  genuinely new feature idea surfaced (Task profile's "Action Items"
+  sub-task checklist) -- flagged to operator, NOT built, needs a schema +
+  product decision first. Next per DESIGN_SPEC.md rollout order: remaining
+  profile pages -- Church, Language School, Project, Task, and the
+  Inventory item detail (maps to the "publication_profile" mock) -- then
+  forms, then Login/Settings/Calendar last.**
 - **UPDATE (session 23): List pages batch 3 SHIPPED and LIVE (Budget,
   Inventory) -- ALL 7 LIST PAGES NOW COMPLETE. Code Agent restyled 2 files
   only (commits `d1b577c`, `1567959`) -- Director verified directly: read
