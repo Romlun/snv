@@ -141,7 +141,7 @@ export default function BudgetPage() {
         </Button>
       </section>
 
-      <section className="grid grid-cols-1 gap-md md:grid-cols-4">
+      <section className="grid grid-cols-1 gap-cs-md md:grid-cols-4">
         {metrics.map((metric) => (
           <Card key={metric.label} padding="md" className="space-y-3">
             <span className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">

@@ -201,7 +201,7 @@ export default function InventoryPage() {
           </select>
         </div>
 
-        <div className="grid grid-cols-1 gap-md md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-cs-md md:grid-cols-3">
           {metrics.map((metric) => (
             <Card key={metric.label} padding="md" className="space-y-3">
               <span className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
