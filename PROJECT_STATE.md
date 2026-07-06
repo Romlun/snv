@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.5 Church profile live, Language School profile next`
+`snv Mission CRM — v2.6 Login bug fix shipped, operator to confirm live`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,34 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 26): Login page bug fix SHIPPED and LIVE. Operator
+  reported a broken sign-in page (screenshot: sidebar visible behind a
+  severely malformed narrow/tall card, unable to log in). Root cause #1
+  (confirmed): root layout.tsx rendered <Sidebar/>/<MobileBottomNav/>
+  unconditionally for EVERY route, including /login -- no route-based
+  separation existed. Fixed via Next.js route groups: all authenticated
+  pages moved into src/app/(app)/ with their own (app)/layout.tsx holding
+  Sidebar/main/nav; root layout.tsx reduced to bare html/body shell;
+  src/app/login/page.tsx now sits OUTSIDE (app), fully isolated. Director
+  verified the move was a clean rename (git diff showed all 33 page files
+  as 0-line renames, zero content changes) and confirmed via build output
+  that /login, /donors, /churches etc. still resolve to their original
+  URLs (route groups don't affect routing) -- didn't just assume this.
+  Also restyled login/page.tsx to Soft Luminous while fixing it (real
+  logo-mark.png + "Light in the East" branding instead of placeholder
+  Heart icon, Card/Input/Button primitives already proven on 5+ other
+  pages -- low risk of the same visual bug recurring). Root cause of the
+  specific narrow/pill visual distortion in the screenshot was not fully
+  isolated in isolation from the sidebar bug -- Director could not
+  reproduce/inspect it live (Claude-in-Chrome connector was unreachable
+  this session after one retry, per self-healing practice, then escalated
+  rather than retried indefinitely) -- ran `npm run build` clean, merged
+  to main (`7948913`), pushed, Vercel confirmed READY on the exact merge
+  SHA (dpl_hJFvRgqzeNyjKKGb6JfKqTcJLyc3), live on snv-zeta.vercel.app.
+  **OPERATOR ACTION NEEDED: check the live /login page directly and
+  confirm the visual bug is actually resolved** -- Director's verification
+  covered code correctness and deploy status but not a live visual
+  render, since browser access wasn't available this session.**
 - **UPDATE (session 25): Church profile page SHIPPED and LIVE. Code Agent
   restyled src/app/churches/[id]/page.tsx only (commit `3a5e83f`) --
   Director verified schema first (churches has no hidden extra columns like
