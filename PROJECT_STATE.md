@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.8 Modal fix shipped (unverified live), needs check`
+`snv Mission CRM — v2.9 Modal fix confirmed live, Language School next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -573,19 +573,17 @@ effective gate. Continue this pattern.
   this is deterministic by how portals work, not a probabilistic fix).
   Director verified: diff scope correct (3 files only), both components
   identically patched, clean build.
-  **VERIFICATION GAP, disclosed: neither Claude-in-Chrome NOR Vercel MCP
-  were reachable this session (both retried per self-healing, both
-  stayed down) -- so there is NO visual confirmation the modal actually
-  renders centered at runtime, and NO independent Vercel deploy-SHA
-  confirmation this time either. Operator also could not click-test
-  locally this session. Merged anyway given the fix mechanism is
-  structurally sound (React Portal DOM relocation, not a CSS value
-  tweak whose behavior needed empirical confirmation like the token
-  collision did) -- but this is a real, acknowledged gap, not full
-  closure. NEXT SESSION: reconnect Claude-in-Chrome and Vercel MCP:
-  (1) confirm deployed SHA matches 216b779, (2) click an engagement
-  score badge on a live Church or Donor page and confirm the modal
-  now centers properly. Merged to main (`216b779`), pushed.**
+  **RESOLVED (session 29): operator confirmed directly -- clicked an
+  engagement score badge on the live site and the modal now renders
+  centered correctly, matching the code-level fix. Vercel MCP tool
+  remained unreachable ('tool not found') even after the operator
+  confirmed the connector itself is connected on their end -- attributed
+  to a transient Claude-services-side issue, not a project problem.
+  Director did not keep retrying past that point. Deploy-SHA
+  cross-check via Vercel skipped this time since operator's direct
+  visual confirmation is the stronger, more meaningful evidence anyway
+  -- worth a quick Vercel check next session if convenient, not urgent.
+  Merged to main (`216b779`), pushed. Bug fully closed.**
 - **UPDATE (session 27): Codebase-wide spacing/sizing token collision FIXED,
   SHIPPED, and CONFIRMED LIVE. Root cause: custom design tokens
   --spacing-sm/md/lg/xl (added in Phase 0) collided with Tailwind v4's
