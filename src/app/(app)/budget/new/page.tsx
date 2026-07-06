@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input, Select } from "@/components/ui/Input";
 
 interface ProjectOption {
   id: string;
@@ -83,92 +86,113 @@ export default function NewBudgetEntryPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <Link href="/budget" className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50">
+    <div className="mx-auto max-w-2xl space-y-gutter">
+      <Link
+        href="/budget"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-on-surface-variant transition-colors hover:text-primary"
+      >
         <ArrowLeft className="h-4 w-4" />
         Back to Budget
       </Link>
 
-      <div className="bg-white border rounded-xl p-8 dark:bg-zinc-900 dark:border-zinc-800">
-        <h1 className="text-2xl font-bold mb-6">New Budget Entry</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Category</label>
-              <select
-                required
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.category}
-                onChange={e => setFormData({ ...formData, category: e.target.value })}
-              >
-                {suggestedCategories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Name</label>
-              <input
-                required
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.name}
-                onChange={e => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Needed</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.needed}
-                onChange={e => setFormData({ ...formData, needed: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Raised</label>
-              <div className="w-full px-3 py-2 border rounded-lg bg-zinc-50 text-zinc-500 dark:bg-zinc-950 dark:border-zinc-800">
-                $0.00
-              </div>
-            </div>
+      <Card padding="lg" className="relative overflow-hidden">
+        <div className="absolute inset-y-0 left-0 w-1.5 bg-primary-container" />
+        <div className="pl-2">
+          <div className="mb-8">
+            <h1 className="font-headline text-headline-lg font-semibold text-on-surface">
+              New Budget Entry
+            </h1>
+            <p className="mt-2 text-sm text-on-surface-variant">
+              Allocate resources and track funding for mission activities.
+            </p>
           </div>
 
-          <label className="flex items-center gap-3 rounded-lg border p-3 text-sm font-medium dark:border-zinc-800">
-            <input
-              type="checkbox"
-              className="h-4 w-4"
-              checked={formData.is_project_based}
-              onChange={e => setFormData({ ...formData, is_project_based: e.target.checked, project_id: e.target.checked ? formData.project_id : "" })}
-            />
-            Project based
-          </label>
-
-          {formData.is_project_based ? (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Project</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.project_id}
-                onChange={e => setFormData({ ...formData, project_id: e.target.value })}
-              >
-                <option value="">No project selected</option>
-                {projects.map(project => (
-                  <option key={project.id} value={project.id}>{project.name}</option>
-                ))}
-              </select>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">Category</label>
+                <Select
+                  required
+                  variant="box"
+                  value={formData.category}
+                  onChange={e => setFormData({ ...formData, category: e.target.value })}
+                >
+                  {suggestedCategories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">Name</label>
+                <Input
+                  required
+                  variant="box"
+                  placeholder="e.g. Winter Outreach 2024"
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
             </div>
-          ) : null}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center"
-          >
-            {loading ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : "Create Budget Entry"}
-          </button>
-        </form>
-      </div>
+            <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">Needed</label>
+                <Input
+                  variant="box"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.needed}
+                  onChange={e => setFormData({ ...formData, needed: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">Raised</label>
+                <div className="w-full rounded-lg border border-outline-variant/20 bg-surface-container px-3 py-2.5 text-sm text-on-surface-variant">
+                  $0.00
+                </div>
+              </div>
+            </div>
+
+            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-outline-variant/20 bg-white/40 p-4 transition-colors hover:bg-primary-container/5">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-5 w-5 rounded border-outline-variant text-primary-container focus:ring-primary-container/40"
+                checked={formData.is_project_based}
+                onChange={e => setFormData({ ...formData, is_project_based: e.target.checked, project_id: e.target.checked ? formData.project_id : "" })}
+              />
+              <div>
+                <p className="text-sm font-semibold text-on-surface">Project based</p>
+                <p className="text-xs text-on-surface-variant">
+                  Link this entry to a specific mission project.
+                </p>
+              </div>
+            </label>
+
+            {formData.is_project_based ? (
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">Project</label>
+                <Select
+                  variant="box"
+                  value={formData.project_id}
+                  onChange={e => setFormData({ ...formData, project_id: e.target.value })}
+                >
+                  <option value="">No project selected</option>
+                  {projects.map(project => (
+                    <option key={project.id} value={project.id}>{project.name}</option>
+                  ))}
+                </Select>
+              </div>
+            ) : null}
+
+            <div className="flex flex-col items-center gap-4 border-t border-outline-variant/20 pt-6">
+              <Button type="submit" disabled={loading} className="w-full md:w-auto md:min-w-60">
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Create Budget Entry"}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </Card>
     </div>
   );
 }
