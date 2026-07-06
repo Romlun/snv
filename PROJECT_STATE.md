@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v3.1 Project profile live, Task profile next`
+`snv Mission CRM — v3.2 Task profile+checklist live, Inventory next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,42 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 32): Task profile page SHIPPED and LIVE, including a
+  genuinely NEW real feature: Action Items checklist (5th of 5 profile
+  pages done -- only Inventory item detail remains). Operator explicitly
+  approved building this (schema + feature), not silently added. Director
+  designed and applied the new task_checklist_items table + RLS via
+  Supabase migration BEFORE dispatching the directive -- columns: id,
+  org_id (auto via get_default_org_id()), task_id (FK, cascade delete),
+  text, is_complete, position, created_at, updated_at. RLS mirrors the
+  EXACT existing tasks-table access model (verified via pg_policies
+  query, not assumed): Admin/Staff full org access; Volunteers can
+  view/toggle items only on tasks assigned to them; INSERT/DELETE
+  restricted to Admin/Staff only. Code Agent (commit `6792065`) correctly
+  wired real fetch/toggle/add against the new table, hid the add-item
+  control client-side for Volunteers (UX nicety -- RLS is the real
+  gate), and correctly did NOT build drag-to-reorder (out of scope per
+  directive). Also dropped the mock's fabricated "Task Overview"
+  narrative (fake donor name, fake villager count) for the real
+  description field, and skipped the mock's fabricated Connected
+  Entities/fake Quick Actions since no such data/functionality exists.
+  Director verification went beyond code review + build for this one,
+  since it's a real data-mutation feature: ran an actual live
+  insert/toggle/delete cycle on disposable temp data via Supabase
+  directly (cleaned up after, confirmed count=0) to verify real
+  Postgres/FK/default behavior -- disclosed clearly that this bypassed
+  RLS (Supabase MCP connection has elevated access), so it verifies
+  table mechanics, not a full authenticated-session RLS behavioral test
+  (would require real login, which Director does not do). RLS policies
+  were separately confirmed present and structurally correct via
+  pg_policies, mirroring the already-proven tasks pattern. Ran
+  `npm run build` -- clean. Merged to main (`806028a`), pushed, Vercel
+  confirmed READY on the exact merge SHA
+  (dpl_Ajd1y94imtXrRserYHyMkmZ13pTL), live on snv-zeta.vercel.app. Next
+  per DESIGN_SPEC.md rollout order: Inventory item detail (maps to the
+  "publication_profile" mock) is the LAST profile page, then forms
+  (only Budget's new-entry form has a dedicated mock -- extrapolate the
+  rest), then Settings/Calendar last (Login already done).**
 - **UPDATE (session 31): Project profile page SHIPPED and LIVE (4th of 5
   profile pages done). Code Agent restyled
   src/app/(app)/projects/[id]/page.tsx only (commit `d5f133a`) -- Director
