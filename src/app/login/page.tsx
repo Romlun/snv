@@ -2,9 +2,12 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { Heart } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -34,61 +37,78 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl border dark:bg-zinc-900 dark:border-zinc-800">
-        <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="flex items-center gap-2 font-bold text-3xl text-blue-600 dark:text-blue-400">
-              <Heart className="fill-current h-8 w-8" />
-              <span>Mission CRM</span>
+    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10 text-on-background">
+      <Card className="w-full max-w-md space-y-8 p-8">
+        <div className="space-y-5 text-center">
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-3">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface shadow-sm ring-1 ring-outline-variant/15">
+                <Image
+                  src="/logo-mark.png"
+                  alt=""
+                  width={34}
+                  height={34}
+                  className="h-8 w-8 object-contain"
+                  priority
+                />
+              </span>
+              <span className="font-headline text-headline-md font-semibold leading-tight text-on-surface">
+                Light in the East
+              </span>
             </div>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">Sign in to your account</h2>
-          <p className="mt-2 text-sm text-zinc-500">Welcome back. Enter your details to continue.</p>
+          <div>
+            <h1 className="font-headline text-headline-lg font-semibold text-on-surface">
+              Sign in
+            </h1>
+            <p className="mt-2 text-sm text-on-surface-variant">
+              Welcome back. Enter your details to continue.
+            </p>
+          </div>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        <form className="space-y-6" onSubmit={handleLogin}>
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
               {error}
             </div>
           )}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+              <label className="mb-1 block text-sm font-semibold text-on-surface">
                 Email address
               </label>
-              <input
+              <Input
                 type="email"
                 required
-                className="w-full px-4 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                variant="box"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+              <label className="mb-1 block text-sm font-semibold text-on-surface">
                 Password
               </label>
-              <input
+              <Input
                 type="password"
                 required
-                className="w-full px-4 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                variant="box"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="w-full"
           >
             {loading ? "Signing in..." : "Sign in"}
-          </button>
+          </Button>
         </form>
-      </div>
-    </div>
+      </Card>
+    </main>
   );
 }
