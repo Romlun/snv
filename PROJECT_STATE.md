@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v3.0 Language School profile live, Project next`
+`snv Mission CRM — v3.1 Project profile live, Task profile next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,27 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 31): Project profile page SHIPPED and LIVE (4th of 5
+  profile pages done). Code Agent restyled
+  src/app/(app)/projects/[id]/page.tsx only (commit `d5f133a`) -- Director
+  verified live schema first (projects has exactly the 12 columns already
+  used, nothing hidden; confirmed contact_logs has NO project_id column at
+  all -- same situation as Language School, so the mock's fabricated
+  "Impact Timeline" was correctly dropped entirely, not force-derived).
+  Also confirmed profiles has NO phone column (fake Local Lead phone
+  number correctly dropped) but DOES have a real, previously-unused
+  avatar_url column -- correctly used with initials-circle fallback,
+  matching the same optional-field pattern as donor birthday. Dropped
+  fake Villages Reached, Resources Allocated, Next Site Visit, fabricated
+  Local Lead identity. Kept/added real equivalents: Total Funding (already
+  real), Days Active (computed from start_date/created_at), Contributions
+  count, and a real "Assigned Staff" card replacing the fake "Local
+  Lead" one. Drop-cap prose styling applied to real description/
+  goal_description fields. Ran `npm run build` personally -- clean.
+  Merged to main (`13ef039`), pushed, Vercel confirmed READY on the exact
+  merge SHA (dpl_6MYUTYtU7F9Lrrgh2qknJQwwMNv4), live on snv-zeta.vercel.app.
+  Next per DESIGN_SPEC.md rollout order: Task and Inventory item detail
+  profile pages remain, then forms, then Settings/Calendar.**
 - **UPDATE (session 30): Language School profile page SHIPPED and LIVE
   (3rd of 5 profile pages done). Code Agent restyled
   src/app/(app)/language-schools/[id]/page.tsx only (commit `1b69e61`) --
