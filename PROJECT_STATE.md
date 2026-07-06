@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v3.3 All profile pages live, forms next`
+`snv Mission CRM — v3.4 Budget form live (pattern set), forms batch 1 next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,30 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 34): Budget New Entry form SHIPPED and LIVE -- forms
+  phase started, this establishes the visual pattern for all remaining
+  forms. Code Agent restyled src/app/(app)/budget/new/page.tsx only
+  (commit `dab5671`). This is the ONLY form with a dedicated Stitch mock,
+  so Director made one real styling call not dictated by any mock: kept
+  the established boxed Input/Select variant (already used successfully
+  on Add Gift/Add Funds/Record Transaction across 3+ profile pages)
+  instead of adopting the mock's underline-style inputs, to avoid a
+  second, inconsistent input language existing in the app. Kept the real
+  category list instead of the mock's fictional ones; kept "Raised" as a
+  genuinely real, deliberate constraint (read-only /bin/sh.00, never editable
+  -- new entries always start at /bin/sh, only real gifts increase it) rather
+  than following the mock's editable-input treatment, which would have
+  let someone fabricate a starting balance. Dropped the mock's fake
+  finance-administrator notification text and JS button-swap gimmick,
+  kept the real Loader2 spinner pattern. Ran `npm run build` -- clean.
+  Merged to main (`25e3461`), pushed, Vercel confirmed READY on the exact
+  merge SHA (dpl_528FTYVqHkPMzZz2vSWyjs4BzQFx), live on snv-zeta.vercel.app.
+  Next: apply this same established pattern (boxed Input/Select
+  primitives, centered card, accent stripe, section grouping) to the
+  remaining 11 form files (New+Edit for Donors, Churches, Language
+  Schools, Projects, Tasks, Inventory) in 2-3 batches, extrapolating
+  since none of those have a dedicated mock -- then Settings/Calendar
+  last.**
 - **UPDATE (session 33): Inventory item detail page SHIPPED and LIVE --
   ALL 5 PROFILE/DETAIL PAGES NOW COMPLETE (Donor, Church, Language School,
   Project, Task, Inventory item). Code Agent restyled
