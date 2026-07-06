@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.6 Login fixed+confirmed, Language School profile next`
+`snv Mission CRM — v2.7 Token collision fixed, Language School profile next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,34 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 27): Codebase-wide spacing/sizing token collision FIXED,
+  SHIPPED, and CONFIRMED LIVE. Root cause: custom design tokens
+  --spacing-sm/md/lg/xl (added in Phase 0) collided with Tailwind v4's
+  unified spacing scale, which ALSO drives width/height/max-width/min-width
+  utilities, not just gap/padding. This silently broke max-w-md on the
+  login page (rendered as 16px instead of 448px -- the reported "pill
+  shaped" bug) plus 3 other spots never reported: the Calendar modal and
+  both Donor/Church engagement-score tooltips. Director confirmed root
+  cause via live getComputedStyle query (not guessed) -- login Card's
+  max-width computed to exactly 16px, matching --spacing-md's value to the
+  pixel. Fix: renamed the 4 colliding tokens to a "cs-" prefix
+  (--spacing-cs-sm/md/lg/xl) in globals.css; found and renamed all 10 real
+  dependent utility-class usages across the app (gap-md, etc.) via grep,
+  confirmed zero leftover old-named usages after the rename. Verified via
+  the COMPILED CSS OUTPUT directly (strongest available evidence,
+  precise): .max-w-md now correctly resolves to var(--container-md) =
+  28rem, .gap-cs-md correctly outputs 16px under its new name. Merged to
+  main (`343a953`) -- note: this merge and its push both happened silently
+  during a Desktop Commander timeout; Director verified after recovery
+  that both had actually succeeded rather than assuming either outcome.
+  Vercel MCP connector was unavailable this session (tool not found,
+  retried per self-healing then stopped) so the deploy SHA was not
+  independently confirmed via Vercel this time -- **operator confirmed
+  directly by signing in successfully on the live site**, which is
+  accepted here as sufficient real-world confirmation given the strength
+  of the code-level verification already in hand. Follow-up worth doing
+  next session: reconnect Vercel MCP and confirm the deployed SHA matches
+  343a953 for full closure of the verification chain.**
 - **UPDATE (session 26): Login page bug fix SHIPPED and LIVE. Operator
   reported a broken sign-in page (screenshot: sidebar visible behind a
   severely malformed narrow/tall card, unable to log in). Root cause #1
