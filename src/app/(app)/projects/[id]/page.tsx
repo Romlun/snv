@@ -2,6 +2,10 @@
 
 import { use, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Input, Select, Textarea } from "@/components/ui/Input";
 import DateField from "@/components/DateField";
 import {
   ArrowLeft,
@@ -9,15 +13,17 @@ import {
   DollarSign,
   FileText,
   Loader2,
+  Mail,
+  Pencil,
   Plus,
   Tags,
   Target,
-  User as UserIcon
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type ProjectStatus = 'Idea' | 'Planning' | 'Active' | 'Waiting' | 'Completed' | 'Cancelled';
+type BadgeVariant = 'neutral' | 'primary' | 'success' | 'warning' | 'error' | 'info';
 
 interface Project {
   id: string;
@@ -38,6 +44,8 @@ interface Project {
 interface AssignedStaff {
   id: string;
   name: string;
+  email: string | null;
+  avatarUrl: string | null;
 }
 
 interface BudgetEntry {
@@ -90,6 +98,15 @@ interface AddFundsFormData {
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+const STATUS_BADGE_VARIANT: Record<ProjectStatus, BadgeVariant> = {
+  Idea: "neutral",
+  Planning: "info",
+  Active: "success",
+  Waiting: "warning",
+  Completed: "primary",
+  Cancelled: "error",
+};
+
 function getFundingPercent(project: Project) {
   if (!project.budget_needed) return 0;
   return Math.min(100, Math.round((project.current_funding / project.budget_needed) * 100));
@@ -111,6 +128,44 @@ function validDateOrNull(value: string) {
 function getDonorName(donors: GiftContributionRow['donors']) {
   const donor = Array.isArray(donors) ? donors[0] : donors;
   return donor?.name || null;
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+function formatDate(value: string | null | undefined, fallback = "Not set") {
+  if (!value) return fallback;
+  const date = DATE_RE.test(value) ? new Date(`${value}T00:00:00`) : new Date(value);
+  if (Number.isNaN(date.getTime())) return fallback;
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatMoney(value: number | null | undefined) {
+  return Number(value || 0).toLocaleString(undefined, {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+}
+
+function daysActive(project: Project) {
+  const raw = project.start_date || project.created_at;
+  const start = DATE_RE.test(raw) ? new Date(`${raw}T00:00:00`) : new Date(raw);
+  if (Number.isNaN(start.getTime())) return 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  start.setHours(0, 0, 0, 0);
+  return Math.max(0, Math.floor((today.getTime() - start.getTime()) / 86400000));
 }
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -149,13 +204,15 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
       const { data: staffData } = await supabase
         .from('project_staff')
-        .select('staff_id, profiles(full_name, email)')
+        .select('staff_id, profiles(full_name, email, avatar_url)')
         .eq('project_id', id);
       setAssignedStaff((staffData || []).map(row => {
         const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
         return {
           id: row.staff_id,
           name: profile?.full_name || profile?.email || row.staff_id,
+          email: profile?.email || null,
+          avatarUrl: profile?.avatar_url || null,
         };
       }));
 
@@ -240,10 +297,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-        <p className="mt-4 text-zinc-500">Loading project details...</p>
-      </div>
+      <Card className="flex flex-col items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="mt-4 text-on-surface-variant">Loading project details...</p>
+      </Card>
     );
   }
 
@@ -254,75 +311,124 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const fundingPercent = getFundingPercent(project);
 
   return (
-    <div className="space-y-6">
-      <Link href="/projects" className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50">
+    <div className="space-y-gutter">
+      <Link
+        href="/projects"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-on-surface-variant transition-colors hover:text-primary"
+      >
         <ArrowLeft className="h-4 w-4" />
         Back to Projects
       </Link>
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex items-center gap-6">
-          <div className="h-20 w-20 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-3xl font-bold text-zinc-400">
-            {project.name.charAt(0)}
-          </div>
-          <div>
-            <div className="flex items-center gap-3">
-               <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
-               <Link href={`/projects/${project.id}/edit`} className="text-sm font-medium text-blue-600 hover:underline">Edit</Link>
+      <section className="glass-card overflow-hidden p-6 lg:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-primary-container/15 font-headline text-headline-lg font-semibold text-primary">
+              {getInitials(project.name)}
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                {project.status}
-              </span>
-              {project.tags && project.tags.length > 0 ? project.tags.map(tag => (
-                <span key={tag} className="px-2.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs font-semibold text-zinc-800 dark:text-zinc-300">
-                  {tag}
-                </span>
-              )) : null}
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant={STATUS_BADGE_VARIANT[project.status]}>{project.status}</Badge>
+                  {project.tags && project.tags.length > 0
+                    ? project.tags.map(tag => (
+                        <Badge key={tag} variant="neutral">{tag}</Badge>
+                      ))
+                    : null}
+                </div>
+                <h1 className="font-headline text-headline-lg font-semibold text-on-surface">
+                  {project.name}
+                </h1>
+                <p className="text-sm text-on-surface-variant">
+                  Started {formatDate(project.start_date, "Not scheduled")}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  type="button"
+                  icon={Plus}
+                  onClick={() => setShowAddFunds(value => !value)}
+                >
+                  Add Funds
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  icon={Pencil}
+                  onClick={() => {
+                    window.location.href = `/projects/${project.id}/edit`;
+                  }}
+                >
+                  Edit Project
+                </Button>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="p-4 bg-white border rounded-xl dark:bg-zinc-900 dark:border-zinc-800 min-w-72">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-zinc-500 font-medium">Funding Progress</p>
-            <p className="text-sm font-bold">{fundingPercent}%</p>
+      <section className="grid grid-cols-1 gap-cs-md md:grid-cols-3">
+        <Card padding="md" className="space-y-3">
+          <span className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+            Total Funding
+          </span>
+          <div className="flex items-baseline gap-2">
+            <span className="font-headline text-headline-md font-bold tabular-nums text-primary">
+              {formatMoney(project.current_funding)}
+            </span>
+            <span className="text-sm text-on-surface-variant">
+              / {formatMoney(project.budget_needed)} goal
+            </span>
           </div>
-          <div className="h-2 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-            <div className="h-full bg-blue-600" style={{ width: `${fundingPercent}%` }} />
+          <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
+            <div
+              className="h-full rounded-full bg-primary-container"
+              style={{ width: `${fundingPercent}%` }}
+            />
           </div>
-          <p className="mt-2 text-xs text-zinc-500">${project.current_funding.toLocaleString()} of ${project.budget_needed.toLocaleString()}</p>
-          <button
-            type="button"
-            onClick={() => setShowAddFunds(value => !value)}
-            className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Add Funds
-          </button>
-        </div>
-      </div>
+        </Card>
+        <Card padding="md" className="space-y-3">
+          <span className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+            Days Active
+          </span>
+          <p className="font-headline text-headline-md font-bold tabular-nums text-on-surface">
+            {daysActive(project)}
+          </p>
+          <p className="text-sm text-on-surface-variant">days since start</p>
+        </Card>
+        <Card padding="md" className="space-y-3">
+          <span className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+            Contributions
+          </span>
+          <p className="font-headline text-headline-md font-bold tabular-nums text-on-surface">
+            {contributions.length}
+          </p>
+          <p className="text-sm text-on-surface-variant">gifts recorded</p>
+        </Card>
+      </section>
 
       {showAddFunds ? (
-        <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-          <h2 className="font-semibold mb-4">Add Funds</h2>
-          <form onSubmit={handleAddFunds} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <h2 className="mb-4 font-headline text-headline-md text-on-surface">
+            Add Funds
+          </h2>
+          <form onSubmit={handleAddFunds} className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Amount</label>
-              <input
+              <label className="text-sm font-semibold text-on-surface">Amount</label>
+              <Input
                 required
+                variant="box"
                 type="number"
                 min="0.01"
                 step="0.01"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
                 value={fundForm.amount}
                 onChange={e => setFundForm({ ...fundForm, amount: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Donor</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+              <label className="text-sm font-semibold text-on-surface">Donor</label>
+              <Select
+                variant="box"
                 value={fundForm.donor_id}
                 onChange={e => setFundForm({ ...fundForm, donor_id: e.target.value })}
               >
@@ -330,7 +436,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 {donors.map(donor => (
                   <option key={donor.id} value={donor.id}>{donor.name}</option>
                 ))}
-              </select>
+              </Select>
             </div>
             <DateField
               label="Gift Date"
@@ -338,192 +444,254 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               onChange={val => setFundForm({ ...fundForm, gift_date: val })}
             />
             <div className="space-y-2">
-              <label className="text-sm font-medium">Method</label>
-              <input
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+              <label className="text-sm font-semibold text-on-surface">Method</label>
+              <Input
+                variant="box"
                 placeholder="cash, check, card, online"
                 value={fundForm.method}
                 onChange={e => setFundForm({ ...fundForm, method: e.target.value })}
               />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium">Note</label>
-              <textarea
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-20"
+              <label className="text-sm font-semibold text-on-surface">Note</label>
+              <Textarea
+                variant="box"
                 value={fundForm.notes}
                 onChange={e => setFundForm({ ...fundForm, notes: e.target.value })}
               />
             </div>
-            <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
-              <button
-                type="submit"
-                disabled={addingFunds}
-                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
-              >
-                {addingFunds ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
-                Save Funds
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowAddFunds(false)}
-                className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
-              >
+            <div className="flex flex-col gap-3 md:col-span-2 sm:flex-row">
+              <Button type="submit" disabled={addingFunds}>
+                {addingFunds ? "Adding..." : "Save Funds"}
+              </Button>
+              <Button type="button" variant="secondary" onClick={() => setShowAddFunds(false)}>
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
-        </section>
+        </Card>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-1">
-          <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-            <h2 className="font-semibold mb-4">Project Details</h2>
+      <div className="grid grid-cols-1 gap-gutter lg:grid-cols-3">
+        <aside className="space-y-gutter lg:col-span-1">
+          <Card>
+            <h2 className="mb-5 font-headline text-headline-md text-on-surface">
+              Project Details
+            </h2>
             <div className="space-y-4">
-              <div className="flex items-center gap-3 text-sm">
-                <Calendar className="h-4 w-4 text-zinc-400" />
-                <span>Start: {project.start_date || 'Not set'}</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Calendar className="h-4 w-4 text-zinc-400" />
-                <span>End: {project.end_date || 'Not set'}</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <DollarSign className="h-4 w-4 text-zinc-400" />
-                <span>Budget: ${project.budget_needed.toLocaleString()}</span>
-              </div>
-              <div className="flex items-start gap-3 text-sm">
-                <Tags className="h-4 w-4 text-zinc-400 mt-0.5" />
-                <span>{project.tags && project.tags.length > 0 ? project.tags.join(", ") : "No tags"}</span>
-              </div>
+              <DetailRow icon={Calendar} label="Start Date" value={formatDate(project.start_date)} />
+              <DetailRow icon={Calendar} label="End Date" value={formatDate(project.end_date)} />
+              <DetailRow icon={DollarSign} label="Budget Needed" value={formatMoney(project.budget_needed)} />
+              <DetailRow
+                icon={Tags}
+                label="Tags"
+                value={project.tags && project.tags.length > 0 ? project.tags.join(", ") : "No tags"}
+              />
             </div>
-          </section>
+          </Card>
 
-          <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-            <h2 className="font-semibold mb-4">Assigned Staff</h2>
-            <div className="space-y-3">
-              {assignedStaff.length > 0 ? assignedStaff.map(row => (
-                <div key={row.id} className="flex items-center gap-2 text-sm font-medium">
-                  <UserIcon className="h-4 w-4 text-zinc-400" />
-                  <span>{row.name}</span>
-                </div>
-              )) : (
-                <p className="text-sm text-zinc-400 italic">No staff assigned.</p>
-              )}
-            </div>
-          </section>
+          <Card>
+            <h2 className="mb-5 font-headline text-headline-md text-on-surface">
+              Assigned Staff
+            </h2>
+            {assignedStaff.length > 0 ? (
+              <div className="space-y-4">
+                {assignedStaff.map((person, index) => (
+                  <div
+                    key={person.id}
+                    className={
+                      index < assignedStaff.length - 1
+                        ? "flex items-center gap-3 border-b border-outline-variant/15 pb-4"
+                        : "flex items-center gap-3"
+                    }
+                  >
+                    {person.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={person.avatarUrl}
+                        alt={person.name}
+                        className="h-12 w-12 shrink-0 rounded-full border border-outline-variant object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-container/15 font-headline text-sm font-semibold text-primary">
+                        {getInitials(person.name)}
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-semibold text-on-surface">{person.name}</p>
+                      {person.email ? (
+                        <p className="flex items-center gap-1.5 text-sm text-on-surface-variant">
+                          <Mail className="h-3.5 w-3.5" />
+                          {person.email}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-on-surface-variant">No staff assigned yet.</p>
+            )}
+          </Card>
 
-          <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-            <h2 className="font-semibold mb-4">Internal Details</h2>
-            <div className="space-y-4">
+          <Card>
+            <h2 className="mb-5 font-headline text-headline-md text-on-surface">
+              Internal Details
+            </h2>
+            <div className="space-y-5">
               <div>
-                <p className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-1">Organization ID</p>
-                <p className="text-sm font-medium break-all">{project.org_id}</p>
+                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+                  Organization ID
+                </p>
+                <p className="break-all text-sm font-semibold text-on-surface">{project.org_id}</p>
               </div>
               <div>
-                <p className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-1">Project ID</p>
-                <p className="text-sm font-medium break-all">{project.id}</p>
+                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+                  Project ID
+                </p>
+                <p className="break-all text-sm font-semibold text-on-surface">{project.id}</p>
               </div>
               <div>
-                <p className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-1">Created</p>
-                <p className="text-sm font-medium">{new Date(project.created_at).toLocaleString()}</p>
+                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+                  Created
+                </p>
+                <p className="text-sm font-semibold text-on-surface">
+                  {new Date(project.created_at).toLocaleString()}
+                </p>
               </div>
               <div>
-                <p className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-1">Updated</p>
-                <p className="text-sm font-medium">{new Date(project.updated_at).toLocaleString()}</p>
+                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+                  Updated
+                </p>
+                <p className="text-sm font-semibold text-on-surface">
+                  {new Date(project.updated_at).toLocaleString()}
+                </p>
               </div>
             </div>
-          </section>
-        </div>
+          </Card>
+        </aside>
 
-        <div className="lg:col-span-2 space-y-6">
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white border rounded-xl p-4 dark:bg-zinc-900 dark:border-zinc-800">
-              <p className="text-sm text-zinc-500 font-medium">Budget Needed</p>
-              <p className="text-2xl font-bold">${project.budget_needed.toLocaleString()}</p>
-            </div>
-            <div className="bg-white border rounded-xl p-4 dark:bg-zinc-900 dark:border-zinc-800">
-              <p className="text-sm text-zinc-500 font-medium">Current Funding</p>
-              <p className="text-2xl font-bold text-green-600">${project.current_funding.toLocaleString()}</p>
-            </div>
-            <div className="bg-white border rounded-xl p-4 dark:bg-zinc-900 dark:border-zinc-800">
-              <p className="text-sm text-zinc-500 font-medium">Status</p>
-              <p className="text-2xl font-bold">{project.status}</p>
-            </div>
-          </section>
-
-          <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-            <h2 className="font-semibold mb-4 flex items-center gap-2">
-              <FileText className="h-4 w-4 text-zinc-400" />
+        <main className="space-y-gutter lg:col-span-2">
+          <Card className="border-l-4 border-l-primary">
+            <h2 className="mb-4 flex items-center gap-2 font-headline text-headline-md text-on-surface">
+              <FileText className="h-4 w-4 text-primary" />
               Description
             </h2>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">{project.description || "No description yet."}</p>
-          </section>
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-on-surface-variant first-letter:float-left first-letter:mr-2 first-letter:font-headline first-letter:text-4xl first-letter:font-semibold first-letter:text-primary">
+              {project.description || "No description yet."}
+            </p>
+          </Card>
 
-          <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-            <h2 className="font-semibold mb-4 flex items-center gap-2">
-              <Target className="h-4 w-4 text-zinc-400" />
+          <Card className="border-l-4 border-l-primary">
+            <h2 className="mb-4 flex items-center gap-2 font-headline text-headline-md text-on-surface">
+              <Target className="h-4 w-4 text-primary" />
               Goal
             </h2>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">{project.goal_description || "No goal description yet."}</p>
-          </section>
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-on-surface-variant first-letter:float-left first-letter:mr-2 first-letter:font-headline first-letter:text-4xl first-letter:font-semibold first-letter:text-primary">
+              {project.goal_description || "No goal description yet."}
+            </p>
+          </Card>
 
-          <section className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
-            <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800">
-              <h2 className="font-semibold">Contributions</h2>
-            </div>
-            <div className="p-6">
+          <Card padding="none" className="overflow-hidden">
+            <Card.Header>
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">
+                  Contributions
+                </h2>
+                <p className="text-sm text-on-surface-variant">
+                  Gifts recorded toward this project.
+                </p>
+              </div>
+              <DollarSign className="h-5 w-5 text-primary" />
+            </Card.Header>
+            <Card.Body>
               {contributions.length > 0 ? (
                 <div className="space-y-3">
                   {contributions.map(gift => (
-                    <div key={gift.id} className="flex flex-col gap-2 border rounded-lg p-4 dark:border-zinc-800 sm:flex-row sm:items-start sm:justify-between">
+                    <div
+                      key={gift.id}
+                      className="flex flex-col gap-3 rounded-xl border border-outline-variant/15 bg-white/40 p-4 transition-colors hover:bg-primary-container/5 sm:flex-row sm:items-start sm:justify-between"
+                    >
                       <div>
-                        <p className="font-medium">{gift.donorName || "No donor selected"}</p>
-                        <p className="text-xs text-zinc-500">
-                          {gift.gift_date} {gift.method ? `- ${gift.method}` : ""}
+                        <p className="font-semibold text-on-surface">{gift.donorName || "No donor selected"}</p>
+                        <p className="text-xs text-on-surface-variant">
+                          {formatDate(gift.gift_date)}
+                          {gift.method ? ` • ${gift.method}` : ""}
                         </p>
-                        {gift.notes ? <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{gift.notes}</p> : null}
+                        {gift.notes ? <p className="mt-2 text-sm text-on-surface-variant">{gift.notes}</p> : null}
                       </div>
-                      <p className="text-sm font-bold text-green-600">${gift.amount.toLocaleString()}</p>
+                      <p className="text-sm font-bold tabular-nums text-primary">{formatMoney(gift.amount)}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-10 text-zinc-500">
+                <div className="py-10 text-center text-on-surface-variant">
                   No contributions recorded yet.
                 </div>
               )}
-            </div>
-          </section>
+            </Card.Body>
+          </Card>
 
-          <section className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
-            <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800">
-              <h2 className="font-semibold">Linked Budget Entries</h2>
-            </div>
-            <div className="p-6">
+          <Card padding="none" className="overflow-hidden">
+            <Card.Header>
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">
+                  Linked Budget Entries
+                </h2>
+                <p className="text-sm text-on-surface-variant">
+                  Budget categories funded by this project.
+                </p>
+              </div>
+            </Card.Header>
+            <Card.Body>
               {budgetEntries.length > 0 ? (
                 <div className="space-y-3">
                   {budgetEntries.map(entry => (
-                    <div key={entry.id} className="flex items-center justify-between border rounded-lg p-4 dark:border-zinc-800">
+                    <div
+                      key={entry.id}
+                      className="flex items-center justify-between rounded-xl border border-outline-variant/15 bg-white/40 p-4"
+                    >
                       <div>
-                        <p className="font-medium">{entry.name}</p>
-                        <p className="text-xs text-zinc-500">{entry.category}</p>
+                        <p className="font-semibold text-on-surface">{entry.name}</p>
+                        <p className="text-xs text-on-surface-variant">{entry.category}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold">${entry.raised.toLocaleString()} raised</p>
-                        <p className="text-xs text-zinc-500">of ${entry.needed.toLocaleString()} needed</p>
+                        <p className="text-sm font-bold tabular-nums text-primary">{formatMoney(entry.raised)} raised</p>
+                        <p className="text-xs text-on-surface-variant">of {formatMoney(entry.needed)} needed</p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-10 text-zinc-500">
+                <div className="py-10 text-center text-on-surface-variant">
                   No budget entries linked yet.
                 </div>
               )}
-            </div>
-          </section>
-        </div>
+            </Card.Body>
+          </Card>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function DetailRow({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Calendar;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex gap-3 text-sm">
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+      <div>
+        <p className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+          {label}
+        </p>
+        <p className="mt-1 text-on-surface">{value}</p>
       </div>
     </div>
   );
