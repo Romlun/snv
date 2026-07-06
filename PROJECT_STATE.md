@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v3.2 Task profile+checklist live, Inventory next`
+`snv Mission CRM — v3.3 All profile pages live, forms next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,30 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 33): Inventory item detail page SHIPPED and LIVE --
+  ALL 5 PROFILE/DETAIL PAGES NOW COMPLETE (Donor, Church, Language School,
+  Project, Task, Inventory item). Code Agent restyled
+  src/app/(app)/inventory/[id]/page.tsx only (commit `a521a91`) -- Director
+  verified live schema first (resources has exactly the 11 columns already
+  used, no image/language/subtitle field exists). Dropped the mock's
+  fabricated hover-reveal book-cover photo, "RU" language tag, and italic
+  subtitle; kept only the mock's abbreviation-badge (title initials) as a
+  static fallback since no photo field exists anywhere. Resource Details
+  and Transaction History were both ALREADY entirely real in this page
+  (no fabrication to correct in the underlying data, just restyling) --
+  omitted the mock's non-functional "View All" button since the real page
+  already shows the complete transaction list. Real ShoppingCart/
+  HeartHandshake icons used for sale/giveaway instead of material-symbols.
+  Auto-fill-amount form logic fully preserved. Ran `npm run build`
+  personally -- clean. Merged to main (`c2234ff`), pushed, Vercel
+  confirmed READY on the exact merge SHA (dpl_7SpbRRYj5t8wfVAvFg2qecw2ai86),
+  live on snv-zeta.vercel.app.
+  **PROFILE-PAGE PHASE OF THE DESIGN ROLLOUT IS COMPLETE.** Per
+  DESIGN_SPEC.md rollout order, next up: forms (only Budget's new-entry
+  form has a dedicated Stitch mock -- extrapolate from the established
+  system for Donors/Churches/Language Schools/Projects/Tasks/Inventory
+  New+Edit forms, which currently sit on old pre-Phase-0 styling), then
+  Login/Settings/Calendar last (Login done; Settings/Calendar remain).**
 - **UPDATE (session 32): Task profile page SHIPPED and LIVE, including a
   genuinely NEW real feature: Action Items checklist (5th of 5 profile
   pages done -- only Inventory item detail remains). Operator explicitly
