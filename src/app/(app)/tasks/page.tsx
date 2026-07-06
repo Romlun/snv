@@ -203,7 +203,7 @@ export default function TasksPage() {
         </Button>
       </section>
 
-      <section className="grid grid-cols-1 gap-md sm:grid-cols-2 xl:grid-cols-5">
+      <section className="grid grid-cols-1 gap-cs-md sm:grid-cols-2 xl:grid-cols-5">
         {metrics.map((metric) => (
           <Card key={metric.label} padding="md" className="space-y-3">
             <span className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">

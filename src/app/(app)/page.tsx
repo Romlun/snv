@@ -311,7 +311,7 @@ export default async function Dashboard() {
 
       <section
         aria-label="Mission metrics"
-        className="grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-5"
+        className="grid grid-cols-1 gap-cs-md sm:grid-cols-2 lg:grid-cols-5"
       >
         {stats.map((stat) => (
           <StatCard

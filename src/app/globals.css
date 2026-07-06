@@ -38,10 +38,10 @@
   --font-headline: "Playfair Display", "Playfair Display Fallback", ui-serif, Georgia, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
+  --spacing-cs-sm: 8px;
+  --spacing-cs-md: 16px;
+  --spacing-cs-lg: 24px;
+  --spacing-cs-xl: 32px;
   --spacing-gutter: 24px;
   --spacing-stack-md: 16px;
   --spacing-stack-lg: 32px;
