@@ -3,9 +3,13 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, BookOpen, Loader2, Plus } from "lucide-react";
+import { ArrowLeft, HeartHandshake, Loader2, Pencil, Plus, ShoppingCart } from "lucide-react";
 import DateField from "@/components/DateField";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Input, Select, Textarea } from "@/components/ui/Input";
 
 type TransactionType = 'sale' | 'giveaway';
 
@@ -94,6 +98,12 @@ function getRecipientName(transaction: ResourceTransactionRow) {
 function formatDate(value: string | null) {
   if (!value) return "No date";
   return new Date(value).toLocaleDateString();
+}
+
+function getAbbreviation(title: string) {
+  const words = title.split(" ").filter(Boolean);
+  if (words.length === 1) return words[0].slice(0, 3).toUpperCase();
+  return words.slice(0, 3).map(word => word.charAt(0).toUpperCase()).join("");
 }
 
 export default function InventoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -253,10 +263,10 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-        <p className="mt-4 text-zinc-500">Loading resource details...</p>
-      </div>
+      <Card className="flex flex-col items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="mt-4 text-on-surface-variant">Loading resource details...</p>
+      </Card>
     );
   }
 
@@ -265,80 +275,101 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
   }
 
   return (
-    <div className="space-y-6">
-      <Link href="/inventory" className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50">
+    <div className="space-y-gutter">
+      <Link
+        href="/inventory"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-on-surface-variant transition-colors hover:text-primary"
+      >
         <ArrowLeft className="h-4 w-4" />
         Back to Inventory
       </Link>
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex items-center gap-6">
-          <div className="h-20 w-20 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-zinc-400">
-            <BookOpen className="h-9 w-9" />
-          </div>
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold tracking-tight">{resource.title}</h1>
-              <Link href={`/inventory/${resource.id}/edit`} className="text-sm font-medium text-blue-600 hover:underline">Edit</Link>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                {resource.category || "Uncategorized"}
+      <section className="glass-card overflow-hidden p-6 lg:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+            <div className="flex h-28 w-20 shrink-0 items-center justify-center rounded-lg border border-outline-variant/20 bg-primary-container/10 p-2 text-center">
+              <span className="font-headline text-headline-md font-semibold text-primary/40 select-none">
+                {getAbbreviation(resource.title)}
               </span>
-              {resource.location ? (
-                <span className="px-2.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs font-semibold text-zinc-800 dark:text-zinc-300">
-                  {resource.location}
-                </span>
-              ) : null}
+            </div>
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="primary">{resource.category || "Uncategorized"}</Badge>
+                  {resource.location ? <Badge variant="neutral">{resource.location}</Badge> : null}
+                </div>
+                <h1 className="font-headline text-headline-lg font-semibold text-on-surface">
+                  {resource.title}
+                </h1>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  type="button"
+                  icon={Plus}
+                  onClick={() => setShowTransactionForm(value => !value)}
+                >
+                  Record Transaction
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  icon={Pencil}
+                  onClick={() => {
+                    window.location.href = `/inventory/${resource.id}/edit`;
+                  }}
+                >
+                  Edit Resource
+                </Button>
+              </div>
             </div>
           </div>
+          <div className="flex items-center justify-between gap-4 rounded-xl border border-outline-variant/15 bg-white/45 p-4 lg:min-w-64">
+            <div>
+              <p className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+                Price
+              </p>
+              <p className="mt-1 text-sm text-on-surface-variant">Per unit</p>
+            </div>
+            <p className="font-headline text-headline-md font-bold text-primary">
+              {formatMoney(resource.price)}
+            </p>
+          </div>
         </div>
-
-        <div className="p-4 bg-white border rounded-xl dark:bg-zinc-900 dark:border-zinc-800 min-w-72">
-          <p className="text-sm text-zinc-500 font-medium">Price</p>
-          <p className="text-2xl font-bold">{formatMoney(resource.price)}</p>
-          <button
-            type="button"
-            onClick={() => setShowTransactionForm(value => !value)}
-            className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Record Transaction
-          </button>
-        </div>
-      </div>
+      </section>
 
       {showTransactionForm ? (
-        <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-          <h2 className="font-semibold mb-4">Record Transaction</h2>
-          <form onSubmit={handleRecordTransaction} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <h2 className="mb-4 font-headline text-headline-md text-on-surface">
+            Record Transaction
+          </h2>
+          <form onSubmit={handleRecordTransaction} className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Type</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+              <label className="text-sm font-semibold text-on-surface">Type</label>
+              <Select
+                variant="box"
                 value={transactionForm.type}
                 onChange={e => handleTransactionTypeChange(e.target.value as TransactionType)}
               >
                 <option value="sale">sale</option>
                 <option value="giveaway">giveaway</option>
-              </select>
+              </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Quantity</label>
-              <input
+              <label className="text-sm font-semibold text-on-surface">Quantity</label>
+              <Input
                 required
+                variant="box"
                 type="number"
                 min="1"
                 step="1"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
                 value={transactionForm.quantity}
                 onChange={e => handleQuantityChange(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Donor</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+              <label className="text-sm font-semibold text-on-surface">Donor</label>
+              <Select
+                variant="box"
                 value={transactionForm.donor_id}
                 onChange={e => setTransactionForm({ ...transactionForm, donor_id: e.target.value, church_id: e.target.value ? "" : transactionForm.church_id })}
               >
@@ -346,12 +377,12 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
                 {donors.map(donor => (
                   <option key={donor.id} value={donor.id}>{donor.name}</option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Church</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+              <label className="text-sm font-semibold text-on-surface">Church</label>
+              <Select
+                variant="box"
                 value={transactionForm.church_id}
                 onChange={e => setTransactionForm({ ...transactionForm, church_id: e.target.value, donor_id: e.target.value ? "" : transactionForm.donor_id })}
               >
@@ -359,15 +390,15 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
                 {churches.map(church => (
                   <option key={church.id} value={church.id}>{church.name}</option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Amount</label>
-              <input
+              <label className="text-sm font-semibold text-on-surface">Amount</label>
+              <Input
+                variant="box"
                 type="number"
                 min="0"
                 step="0.01"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
                 value={transactionForm.amount}
                 onChange={e => {
                   setAmountWasAutoFilled(false);
@@ -381,102 +412,114 @@ export default function InventoryDetailPage({ params }: { params: Promise<{ id: 
               onChange={val => setTransactionForm({ ...transactionForm, transaction_date: val })}
             />
             <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium">Notes</label>
-              <textarea
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-20"
+              <label className="text-sm font-semibold text-on-surface">Notes</label>
+              <Textarea
+                variant="box"
                 value={transactionForm.notes}
                 onChange={e => setTransactionForm({ ...transactionForm, notes: e.target.value })}
               />
             </div>
-            <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
-              <button
-                type="submit"
-                disabled={addingTransaction}
-                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
-              >
-                {addingTransaction ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
-                Save Transaction
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowTransactionForm(false)}
-                className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
-              >
+            <div className="flex flex-col gap-3 md:col-span-2 sm:flex-row">
+              <Button type="submit" disabled={addingTransaction}>
+                {addingTransaction ? "Saving..." : "Save Transaction"}
+              </Button>
+              <Button type="button" variant="secondary" onClick={() => setShowTransactionForm(false)}>
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
-        </section>
+        </Card>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-          <h2 className="font-semibold mb-4">Resource Details</h2>
-          <dl className="space-y-4 text-sm">
-            <div>
-              <dt className="text-zinc-500">Title</dt>
-              <dd className="font-medium">{resource.title}</dd>
+      <div className="grid grid-cols-1 gap-gutter lg:grid-cols-3">
+        <aside className="space-y-gutter lg:col-span-1">
+          <Card>
+            <h2 className="mb-5 font-headline text-headline-md text-on-surface">
+              Resource Details
+            </h2>
+            <div className="space-y-4 text-sm">
+              <div className="flex items-center justify-between border-b border-outline-variant/15 pb-3">
+                <span className="text-on-surface-variant">Category</span>
+                <span className="font-semibold text-on-surface">{resource.category || "Uncategorized"}</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-outline-variant/15 pb-3">
+                <span className="text-on-surface-variant">Quantity Available</span>
+                <span className="font-semibold tabular-nums text-on-surface">{resource.quantity_available || 0}</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-outline-variant/15 pb-3">
+                <span className="text-on-surface-variant">Quantity Sold</span>
+                <span className="font-semibold tabular-nums text-on-surface">{resource.quantity_sold || 0}</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-outline-variant/15 pb-3">
+                <span className="text-on-surface-variant">Quantity Given</span>
+                <span className="font-semibold tabular-nums text-on-surface">{resource.quantity_given || 0}</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-outline-variant/15 pb-3">
+                <span className="text-on-surface-variant">Price</span>
+                <span className="font-semibold tabular-nums text-on-surface">{formatMoney(resource.price)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-on-surface-variant">Location</span>
+                <span className="font-semibold text-on-surface">{resource.location || "Not set"}</span>
+              </div>
             </div>
-            <div>
-              <dt className="text-zinc-500">Category</dt>
-              <dd className="font-medium">{resource.category || "Uncategorized"}</dd>
-            </div>
-            <div>
-              <dt className="text-zinc-500">Quantity Available</dt>
-              <dd className="font-medium">{resource.quantity_available || 0}</dd>
-            </div>
-            <div>
-              <dt className="text-zinc-500">Quantity Sold</dt>
-              <dd className="font-medium">{resource.quantity_sold || 0}</dd>
-            </div>
-            <div>
-              <dt className="text-zinc-500">Quantity Given</dt>
-              <dd className="font-medium">{resource.quantity_given || 0}</dd>
-            </div>
-            <div>
-              <dt className="text-zinc-500">Price</dt>
-              <dd className="font-medium">{formatMoney(resource.price)}</dd>
-            </div>
-            <div>
-              <dt className="text-zinc-500">Location</dt>
-              <dd className="font-medium">{resource.location || "Not set"}</dd>
-            </div>
-          </dl>
-        </section>
+          </Card>
+        </aside>
 
-        <section className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800 lg:col-span-2">
-          <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800">
-            <h2 className="font-semibold">Transaction History</h2>
-          </div>
-          <div className="p-6">
-            {transactions.length > 0 ? (
-              <div className="space-y-3">
-                {transactions.map(transaction => (
-                  <div key={transaction.id} className="flex flex-col gap-3 border rounded-lg p-4 dark:border-zinc-800 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                          {transaction.type}
-                        </span>
-                        <p className="font-medium">Qty {transaction.quantity}</p>
-                        {transaction.amount !== null ? <p className="text-sm text-green-600">{formatMoney(transaction.amount)}</p> : null}
+        <main className="space-y-gutter lg:col-span-2">
+          <Card padding="none" className="overflow-hidden">
+            <Card.Header>
+              <h2 className="font-headline text-headline-md text-on-surface">
+                Transaction History
+              </h2>
+            </Card.Header>
+            <Card.Body>
+              {transactions.length > 0 ? (
+                <div className="space-y-3">
+                  {transactions.map(transaction => (
+                    <div
+                      key={transaction.id}
+                      className="flex flex-col gap-3 rounded-xl border border-outline-variant/15 bg-white/40 p-4 transition-colors hover:bg-primary-container/5 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container/15 text-primary">
+                          {transaction.type === "sale" ? (
+                            <ShoppingCart className="h-5 w-5" />
+                          ) : (
+                            <HeartHandshake className="h-5 w-5" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-semibold capitalize text-on-surface">
+                            {transaction.type} - {transaction.quantity} units
+                          </p>
+                          <p className="text-sm text-on-surface-variant">
+                            {transaction.recipientName || "No recipient recorded"}
+                          </p>
+                          {transaction.notes ? (
+                            <p className="mt-1 text-sm text-on-surface-variant">{transaction.notes}</p>
+                          ) : null}
+                        </div>
                       </div>
-                      <p className="mt-1 text-xs text-zinc-500">{formatDate(transaction.transaction_date)}</p>
-                      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                        Recipient: {transaction.recipientName || "Not set"}
-                      </p>
-                      {transaction.notes ? <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{transaction.notes}</p> : null}
+                      <div className="text-right">
+                        <p className="text-sm font-bold tabular-nums text-primary">
+                          {transaction.amount !== null ? formatMoney(transaction.amount) : "Free"}
+                        </p>
+                        <p className="text-xs text-on-surface-variant">
+                          {formatDate(transaction.transaction_date)}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-10 text-zinc-500">
-                No transactions recorded yet.
-              </div>
-            )}
-          </div>
-        </section>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-10 text-center text-on-surface-variant">
+                  No transactions recorded yet.
+                </div>
+              )}
+            </Card.Body>
+          </Card>
+        </main>
       </div>
     </div>
   );
