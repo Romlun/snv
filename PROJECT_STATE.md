@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.6 Login bug fix shipped, operator to confirm live`
+`snv Mission CRM — v2.6 Login fixed+confirmed, Language School profile next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -579,10 +579,8 @@ effective gate. Continue this pattern.
   rather than retried indefinitely) -- ran `npm run build` clean, merged
   to main (`7948913`), pushed, Vercel confirmed READY on the exact merge
   SHA (dpl_hJFvRgqzeNyjKKGb6JfKqTcJLyc3), live on snv-zeta.vercel.app.
-  **OPERATOR ACTION NEEDED: check the live /login page directly and
-  confirm the visual bug is actually resolved** -- Director's verification
-  covered code correctness and deploy status but not a live visual
-  render, since browser access wasn't available this session.**
+  **CONFIRMED by operator: logged in successfully on the live site.
+  Visual bug and the Sidebar-on-login structural issue are both resolved.**
 - **UPDATE (session 25): Church profile page SHIPPED and LIVE. Code Agent
   restyled src/app/churches/[id]/page.tsx only (commit `3a5e83f`) --
   Director verified schema first (churches has no hidden extra columns like
