@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { EngagementScoreRing } from "@/components/EngagementScoreRing";
+import { Portal } from "@/components/ui/Portal";
 
 interface ChurchEngagementScoreProps {
   churchId: string;
@@ -133,48 +134,50 @@ export function ChurchEngagementScore({ churchId, score }: ChurchEngagementScore
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 px-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-sm rounded-xl border bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex items-center justify-between border-b px-4 py-3 dark:border-zinc-800">
-              <div>
-                <h2 className="font-semibold">Engagement Score</h2>
-                <p className="text-xs text-zinc-500">{breakdown?.total ?? score}/100 total</p>
+        <Portal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 px-4" role="dialog" aria-modal="true">
+            <div className="w-full max-w-sm rounded-xl border bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex items-center justify-between border-b px-4 py-3 dark:border-zinc-800">
+                <div>
+                  <h2 className="font-semibold">Engagement Score</h2>
+                  <p className="text-xs text-zinc-500">{breakdown?.total ?? score}/100 total</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                  aria-label="Close engagement score breakdown"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-                aria-label="Close engagement score breakdown"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="p-4">
-              {loading ? (
-                <div className="flex items-center justify-center gap-2 py-8 text-sm text-zinc-500">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Loading breakdown...
-                </div>
-              ) : error ? (
-                <p className="py-6 text-center text-sm text-red-600">{error}</p>
-              ) : (
-                <div className="space-y-3">
-                  {rows.map(row => (
-                    <div key={row.label} className="flex items-start justify-between gap-4 rounded-lg border p-3 dark:border-zinc-800">
-                      <div>
-                        <p className="text-sm font-semibold">{row.label}</p>
-                        <p className="text-xs text-zinc-500">{row.fact}</p>
+              <div className="p-4">
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2 py-8 text-sm text-zinc-500">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading breakdown...
+                  </div>
+                ) : error ? (
+                  <p className="py-6 text-center text-sm text-red-600">{error}</p>
+                ) : (
+                  <div className="space-y-3">
+                    {rows.map(row => (
+                      <div key={row.label} className="flex items-start justify-between gap-4 rounded-lg border p-3 dark:border-zinc-800">
+                        <div>
+                          <p className="text-sm font-semibold">{row.label}</p>
+                          <p className="text-xs text-zinc-500">{row.fact}</p>
+                        </div>
+                        <p className="shrink-0 text-sm font-bold text-zinc-900 dark:text-zinc-50">
+                          {row.points}/{row.max}
+                        </p>
                       </div>
-                      <p className="shrink-0 text-sm font-bold text-zinc-900 dark:text-zinc-50">
-                        {row.points}/{row.max}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </Portal>
       ) : null}
     </>
   );
