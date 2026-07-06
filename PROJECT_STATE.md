@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.9 Modal fix confirmed live, Language School next`
+`snv Mission CRM — v3.0 Language School profile live, Project next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,26 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 30): Language School profile page SHIPPED and LIVE
+  (3rd of 5 profile pages done). Code Agent restyled
+  src/app/(app)/language-schools/[id]/page.tsx only (commit `1b69e61`) --
+  Director verified live schema first (language_schools has no hidden
+  extras, matches what the page already used; confirmed gifts has NO
+  language_school_id column at all, meaning -- unlike Church's real
+  "Projects Supported" -- there is no real equivalent for the mock's
+  "Project Alignment" section here, so it was correctly dropped entirely
+  rather than fabricated or force-derived). Also correctly dropped the
+  fake "Academic Health 8.2/10" score (D8 -- no engagement score for
+  schools) and fake student-count trend, and replaced the fabricated
+  "Educational Pulse" narrative with the real contact_logs timeline in
+  the mock's visual pattern. Real "Partner since" via created_at. Ran
+  `npm run build` personally -- clean. Merged to main (`071792c`),
+  pushed, Vercel MCP reachable again this session and confirmed READY on
+  the exact merge SHA (dpl_DicSkD46d3r31emNes7YbhUhzGPN), live on
+  snv-zeta.vercel.app. Next per DESIGN_SPEC.md rollout order: Project,
+  Task, and Inventory item detail profile pages remain, then forms, then
+  Login/Settings/Calendar (already done for Login; Settings/Calendar
+  still pending).**
 - **UPDATE (session 28): Engagement score modal positioning bug FIXED and
   SHIPPED (code-verified, NOT yet visually confirmed -- see gap below).
   Operator reported the score breakdown modal rendering squeezed into/
