@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v2.7 Token collision fixed, Language School profile next`
+`snv Mission CRM — v2.8 Modal fix shipped (unverified live), needs check`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,37 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 28): Engagement score modal positioning bug FIXED and
+  SHIPPED (code-verified, NOT yet visually confirmed -- see gap below).
+  Operator reported the score breakdown modal rendering squeezed into/
+  overlapping the header instead of centered on the page. Root cause
+  (identified via code inspection, confirmed by CSS spec, not guessed):
+  both ChurchEngagementScore.tsx and DonorEngagementScore.tsx render a
+  `position: fixed` modal from INSIDE their detail page's glass-card
+  header section. Per CSS spec, any ancestor with backdrop-filter (also
+  true of filter/transform/perspective/will-change) creates a new
+  containing block for fixed-positioned descendants -- so the "fixed,
+  full-screen" modal was actually contained within that header's bounding
+  box, not the viewport. Fix: new reusable src/components/ui/Portal.tsx
+  (createPortal into document.body) wraps both modals, escaping the
+  containing-block issue structurally (the DOM node becomes a direct
+  child of <body>, no glass-card ancestor exists between it and root --
+  this is deterministic by how portals work, not a probabilistic fix).
+  Director verified: diff scope correct (3 files only), both components
+  identically patched, clean build.
+  **VERIFICATION GAP, disclosed: neither Claude-in-Chrome NOR Vercel MCP
+  were reachable this session (both retried per self-healing, both
+  stayed down) -- so there is NO visual confirmation the modal actually
+  renders centered at runtime, and NO independent Vercel deploy-SHA
+  confirmation this time either. Operator also could not click-test
+  locally this session. Merged anyway given the fix mechanism is
+  structurally sound (React Portal DOM relocation, not a CSS value
+  tweak whose behavior needed empirical confirmation like the token
+  collision did) -- but this is a real, acknowledged gap, not full
+  closure. NEXT SESSION: reconnect Claude-in-Chrome and Vercel MCP:
+  (1) confirm deployed SHA matches 216b779, (2) click an engagement
+  score badge on a live Church or Donor page and confirm the modal
+  now centers properly. Merged to main (`216b779`), pushed.**
 - **UPDATE (session 27): Codebase-wide spacing/sizing token collision FIXED,
   SHIPPED, and CONFIRMED LIVE. Root cause: custom design tokens
   --spacing-sm/md/lg/xl (added in Phase 0) collided with Tailwind v4's
