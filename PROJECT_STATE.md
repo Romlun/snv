@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v3.4 Budget form live (pattern set), forms batch 1 next`
+`snv Mission CRM — v3.5 Donor forms live, Churches/LangSchools next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,21 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 35): Donor New + Edit forms SHIPPED and LIVE (forms
+  batch 1 of ~4). Code Agent restyled both files only (commit `612fce5`)
+  -- Director verified both already had real birthday/address fields from
+  an earlier session, confirmed both stayed present and functional after
+  the restyle. Applied the Budget-established pattern (boxed primitives,
+  Card+accent-stripe, centered layout) with a sensible extension: fields
+  organized into labeled sections (Contact Details / Relationship / Giving
+  Profile / Notes) -- not explicitly directed but a reasonable, consistent
+  application of the pattern. All real logic (insert/update payload,
+  recurring-donor conditional section, staff/church fetch, redirect)
+  identical to before. Ran `npm run build` -- clean. Merged to main
+  (`5d2361a`), pushed, Vercel confirmed READY on the exact merge SHA
+  (dpl_6sZRvupHL3iCCEMjLmUBbwQGreKR), live on snv-zeta.vercel.app. Next:
+  Churches + Language Schools New/Edit forms (batch 2), then Projects +
+  Tasks (batch 3), then Inventory (batch 4), then Settings/Calendar.**
 - **UPDATE (session 34): Budget New Entry form SHIPPED and LIVE -- forms
   phase started, this establishes the visual pattern for all remaining
   forms. Code Agent restyled src/app/(app)/budget/new/page.tsx only
