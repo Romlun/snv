@@ -621,18 +621,6 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
               </div>
               <div>
                 <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
-                  Organization ID
-                </p>
-                <p className="break-all text-sm font-semibold text-on-surface">{church.org_id}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
-                  Church ID
-                </p>
-                <p className="break-all text-sm font-semibold text-on-surface">{church.id}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
                   Created
                 </p>
                 <p className="text-sm font-semibold text-on-surface">

@@ -389,12 +389,6 @@ export default function TaskDetailPage({ params }: { params: Promise<{ id: strin
                 </p>
                 <p className="text-sm font-semibold capitalize text-on-surface">{task.related_to_type || "None"}</p>
               </div>
-              <div>
-                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
-                  Related ID
-                </p>
-                <p className="break-all text-sm font-semibold text-on-surface">{task.related_to_id || "None"}</p>
-              </div>
             </div>
           </Card>
 
@@ -403,18 +397,6 @@ export default function TaskDetailPage({ params }: { params: Promise<{ id: strin
               Internal Details
             </h2>
             <div className="space-y-5">
-              <div>
-                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
-                  Organization ID
-                </p>
-                <p className="break-all text-sm font-semibold text-on-surface">{task.org_id}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
-                  Task ID
-                </p>
-                <p className="break-all text-sm font-semibold text-on-surface">{task.id}</p>
-              </div>
               <div>
                 <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
                   Created
