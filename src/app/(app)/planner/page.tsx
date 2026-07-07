@@ -183,7 +183,7 @@ export default function PlannerPage() {
   const supabase = createClient();
   const [items, setItems] = useState<PlannerItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<ViewMode>("week");
+  const [view, setView] = useState<ViewMode>("day");
   const [anchorDate, setAnchorDate] = useState(() => new Date());
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [savingTask, setSavingTask] = useState(false);
