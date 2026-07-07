@@ -31,6 +31,13 @@ interface RelatedRecord {
   type: RelatedType;
 }
 
+interface ProjectPhase {
+  id: string;
+  project_id: string;
+  name: string;
+  position: number;
+}
+
 interface FormData {
   title: string;
   description: string;
@@ -40,6 +47,7 @@ interface FormData {
   status: TaskStatus;
   related_to_type: RelatedType | "";
   related_to_id: string;
+  phase_id: string;
 }
 
 const priorities: TaskPriority[] = ["Low", "Medium", "High"];
@@ -74,6 +82,7 @@ export default function NewTaskPage() {
   const [loading, setLoading] = useState(false);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [relatedRecords, setRelatedRecords] = useState<RelatedRecord[]>([]);
+  const [projectPhases, setProjectPhases] = useState<ProjectPhase[]>([]);
   const [formData, setFormData] = useState<FormData>({
     title: "",
     description: "",
@@ -83,6 +92,7 @@ export default function NewTaskPage() {
     status: "Not started",
     related_to_type: "",
     related_to_id: "",
+    phase_id: "",
   });
 
   useEffect(() => {
@@ -92,14 +102,17 @@ export default function NewTaskPage() {
         { data: donorData },
         { data: churchData },
         { data: projectData },
+        { data: phaseData },
       ] = await Promise.all([
         supabase.from("profiles").select("id, full_name, email").order("full_name"),
         supabase.from("donors").select("id, name").order("name"),
         supabase.from("churches").select("id, name").order("name"),
         supabase.from("projects").select("id, name").order("name"),
+        supabase.from("project_phases").select("id, project_id, name, position").order("position"),
       ]);
 
       setProfiles((profileData || []) as Profile[]);
+      setProjectPhases((phaseData || []) as ProjectPhase[]);
       setRelatedRecords([
         ...((donorData || []) as Array<{ id: string; name: string }>).map(row => ({
           ...row,
@@ -122,6 +135,9 @@ export default function NewTaskPage() {
   const visibleRelatedRecords = relatedRecords.filter(
     record => record.type === formData.related_to_type,
   );
+  const visibleProjectPhases = projectPhases.filter(
+    phase => phase.project_id === formData.related_to_id,
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,6 +152,10 @@ export default function NewTaskPage() {
         related_to_id:
           formData.related_to_type && formData.related_to_id
             ? formData.related_to_id
+            : null,
+        phase_id:
+          formData.related_to_type === "project" && formData.related_to_id
+            ? formData.phase_id || null
             : null,
         due_date: dueDateIsoOrNull(formData.due_date),
         priority: formData.priority,
@@ -284,6 +304,7 @@ export default function NewTaskPage() {
                         ...formData,
                         related_to_type: e.target.value as RelatedType | "",
                         related_to_id: "",
+                        phase_id: "",
                       })
                     }
                   >
@@ -305,6 +326,7 @@ export default function NewTaskPage() {
                       setFormData({
                         ...formData,
                         related_to_id: e.target.value,
+                        phase_id: "",
                       })
                     }
                   >
@@ -316,6 +338,30 @@ export default function NewTaskPage() {
                     ))}
                   </Select>
                 </div>
+                {formData.related_to_type === "project" && formData.related_to_id ? (
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-semibold text-on-surface">
+                      Phase
+                    </label>
+                    <Select
+                      variant="box"
+                      value={formData.phase_id}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          phase_id: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">No phase</option>
+                      {visibleProjectPhases.map(phase => (
+                        <option key={phase.id} value={phase.id}>
+                          {phase.name}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                ) : null}
               </div>
             </section>
 
