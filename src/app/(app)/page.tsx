@@ -44,6 +44,8 @@ function getInitials(name: string) {
 export default async function Dashboard() {
   const supabase = await createClient();
   const today = new Date().toISOString().split("T")[0];
+  const weekFromNow = new Date(Date.now() + 7 * 86400000)
+    .toISOString().split("T")[0];
   const { start: monthStart, end: monthEnd } =
     getTransactionDateRange("month");
   const lowEngagementThreshold = 40;
@@ -83,8 +85,9 @@ export default async function Dashboard() {
       .select("id, title, due_date, priority, status")
       .neq("status", "Completed")
       .neq("status", "Cancelled")
-      .order("due_date", { ascending: true, nullsFirst: false })
-      .limit(5),
+      .gt("due_date", today)
+      .lte("due_date", weekFromNow)
+      .order("due_date", { ascending: true, nullsFirst: false }),
     supabase
       .from("resource_transactions")
       .select("quantity, type, amount")
