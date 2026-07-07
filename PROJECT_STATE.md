@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v4.3 Idle, awaiting reporting requirements from team`
+`snv Mission CRM — v4.4 Building project phases + action items`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -338,6 +338,19 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   before shipping. No app code changes needed — the Inventory pages already
   read/write this column directly, so the fix took effect immediately on
   migration, no Code Agent dispatch or deploy required.
+- **D10 — Project phases are custom per project, not a fixed template
+  (session 41, operator-confirmed).** Each project defines its own stages
+  via a real `project_phases` table (name, position, status reusing the
+  existing `task_status` enum, start/end dates), not a hardcoded universal
+  sequence. Don't propose collapsing this into `projects.status` later —
+  the two are deliberately separate: `projects.status` is the whole
+  project's lifecycle, phases are its internal plan.
+- **D11 — Project action items ARE Tasks, not a second system (session 41,
+  operator-confirmed).** `tasks.phase_id` (nullable, ON DELETE SET NULL)
+  links a task to a project phase. Do not build a separate lightweight
+  checklist for this — the operator explicitly chose reuse over a second
+  system when asked. `project_staff` (team) also stays a flat list on the
+  same decision pass — no per-person roles were added.
 
 ## 6. PRECEDENTS (banked principles — apply automatically, don't re-litigate)
 - **P1 — Next 16 docs first.** Every directive touching framework code: read
@@ -566,6 +579,39 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **NEW (session 41 cont'd x3): Project profile rebuild — phases + action
+  items.** Operator wants the Project profile genuinely useful for planning
+  and implementation, not just funding tracking. Director read the full
+  current Projects detail page first: it already has funding tracking and a
+  flat "Assigned Staff" list (`project_staff`), but NO phase concept and —
+  the real gap — Tasks linked to a project via `related_to_id` are already
+  in the system but completely invisible on the project's own page.
+  Scoped with 3 grounded questions (all recommended options confirmed):
+  1. **Phases are custom per project**, not a fixed template — each
+     project defines its own stages.
+  2. **Action items reuse the existing `tasks` table** — no second task
+     system. A task can optionally belong to a phase.
+  3. **Team stays the flat `project_staff` list** — no roles added.
+  Schema built and verified live this session (see standing decisions D10,
+  D11 below for the shape): new `project_phases` table + `tasks.phase_id`
+  (nullable, ON DELETE SET NULL). Ran a full disposable insert → cascade →
+  set-null test cycle before considering it done, not just "migration
+  applied." `database.ts` regenerated and committed to the feature branch
+  as its own clean commit (`870a6b8`) — same pattern as Phase 0: schema
+  reflection separate from the UI commit that will build on it, so the
+  branch never sits on a broken intermediate build.
+  **UI directive dispatched, not yet built**: adds a "Phases & Action
+  Items" section to the Project detail page (phase cards with status/dates,
+  each listing its tasks, inline "+ Add Phase" and "+ Add Action Item"
+  mini-forms mirroring the existing "Add Funds" toggle pattern already on
+  that page), plus a Phase selector on the Tasks New/Edit forms that only
+  appears when related_to_type is "project", populated from that project's
+  phases. Assumption stated to the operator, not re-confirmed as a separate
+  question: the "Add Action Item" mini-form's assignee dropdown uses the
+  project's own `project_staff` list (already fetched on that page) rather
+  than the full org staff list, and is a lightweight title/assignee/due-date
+  form, not the full Task form — full editing still available via the
+  task's own page.
 - **UPDATE (session 41 cont'd x2): Raw ID cleanup shipped and verified
   live.** Operator flagged the raw Organization ID / Church ID UUIDs
   rendering on entity detail pages as bad UI. Director scoped it precisely
