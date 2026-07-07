@@ -20,9 +20,9 @@ type DonorUpdate = Database["public"]["Tables"]["donors"]["Update"] & {
   birthday?: string | null;
   address?: string | null;
 };
-type DonorStage = Database["public"]["Tables"]["donors"]["Row"]["stage"];
+type DonorStage = NonNullable<Database["public"]["Tables"]["donors"]["Row"]["stage"]>;
 type RelationshipStatus =
-  Database["public"]["Tables"]["donors"]["Row"]["relationship_status"];
+  NonNullable<Database["public"]["Tables"]["donors"]["Row"]["relationship_status"]>;
 type RecurringCadence = "monthly" | "quarterly";
 
 interface FormData {
@@ -89,11 +89,11 @@ export default function EditDonorPage({
           phone: donorData.phone || "",
           birthday: donorData.birthday || "",
           address: donorData.address || "",
-          stage: donorData.stage,
-          relationship_status: donorData.relationship_status,
+          stage: donorData.stage ?? "New contact",
+          relationship_status: donorData.relationship_status ?? "Steady",
           assigned_staff_id: donorData.assigned_staff_id || "",
           church_id: donorData.church_id || "",
-          is_recurring: donorData.is_recurring,
+          is_recurring: donorData.is_recurring ?? false,
           recurring_amount: donorData.recurring_amount
             ? String(donorData.recurring_amount)
             : "",

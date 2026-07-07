@@ -361,7 +361,7 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
     },
     {
       label: "Relationship",
-      value: church.relationship_status,
+      value: church.relationship_status ?? "Steady",
       detail: "Current partnership status",
     },
   ];
@@ -389,7 +389,7 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
                   <RelationshipStatusSelect
                     id={church.id}
                     table="churches"
-                    value={church.relationship_status}
+                    value={church.relationship_status ?? "Steady"}
                     onSaved={relationship_status => setChurch(prev => prev ? { ...prev, relationship_status } : prev)}
                   />
                 </div>
@@ -432,7 +432,7 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
                 Based on recent activity
               </p>
             </div>
-            <ChurchEngagementScore churchId={church.id} score={church.engagement_score} />
+            <ChurchEngagementScore churchId={church.id} score={church.engagement_score ?? 0} />
           </div>
         </div>
       </section>
@@ -636,7 +636,7 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
                   Created
                 </p>
                 <p className="text-sm font-semibold text-on-surface">
-                  {new Date(church.created_at).toLocaleString()}
+                  {church.created_at ? new Date(church.created_at).toLocaleString() : "Not recorded"}
                 </p>
               </div>
               <div>
@@ -644,7 +644,7 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
                   Updated
                 </p>
                 <p className="text-sm font-semibold text-on-surface">
-                  {new Date(church.updated_at).toLocaleString()}
+                  {church.updated_at ? new Date(church.updated_at).toLocaleString() : "Not recorded"}
                 </p>
               </div>
             </div>

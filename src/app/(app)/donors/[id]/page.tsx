@@ -339,7 +339,7 @@ export default function DonorDetailPage({
     },
     {
       label: "Engagement Score",
-      value: `${donor.engagement_score}/100`,
+      value: `${donor.engagement_score ?? 0}/100`,
       detail: "Based on real activity",
     },
     {
@@ -373,11 +373,11 @@ export default function DonorDetailPage({
             <div className="space-y-3">
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="info">{donor.stage}</Badge>
+                  <Badge variant="info">{donor.stage ?? "New contact"}</Badge>
                   <RelationshipStatusSelect
                     id={donor.id}
                     table="donors"
-                    value={donor.relationship_status}
+                    value={donor.relationship_status ?? "Steady"}
                     onSaved={(relationship_status) =>
                       setDonor((prev) =>
                         prev ? { ...prev, relationship_status } : prev,
@@ -426,7 +426,7 @@ export default function DonorDetailPage({
             </div>
             <DonorEngagementScore
               donorId={donor.id}
-              score={donor.engagement_score}
+              score={donor.engagement_score ?? 0}
             />
           </div>
         </div>

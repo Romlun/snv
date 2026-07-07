@@ -211,7 +211,7 @@ export default function DonorsPage() {
                       <RelationshipStatusSelect
                         id={donor.id}
                         table="donors"
-                        value={donor.relationship_status}
+                        value={donor.relationship_status ?? "Steady"}
                         onSaved={(relationship_status) =>
                           setDonors((prev) =>
                             prev.map((row) =>
@@ -226,7 +226,7 @@ export default function DonorsPage() {
                     <td className="px-6 py-4 text-center">
                       <DonorEngagementScore
                         donorId={donor.id}
-                        score={donor.engagement_score}
+                        score={donor.engagement_score ?? 0}
                       />
                     </td>
                     <td className="px-6 py-4 text-right font-semibold tabular-nums text-on-surface">
