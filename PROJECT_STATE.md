@@ -250,18 +250,23 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   mention it doesn't have).
 
 **What's NOT built yet, in priority order:**
-1. **Real-time team communication (session 16, new roadmap item)** — operator
-   wants this scoped for a NEXT PHASE, not now. Direction is decided: real-time
-   chat (not just a discussion thread), because the team is distributed
-   across the US and needs live back-and-forth, not just async updates.
-   Starting point for a project discussion thread already exists cheaply
-   (the `notes` table already supports any `entity_type`, including
-   `'project'` — that gets a discussion log almost for free, same pattern as
-   Donors/Churches/Schools/Tasks). Real-time delivery (live updates without
-   refresh) is a genuinely different piece of infrastructure than anything
-   built so far in this request/response app — needs its own design pass
-   before building, not a quick directive. Don't build this reactively.
-2. **Reporting, AI features** — later phases, not yet scoped in detail.
+1. **Reporting, AI features (REORDERED to front, session 41)** — operator
+   explicitly postponed real-time chat and chose to scope this first
+   instead. Not yet scoped in detail as of this note; scoping conversation
+   in progress — see the in-flight log for whatever was decided.
+2. **Real-time team communication (session 16, new roadmap item)** —
+   POSTPONED (session 41, operator's explicit choice, not a mistake/stuck
+   situation — don't second-guess this later without asking). Direction
+   was already decided before the postponement: real-time chat (not just a
+   discussion thread), because the team is distributed across the US and
+   needs live back-and-forth, not just async updates. Starting point for a
+   project discussion thread already exists cheaply (the `notes` table
+   already supports any `entity_type`, including `'project'` — that gets a
+   discussion log almost for free, same pattern as Donors/Churches/
+   Schools/Tasks). Real-time delivery (live updates without refresh) is a
+   genuinely different piece of infrastructure than anything built so far
+   in this request/response app — needs its own design pass before
+   building, not a quick directive. Don't build this reactively.
 3. **Deferred polish/design pass** — after functional work settles. Candidate tool:
    Stitch (Google AI UI-design MCP) — see §9 for the security caveat on its key.
 
