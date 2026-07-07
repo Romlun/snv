@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v4.5 Project phases + action items shipped`
+`snv Mission CRM — v4.6 Planner shipped, dashboard attention window fixed`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -579,6 +579,35 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 41 cont'd x5): Dashboard 7-day bound + new Planner
+  page SHIPPED and verified live — but landed differently than usual.**
+  Both commits (`af79047` bound-Upcoming-to-7-days, `88084a2` new Planner
+  page) were pushed directly to `main` on GitHub before Director got to
+  review them — found already at HEAD of local `main` with
+  `origin/main` == local `main`, not as an unpushed local commit like every
+  prior round. Nothing about the commits themselves was concerning (correct
+  authorship, content matched the dispatched directives exactly, both
+  already auto-deployed and READY on Vercel before verification started),
+  but this bypasses the normal "Director verifies, then merges" gate. Not
+  treated as an unrecognized/injected commit (see DIRECTOR SWAP guidance) —
+  this is clearly the same session's expected work, just pushed by a
+  different path. Flagging so a future session notices if this becomes the
+  new norm rather than a one-off: worth asking the operator whether pushes
+  to main should go back through Director, or whether direct pushes are now
+  fine given Codex apparently has push access this session.
+  Verified anyway, after the fact: read both diffs in full (574 + 2
+  insertions across planner/page.tsx + Sidebar.tsx, dashboard fix was a
+  clean 2-line query change), `npx tsc --noEmit` and `npm run build` both
+  clean, confirmed via a real (non-disposable) query that the operator's
+  own account already has 3 active tasks + 1 donor follow-up that will
+  populate the new Planner immediately. Confirmed READY on Vercel for both
+  exact SHAs (dpl_796Y7GAAR3whghkdjxX5ovEcEWrY, dpl_EeMrxWse5q2zpnjD7D6iPFJf9yTM).
+  Planner reuses the exact ReminderItem-style unification pattern already
+  on the Dashboard (own tasks + own assigned donor/church/language-school
+  follow-ups), date-fns for all day/week/month/quarter range math, a
+  quick-add for personal tasks, own-work-only (no admin-views-others
+  capability, per operator's choice), new Sidebar entry (desktop only,
+  mobile bottom nav's curated 4 items deliberately untouched).
 - **UPDATE (session 41 cont'd x4): Project profile rebuild SHIPPED and
   verified live.** Code Agent delivered all 3 files as one commit
   (`19239f3` on the feature branch, again found as a local unpushed commit
