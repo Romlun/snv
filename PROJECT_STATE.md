@@ -556,6 +556,22 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 41 cont'd x2): Raw ID cleanup shipped and verified
+  live.** Operator flagged the raw Organization ID / Church ID UUIDs
+  rendering on entity detail pages as bad UI. Director scoped it precisely
+  before drafting anything: grepped for the exact pattern across the whole
+  app, found 9 occurrences across exactly 4 files (Churches, Projects,
+  Language Schools, Tasks) — Donors and Inventory never had this footer at
+  all, so removing it makes all 6 entity pages consistent rather than
+  inconsistent. Presented 3 real options (remove / shorten+copy / add real
+  friendly IDs) with a recommendation; operator chose remove. Code Agent
+  delivered a 4-file, 54-line-deletion-only commit (`7ecccfd` on the feature
+  branch, again found as a local unpushed commit, again read in full before
+  trusting the bare "done") — diff matched the directive exactly, including
+  correctly leaving Tasks' "Linked Record" and "Related Type" fields alone.
+  `npx tsc --noEmit` and `npm run build` both clean. Merged to main
+  (`f431ffd`), confirmed READY on that exact SHA
+  (dpl_518c51BgWYEjuUuq5xGxBLoDGkaQ) via Vercel.
 - **UPDATE (session 41 cont'd): Phase 0 hygiene pass COMPLETE — all 4 items
   shipped and verified live.** Code Agent (Codex) delivered items 3+4 as one
   commit on the feature branch (`39dd431`) — did NOT push it themselves (per
