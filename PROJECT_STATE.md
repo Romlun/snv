@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v4.2 Phase 0 complete, choosing next phase`
+`snv Mission CRM — v4.3 Idle, awaiting reporting requirements from team`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -252,8 +252,13 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
 **What's NOT built yet, in priority order:**
 1. **Reporting, AI features (REORDERED to front, session 41)** — operator
    explicitly postponed real-time chat and chose to scope this first
-   instead. Not yet scoped in detail as of this note; scoping conversation
-   in progress — see the in-flight log for whatever was decided.
+   instead, then PAUSED the scoping conversation itself (same session):
+   operator is waiting on input from the team/workers on what reporting
+   they actually need before deciding anything further. Director asked two
+   grounded scoping questions (which reports matter, what "AI" should mean)
+   but got no answer to either — operator wants to gather real input first.
+   Do NOT re-raise or re-ask these scoping questions next session; wait for
+   the operator to bring back what the team said.
 2. **Real-time team communication (session 16, new roadmap item)** —
    POSTPONED (session 41, operator's explicit choice, not a mistake/stuck
    situation — don't second-guess this later without asking). Direction
