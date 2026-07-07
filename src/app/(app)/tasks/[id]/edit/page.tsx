@@ -6,10 +6,18 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import DateField from "@/components/DateField";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input, Select, Textarea } from "@/components/ui/Input";
 
-type TaskStatus = 'Not started' | 'In progress' | 'Waiting' | 'Completed' | 'Cancelled';
-type TaskPriority = 'Low' | 'Medium' | 'High';
-type RelatedType = 'donor' | 'church' | 'project';
+type TaskStatus =
+  | "Not started"
+  | "In progress"
+  | "Waiting"
+  | "Completed"
+  | "Cancelled";
+type TaskPriority = "Low" | "Medium" | "High";
+type RelatedType = "donor" | "church" | "project";
 
 interface Profile {
   id: string;
@@ -34,15 +42,25 @@ interface FormData {
   related_to_id: string;
 }
 
-const priorities: TaskPriority[] = ['Low', 'Medium', 'High'];
-const taskStatuses: TaskStatus[] = ['Not started', 'In progress', 'Waiting', 'Completed', 'Cancelled'];
+const priorities: TaskPriority[] = ["Low", "Medium", "High"];
+const taskStatuses: TaskStatus[] = [
+  "Not started",
+  "In progress",
+  "Waiting",
+  "Completed",
+  "Cancelled",
+];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function validDateOrNull(value: string) {
   if (!DATE_RE.test(value)) return null;
   const [year, month, day] = value.split("-").map(Number);
   const date = new Date(Date.UTC(year, month - 1, day));
-  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? value : null;
+  return date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+    ? value
+    : null;
 }
 
 function dueDateIsoOrNull(value: string) {
@@ -54,7 +72,11 @@ function toDateInputValue(value: string | null) {
   return value?.match(DATE_RE)?.[0] || "";
 }
 
-export default function EditTaskPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditTaskPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const router = useRouter();
   const supabase = createClient();
@@ -76,19 +98,34 @@ export default function EditTaskPage({ params }: { params: Promise<{ id: string 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [{ data: taskData }, { data: profileData }, { data: donorData }, { data: churchData }, { data: projectData }] = await Promise.all([
-          supabase.from('tasks').select('*').eq('id', id).single(),
-          supabase.from('profiles').select('id, full_name, email').order('full_name'),
-          supabase.from('donors').select('id, name').order('name'),
-          supabase.from('churches').select('id, name').order('name'),
-          supabase.from('projects').select('id, name').order('name'),
+        const [
+          { data: taskData },
+          { data: profileData },
+          { data: donorData },
+          { data: churchData },
+          { data: projectData },
+        ] = await Promise.all([
+          supabase.from("tasks").select("*").eq("id", id).single(),
+          supabase.from("profiles").select("id, full_name, email").order("full_name"),
+          supabase.from("donors").select("id, name").order("name"),
+          supabase.from("churches").select("id, name").order("name"),
+          supabase.from("projects").select("id, name").order("name"),
         ]);
 
         setProfiles((profileData || []) as Profile[]);
         setRelatedRecords([
-          ...((donorData || []) as Array<{ id: string; name: string }>).map(row => ({ ...row, type: 'donor' as const })),
-          ...((churchData || []) as Array<{ id: string; name: string }>).map(row => ({ ...row, type: 'church' as const })),
-          ...((projectData || []) as Array<{ id: string; name: string }>).map(row => ({ ...row, type: 'project' as const })),
+          ...((donorData || []) as Array<{ id: string; name: string }>).map(row => ({
+            ...row,
+            type: "donor" as const,
+          })),
+          ...((churchData || []) as Array<{ id: string; name: string }>).map(row => ({
+            ...row,
+            type: "church" as const,
+          })),
+          ...((projectData || []) as Array<{ id: string; name: string }>).map(row => ({
+            ...row,
+            type: "project" as const,
+          })),
         ]);
 
         if (taskData) {
@@ -113,24 +150,33 @@ export default function EditTaskPage({ params }: { params: Promise<{ id: string 
     fetchData();
   }, [id, supabase]);
 
-  const visibleRelatedRecords = relatedRecords.filter(record => record.type === formData.related_to_type);
+  const visibleRelatedRecords = relatedRecords.filter(
+    record => record.type === formData.related_to_type,
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await supabase.from('tasks').update({
-        title: formData.title,
-        description: formData.description || null,
-        assigned_to: formData.assigned_to || null,
-        related_to_type: formData.related_to_type || null,
-        related_to_id: formData.related_to_type && formData.related_to_id ? formData.related_to_id : null,
-        due_date: dueDateIsoOrNull(formData.due_date),
-        priority: formData.priority,
-        status: formData.status,
-        completed_date: formData.status === 'Completed' ? new Date().toISOString() : null,
-      }).eq('id', id);
+      const { error } = await supabase
+        .from("tasks")
+        .update({
+          title: formData.title,
+          description: formData.description || null,
+          assigned_to: formData.assigned_to || null,
+          related_to_type: formData.related_to_type || null,
+          related_to_id:
+            formData.related_to_type && formData.related_to_id
+              ? formData.related_to_id
+              : null,
+          due_date: dueDateIsoOrNull(formData.due_date),
+          priority: formData.priority,
+          status: formData.status,
+          completed_date:
+            formData.status === "Completed" ? new Date().toISOString() : null,
+        })
+        .eq("id", id);
 
       if (error) throw error;
       router.push(`/tasks/${id}`);
@@ -145,123 +191,215 @@ export default function EditTaskPage({ params }: { params: Promise<{ id: string 
 
   if (fetching) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-        <p className="mt-4 text-zinc-500">Loading task data...</p>
-      </div>
+      <Card className="flex flex-col items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="mt-4 text-on-surface-variant">Loading task data...</p>
+      </Card>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <Link href={`/tasks/${id}`} className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50">
+    <div className="mx-auto max-w-2xl space-y-gutter">
+      <Link
+        href={`/tasks/${id}`}
+        className="inline-flex items-center gap-2 text-sm font-semibold text-on-surface-variant transition-colors hover:text-primary"
+      >
         <ArrowLeft className="h-4 w-4" />
         Back to Task
       </Link>
 
-      <div className="bg-white border rounded-xl p-8 dark:bg-zinc-900 dark:border-zinc-800">
-        <h1 className="text-2xl font-bold mb-6">Edit Task</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Title</label>
-            <input
-              required
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.title}
-              onChange={e => setFormData({ ...formData, title: e.target.value })}
-            />
+      <Card padding="lg" className="relative overflow-hidden">
+        <div className="absolute inset-y-0 left-0 w-1.5 bg-primary-container" />
+        <div className="pl-2">
+          <div className="mb-8">
+            <h1 className="font-headline text-headline-lg font-semibold text-on-surface">
+              Edit Task
+            </h1>
+            <p className="mt-2 text-sm text-on-surface-variant">
+              Update the work, owner, timing, and related record.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Assigned To</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.assigned_to}
-                onChange={e => setFormData({ ...formData, assigned_to: e.target.value })}
-              >
-                <option value="">Unassigned</option>
-                {profiles.map(profile => (
-                  <option key={profile.id} value={profile.id}>{profile.full_name || profile.email}</option>
-                ))}
-              </select>
-            </div>
-            <DateField
-              label="Due Date"
-              value={formData.due_date}
-              onChange={val => setFormData({ ...formData, due_date: val })}
-            />
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Priority</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.priority}
-                onChange={e => setFormData({ ...formData, priority: e.target.value as TaskPriority })}
-              >
-                {priorities.map(priority => (
-                  <option key={priority} value={priority}>{priority}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.status}
-                onChange={e => setFormData({ ...formData, status: e.target.value as TaskStatus })}
-              >
-                {taskStatuses.map(status => (
-                  <option key={status} value={status}>{status}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Related Type</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.related_to_type}
-                onChange={e => setFormData({ ...formData, related_to_type: e.target.value as RelatedType | "", related_to_id: "" })}
-              >
-                <option value="">None</option>
-                <option value="donor">Donor</option>
-                <option value="church">Church</option>
-                <option value="project">Project</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Related Record</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.related_to_id}
-                disabled={!formData.related_to_type}
-                onChange={e => setFormData({ ...formData, related_to_id: e.target.value })}
-              >
-                <option value="">None</option>
-                {visibleRelatedRecords.map(record => (
-                  <option key={record.id} value={record.id}>{record.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <section className="space-y-4">
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">
+                  Task Details
+                </h2>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">
+                  Title
+                </label>
+                <Input
+                  required
+                  variant="box"
+                  value={formData.title}
+                  onChange={e =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Assigned To
+                  </label>
+                  <Select
+                    variant="box"
+                    value={formData.assigned_to}
+                    onChange={e =>
+                      setFormData({ ...formData, assigned_to: e.target.value })
+                    }
+                  >
+                    <option value="">Unassigned</option>
+                    {profiles.map(profile => (
+                      <option key={profile.id} value={profile.id}>
+                        {profile.full_name || profile.email}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                <DateField
+                  label="Due Date"
+                  value={formData.due_date}
+                  onChange={val => setFormData({ ...formData, due_date: val })}
+                />
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Priority
+                  </label>
+                  <Select
+                    variant="box"
+                    value={formData.priority}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        priority: e.target.value as TaskPriority,
+                      })
+                    }
+                  >
+                    {priorities.map(priority => (
+                      <option key={priority} value={priority}>
+                        {priority}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Status
+                  </label>
+                  <Select
+                    variant="box"
+                    value={formData.status}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        status: e.target.value as TaskStatus,
+                      })
+                    }
+                  >
+                    {taskStatuses.map(status => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+            </section>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Description</label>
-            <textarea
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-24"
-              value={formData.description}
-              onChange={e => setFormData({ ...formData, description: e.target.value })}
-            />
-          </div>
+            <section className="space-y-4">
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">
+                  Related Record
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Related Type
+                  </label>
+                  <Select
+                    variant="box"
+                    value={formData.related_to_type}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        related_to_type: e.target.value as RelatedType | "",
+                        related_to_id: "",
+                      })
+                    }
+                  >
+                    <option value="">None</option>
+                    <option value="donor">Donor</option>
+                    <option value="church">Church</option>
+                    <option value="project">Project</option>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Related Record
+                  </label>
+                  <Select
+                    variant="box"
+                    value={formData.related_to_id}
+                    disabled={!formData.related_to_type}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        related_to_id: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">None</option>
+                    {visibleRelatedRecords.map(record => (
+                      <option key={record.id} value={record.id}>
+                        {record.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+            </section>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center"
-          >
-            {loading ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : "Save Changes"}
-          </button>
-        </form>
-      </div>
+            <section className="space-y-4">
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">
+                  Notes
+                </h2>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">
+                  Description
+                </label>
+                <Textarea
+                  variant="box"
+                  value={formData.description}
+                  onChange={e =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                />
+              </div>
+            </section>
+
+            <div className="flex flex-col items-center gap-4 border-t border-outline-variant/20 pt-6">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full md:w-auto md:min-w-60"
+              >
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </Card>
     </div>
   );
 }
