@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v3.9 Calendar live, Settings is the last page`
+`snv Mission CRM — v4.0 Design rollout complete, ready for next phase`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,7 +555,36 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
-- **UPDATE (session 39): Calendar page SHIPPED and LIVE. Code Agent
+- **UPDATE (session 40): Settings page SHIPPED and LIVE --
+  ENTIRE DESIGN ROLLOUT COMPLETE.** Code Agent restyled
+  src/app/(app)/settings/page.tsx only (commit `f0d9206`) -- Director gave
+  this page extra scrutiny given it touches auth/roles (password change,
+  team member add/delete, role assignment, password reset) with no
+  dedicated mock to extrapolate from. Verified line-by-line that every
+  handler function (handleSubmit, handleChangePassword, handleRoleChange,
+  handleDeleteMember, handleResetPassword) is byte-for-byte identical to
+  the pre-restyle version -- zero logic drift on a sensitive page. Ran
+  `npm run build` -- clean. Same recurring stale-PROJECT_STATE.md
+  checkpoint pattern occurred a third time (109 lines) -- caught and
+  self-resolved the same proven way (checked main's real copy via
+  `git show`, verified again post-merge). Merged to main (`6e370fe`),
+  pushed, confirmed READY on the exact merge SHA
+  (dpl_8ajWTxrammWEaEtUiAPGGJo4xH4i) via list_deployments, live on
+  snv-zeta.vercel.app.
+  **THE SOFT LUMINOUS DESIGN ROLLOUT IS FULLY COMPLETE: foundations
+  (tokens/fonts/primitives/Sidebar/mobile nav), all 7 list pages, all 5
+  profile/detail pages, all forms (13 files), Login (plus a real
+  structural bug fix), Calendar, and Settings. Two genuinely new real
+  features were added along the way with operator approval: Task Action
+  Items checklist (new schema) and Project staff multi-select (new
+  schema-backed UI). Two real production bugs were found and fixed:
+  the spacing/sizing token collision (login pill bug + 3 other silent
+  spots) and the engagement-score modal backdrop-filter containing-block
+  bug (fixed proactively on Calendar before it could recur a third time).
+  One standing open item: donors.card_expiry is still unverified/
+  unaddressed (flagged session 24, needs operator attention). This is a
+  clean, natural point for a Director swap -- operator has indicated
+  they will start a fresh chat next.** Code Agent
   restyled src/app/(app)/calendar/page.tsx only (commit `bc7254d`) --
   Director proactively directed the day-detail modal to be wrapped in the
   existing Portal component BEFORE dispatching, since the mock's calendar
