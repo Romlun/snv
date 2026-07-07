@@ -18,11 +18,13 @@ import {
   Plus,
   Tags,
   Target,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type ProjectStatus = 'Idea' | 'Planning' | 'Active' | 'Waiting' | 'Completed' | 'Cancelled';
+type TaskStatus = "Not started" | "In progress" | "Waiting" | "Completed" | "Cancelled";
 type BadgeVariant = 'neutral' | 'primary' | 'success' | 'warning' | 'error' | 'info';
 
 interface Project {
@@ -88,12 +90,44 @@ interface Contribution {
   donorName: string | null;
 }
 
+interface ProjectPhase {
+  id: string;
+  project_id: string;
+  name: string;
+  status: TaskStatus;
+  start_date: string | null;
+  end_date: string | null;
+  position: number;
+}
+
+interface ProjectTask {
+  id: string;
+  title: string;
+  assigned_to: string | null;
+  due_date: string | null;
+  status: TaskStatus | null;
+  phase_id: string | null;
+}
+
 interface AddFundsFormData {
   amount: string;
   donor_id: string;
   gift_date: string;
   method: string;
   notes: string;
+}
+
+interface PhaseFormData {
+  name: string;
+  status: TaskStatus;
+  start_date: string;
+  end_date: string;
+}
+
+interface ActionItemFormData {
+  title: string;
+  assigned_to: string;
+  due_date: string;
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -106,6 +140,22 @@ const STATUS_BADGE_VARIANT: Record<ProjectStatus, BadgeVariant> = {
   Completed: "primary",
   Cancelled: "error",
 };
+
+const PHASE_STATUS_BADGE_VARIANT: Record<TaskStatus, BadgeVariant> = {
+  "Not started": "neutral",
+  "In progress": "info",
+  Waiting: "warning",
+  Completed: "success",
+  Cancelled: "error",
+};
+
+const phaseStatuses: TaskStatus[] = [
+  "Not started",
+  "In progress",
+  "Waiting",
+  "Completed",
+  "Cancelled",
+];
 
 function getFundingPercent(project: Project) {
   if (!project.budget_needed) return 0;
@@ -158,6 +208,23 @@ function formatMoney(value: number | null | undefined) {
   });
 }
 
+function emptyPhaseForm(): PhaseFormData {
+  return {
+    name: "",
+    status: "Not started",
+    start_date: "",
+    end_date: "",
+  };
+}
+
+function emptyActionItemForm(): ActionItemFormData {
+  return {
+    title: "",
+    assigned_to: "",
+    due_date: "",
+  };
+}
+
 function daysActive(project: Project) {
   const raw = project.start_date || project.created_at;
   const start = DATE_RE.test(raw) ? new Date(`${raw}T00:00:00`) : new Date(raw);
@@ -175,8 +242,17 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const [budgetEntries, setBudgetEntries] = useState<BudgetEntry[]>([]);
   const [donors, setDonors] = useState<Donor[]>([]);
   const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [phases, setPhases] = useState<ProjectPhase[]>([]);
+  const [projectTasks, setProjectTasks] = useState<ProjectTask[]>([]);
   const [showAddFunds, setShowAddFunds] = useState(false);
   const [addingFunds, setAddingFunds] = useState(false);
+  const [showAddPhase, setShowAddPhase] = useState(false);
+  const [savingPhase, setSavingPhase] = useState(false);
+  const [editingPhaseId, setEditingPhaseId] = useState<string | null>(null);
+  const [phaseForm, setPhaseForm] = useState<PhaseFormData>(emptyPhaseForm());
+  const [actionItemPhaseId, setActionItemPhaseId] = useState<string | null>(null);
+  const [savingActionItem, setSavingActionItem] = useState(false);
+  const [actionItemForm, setActionItemForm] = useState<ActionItemFormData>(emptyActionItemForm());
   const [fundForm, setFundForm] = useState<AddFundsFormData>({
     amount: "",
     donor_id: "",
@@ -243,6 +319,21 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         donorName: getDonorName(gift.donors),
       })));
 
+      const { data: phaseData } = await supabase
+        .from('project_phases')
+        .select('id, project_id, name, status, start_date, end_date, position')
+        .eq('project_id', id)
+        .order('position', { ascending: true });
+      setPhases((phaseData || []) as ProjectPhase[]);
+
+      const { data: taskData } = await supabase
+        .from('tasks')
+        .select('id, title, assigned_to, due_date, status, phase_id')
+        .eq('related_to_type', 'project')
+        .eq('related_to_id', id)
+        .order('due_date', { ascending: true, nullsFirst: false });
+      setProjectTasks((taskData || []) as ProjectTask[]);
+
     } catch (err) {
       console.error(err);
     } finally {
@@ -295,6 +386,119 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     }
   };
 
+  const handleAddPhase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingPhase(true);
+
+    try {
+      const { error } = await supabase.from('project_phases').insert({
+        project_id: id,
+        name: phaseForm.name,
+        status: phaseForm.status,
+        start_date: validDateOrNull(phaseForm.start_date),
+        end_date: validDateOrNull(phaseForm.end_date),
+        position: phases.length,
+      });
+
+      if (error) throw error;
+
+      await fetchProjectData();
+      setPhaseForm(emptyPhaseForm());
+      setShowAddPhase(false);
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "Error adding phase");
+    } finally {
+      setSavingPhase(false);
+    }
+  };
+
+  const startEditingPhase = (phase: ProjectPhase) => {
+    setEditingPhaseId(phase.id);
+    setPhaseForm({
+      name: phase.name,
+      status: phase.status,
+      start_date: phase.start_date || "",
+      end_date: phase.end_date || "",
+    });
+  };
+
+  const handleUpdatePhase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPhaseId) return;
+    setSavingPhase(true);
+
+    try {
+      const { error } = await supabase
+        .from('project_phases')
+        .update({
+          name: phaseForm.name,
+          status: phaseForm.status,
+          start_date: validDateOrNull(phaseForm.start_date),
+          end_date: validDateOrNull(phaseForm.end_date),
+        })
+        .eq('id', editingPhaseId);
+
+      if (error) throw error;
+
+      await fetchProjectData();
+      setEditingPhaseId(null);
+      setPhaseForm(emptyPhaseForm());
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "Error updating phase");
+    } finally {
+      setSavingPhase(false);
+    }
+  };
+
+  const handleDeletePhase = async (phaseId: string) => {
+    if (!window.confirm("Delete this phase? Existing tasks will move to No Phase.")) return;
+
+    try {
+      const { error } = await supabase.from('project_phases').delete().eq('id', phaseId);
+      if (error) throw error;
+      await fetchProjectData();
+      if (editingPhaseId === phaseId) {
+        setEditingPhaseId(null);
+        setPhaseForm(emptyPhaseForm());
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "Error deleting phase");
+    }
+  };
+
+  const handleAddActionItem = async (e: React.FormEvent, phaseId: string) => {
+    e.preventDefault();
+    setSavingActionItem(true);
+
+    try {
+      const dueDate = validDateOrNull(actionItemForm.due_date);
+      const { error } = await supabase.from('tasks').insert({
+        title: actionItemForm.title,
+        assigned_to: actionItemForm.assigned_to || null,
+        due_date: dueDate ? new Date(dueDate).toISOString() : null,
+        phase_id: phaseId,
+        related_to_type: 'project',
+        related_to_id: id,
+        status: 'Not started',
+        priority: 'Medium',
+      });
+
+      if (error) throw error;
+
+      await fetchProjectData();
+      setActionItemForm(emptyActionItemForm());
+      setActionItemPhaseId(null);
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "Error adding action item");
+    } finally {
+      setSavingActionItem(false);
+    }
+  };
+
   if (loading) {
     return (
       <Card className="flex flex-col items-center justify-center py-20">
@@ -309,6 +513,16 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const fundingPercent = getFundingPercent(project);
+  const tasksByPhase = new Map<string, ProjectTask[]>();
+  projectTasks.forEach(task => {
+    if (!task.phase_id) return;
+    const existing = tasksByPhase.get(task.phase_id) || [];
+    existing.push(task);
+    tasksByPhase.set(task.phase_id, existing);
+  });
+  const unphasedTasks = projectTasks.filter(task => !task.phase_id);
+  const getAssigneeName = (assignedTo: string | null) =>
+    assignedStaff.find(person => person.id === assignedTo)?.name || null;
 
   return (
     <div className="space-y-gutter">
@@ -560,6 +774,351 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         </aside>
 
         <main className="space-y-gutter lg:col-span-2">
+          <Card padding="none" className="overflow-hidden">
+            <Card.Header>
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">
+                  Phases & Action Items
+                </h2>
+                <p className="text-sm text-on-surface-variant">
+                  Plan the project in custom phases and track related tasks.
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                icon={Plus}
+                onClick={() => {
+                  setShowAddPhase(value => !value);
+                  setEditingPhaseId(null);
+                  setPhaseForm(emptyPhaseForm());
+                }}
+              >
+                Add Phase
+              </Button>
+            </Card.Header>
+            <Card.Body>
+              {showAddPhase ? (
+                <form
+                  onSubmit={handleAddPhase}
+                  className="mb-5 grid grid-cols-1 gap-4 rounded-xl border border-outline-variant/15 bg-white/45 p-4 md:grid-cols-2"
+                >
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-semibold text-on-surface">Name</label>
+                    <Input
+                      required
+                      variant="box"
+                      value={phaseForm.name}
+                      onChange={e => setPhaseForm({ ...phaseForm, name: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-on-surface">Status</label>
+                    <Select
+                      variant="box"
+                      value={phaseForm.status}
+                      onChange={e => setPhaseForm({ ...phaseForm, status: e.target.value as TaskStatus })}
+                    >
+                      {phaseStatuses.map(status => (
+                        <option key={status} value={status}>{status}</option>
+                      ))}
+                    </Select>
+                  </div>
+                  <DateField
+                    label="Start Date"
+                    value={phaseForm.start_date}
+                    onChange={val => setPhaseForm({ ...phaseForm, start_date: val })}
+                  />
+                  <DateField
+                    label="End Date"
+                    value={phaseForm.end_date}
+                    onChange={val => setPhaseForm({ ...phaseForm, end_date: val })}
+                  />
+                  <div className="flex flex-col gap-3 md:col-span-2 sm:flex-row">
+                    <Button type="submit" disabled={savingPhase}>
+                      {savingPhase ? "Saving..." : "Save Phase"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => {
+                        setShowAddPhase(false);
+                        setPhaseForm(emptyPhaseForm());
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              ) : null}
+
+              {phases.length > 0 ? (
+                <div className="space-y-4">
+                  {phases.map(phase => {
+                    const phaseTasks = tasksByPhase.get(phase.id) || [];
+                    const isEditing = editingPhaseId === phase.id;
+
+                    return (
+                      <div
+                        key={phase.id}
+                        className="rounded-xl border border-outline-variant/15 bg-white/40 p-4"
+                      >
+                        {isEditing ? (
+                          <form onSubmit={handleUpdatePhase} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div className="space-y-2 md:col-span-2">
+                              <label className="text-sm font-semibold text-on-surface">Name</label>
+                              <Input
+                                required
+                                variant="box"
+                                value={phaseForm.name}
+                                onChange={e => setPhaseForm({ ...phaseForm, name: e.target.value })}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-on-surface">Status</label>
+                              <Select
+                                variant="box"
+                                value={phaseForm.status}
+                                onChange={e => setPhaseForm({ ...phaseForm, status: e.target.value as TaskStatus })}
+                              >
+                                {phaseStatuses.map(status => (
+                                  <option key={status} value={status}>{status}</option>
+                                ))}
+                              </Select>
+                            </div>
+                            <DateField
+                              label="Start Date"
+                              value={phaseForm.start_date}
+                              onChange={val => setPhaseForm({ ...phaseForm, start_date: val })}
+                            />
+                            <DateField
+                              label="End Date"
+                              value={phaseForm.end_date}
+                              onChange={val => setPhaseForm({ ...phaseForm, end_date: val })}
+                            />
+                            <div className="flex flex-col gap-3 md:col-span-2 sm:flex-row">
+                              <Button type="submit" disabled={savingPhase}>
+                                {savingPhase ? "Saving..." : "Save Changes"}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={() => {
+                                  setEditingPhaseId(null);
+                                  setPhaseForm(emptyPhaseForm());
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </form>
+                        ) : (
+                          <>
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                              <div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <h3 className="font-headline text-headline-md text-on-surface">
+                                    {phase.name}
+                                  </h3>
+                                  <Badge variant={PHASE_STATUS_BADGE_VARIANT[phase.status]}>
+                                    {phase.status}
+                                  </Badge>
+                                </div>
+                                {phase.start_date || phase.end_date ? (
+                                  <p className="mt-1 text-sm text-on-surface-variant">
+                                    {formatDate(phase.start_date, "No start")} - {formatDate(phase.end_date, "No end")}
+                                  </p>
+                                ) : null}
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  aria-label={`Edit ${phase.name}`}
+                                  className="focus-ring inline-flex h-9 w-9 items-center justify-center rounded-lg border border-outline-variant/20 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+                                  onClick={() => startEditingPhase(phase)}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  aria-label={`Delete ${phase.name}`}
+                                  className="focus-ring inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-200 text-red-700 transition-colors hover:bg-red-50"
+                                  onClick={() => handleDeletePhase(phase.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="mt-4 space-y-3">
+                              {phaseTasks.length > 0 ? (
+                                phaseTasks.map(task => (
+                                  <div
+                                    key={task.id}
+                                    className="flex flex-col gap-3 rounded-lg border border-outline-variant/10 bg-white/45 p-3 transition-colors hover:bg-primary-container/5 sm:flex-row sm:items-start sm:justify-between"
+                                  >
+                                    <div>
+                                      <Link
+                                        href={`/tasks/${task.id}`}
+                                        className="font-semibold text-on-surface hover:text-primary"
+                                      >
+                                        {task.title}
+                                      </Link>
+                                      <p className="mt-1 text-xs text-on-surface-variant">
+                                        {getAssigneeName(task.assigned_to) || "Unassigned"}
+                                        {task.due_date ? ` • Due ${formatDate(task.due_date)}` : ""}
+                                      </p>
+                                    </div>
+                                    <Badge variant={PHASE_STATUS_BADGE_VARIANT[task.status || "Not started"]}>
+                                      {task.status || "Not started"}
+                                    </Badge>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="rounded-lg border border-dashed border-outline-variant/20 p-3 text-sm text-on-surface-variant">
+                                  No action items in this phase yet.
+                                </p>
+                              )}
+                            </div>
+
+                            {actionItemPhaseId === phase.id ? (
+                              <form
+                                onSubmit={event => handleAddActionItem(event, phase.id)}
+                                className="mt-4 grid grid-cols-1 gap-4 rounded-lg border border-outline-variant/15 bg-white/50 p-4 md:grid-cols-2"
+                              >
+                                <div className="space-y-2 md:col-span-2">
+                                  <label className="text-sm font-semibold text-on-surface">Title</label>
+                                  <Input
+                                    required
+                                    variant="box"
+                                    value={actionItemForm.title}
+                                    onChange={e => setActionItemForm({ ...actionItemForm, title: e.target.value })}
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-sm font-semibold text-on-surface">Assigned To</label>
+                                  <Select
+                                    variant="box"
+                                    value={actionItemForm.assigned_to}
+                                    onChange={e => setActionItemForm({ ...actionItemForm, assigned_to: e.target.value })}
+                                  >
+                                    <option value="">Unassigned</option>
+                                    {assignedStaff.map(person => (
+                                      <option key={person.id} value={person.id}>{person.name}</option>
+                                    ))}
+                                  </Select>
+                                </div>
+                                <DateField
+                                  label="Due Date"
+                                  value={actionItemForm.due_date}
+                                  onChange={val => setActionItemForm({ ...actionItemForm, due_date: val })}
+                                />
+                                <div className="flex flex-col gap-3 md:col-span-2 sm:flex-row">
+                                  <Button type="submit" disabled={savingActionItem}>
+                                    {savingActionItem ? "Adding..." : "Save Action Item"}
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={() => {
+                                      setActionItemPhaseId(null);
+                                      setActionItemForm(emptyActionItemForm());
+                                    }}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </form>
+                            ) : (
+                              <button
+                                type="button"
+                                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary-container"
+                                onClick={() => {
+                                  setActionItemPhaseId(phase.id);
+                                  setActionItemForm(emptyActionItemForm());
+                                }}
+                              >
+                                <Plus className="h-4 w-4" />
+                                Add Action Item
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {unphasedTasks.length > 0 ? (
+                    <div className="rounded-xl border border-outline-variant/15 bg-white/30 p-4">
+                      <h3 className="font-headline text-headline-md text-on-surface">
+                        No Phase
+                      </h3>
+                      <div className="mt-4 space-y-3">
+                        {unphasedTasks.map(task => (
+                          <div
+                            key={task.id}
+                            className="flex flex-col gap-3 rounded-lg border border-outline-variant/10 bg-white/45 p-3 sm:flex-row sm:items-start sm:justify-between"
+                          >
+                            <div>
+                              <Link
+                                href={`/tasks/${task.id}`}
+                                className="font-semibold text-on-surface hover:text-primary"
+                              >
+                                {task.title}
+                              </Link>
+                              <p className="mt-1 text-xs text-on-surface-variant">
+                                {getAssigneeName(task.assigned_to) || "Unassigned"}
+                                {task.due_date ? ` • Due ${formatDate(task.due_date)}` : ""}
+                              </p>
+                            </div>
+                            <Badge variant={PHASE_STATUS_BADGE_VARIANT[task.status || "Not started"]}>
+                              {task.status || "Not started"}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : unphasedTasks.length > 0 ? (
+                <div className="rounded-xl border border-outline-variant/15 bg-white/30 p-4">
+                  <h3 className="font-headline text-headline-md text-on-surface">
+                    No Phase
+                  </h3>
+                  <div className="mt-4 space-y-3">
+                    {unphasedTasks.map(task => (
+                      <div
+                        key={task.id}
+                        className="flex flex-col gap-3 rounded-lg border border-outline-variant/10 bg-white/45 p-3 sm:flex-row sm:items-start sm:justify-between"
+                      >
+                        <div>
+                          <Link
+                            href={`/tasks/${task.id}`}
+                            className="font-semibold text-on-surface hover:text-primary"
+                          >
+                            {task.title}
+                          </Link>
+                          <p className="mt-1 text-xs text-on-surface-variant">
+                            {getAssigneeName(task.assigned_to) || "Unassigned"}
+                            {task.due_date ? ` • Due ${formatDate(task.due_date)}` : ""}
+                          </p>
+                        </div>
+                        <Badge variant={PHASE_STATUS_BADGE_VARIANT[task.status || "Not started"]}>
+                          {task.status || "Not started"}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="py-10 text-center text-on-surface-variant">
+                  No phases or action items yet.
+                </div>
+              )}
+            </Card.Body>
+          </Card>
+
           <Card className="border-l-4 border-l-primary">
             <h2 className="mb-4 flex items-center gap-2 font-headline text-headline-md text-on-surface">
               <FileText className="h-4 w-4 text-primary" />

@@ -678,6 +678,60 @@ export type Database = {
           },
         ]
       }
+      project_phases: {
+        Row: {
+          created_at: string | null
+          end_date: string | null
+          id: string
+          name: string
+          org_id: string | null
+          position: number
+          project_id: string
+          start_date: string | null
+          status: Database["public"]["Enums"]["task_status"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          name: string
+          org_id?: string | null
+          position?: number
+          project_id: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          name?: string
+          org_id?: string | null
+          position?: number
+          project_id?: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_phases_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_phases_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_staff: {
         Row: {
           project_id: string
@@ -984,6 +1038,7 @@ export type Database = {
           due_date: string | null
           id: string
           org_id: string | null
+          phase_id: string | null
           priority: Database["public"]["Enums"]["task_priority"] | null
           related_to_id: string | null
           related_to_type: string | null
@@ -999,6 +1054,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           org_id?: string | null
+          phase_id?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
           related_to_id?: string | null
           related_to_type?: string | null
@@ -1014,6 +1070,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           org_id?: string | null
+          phase_id?: string | null
           priority?: Database["public"]["Enums"]["task_priority"] | null
           related_to_id?: string | null
           related_to_type?: string | null
@@ -1034,6 +1091,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "project_phases"
             referencedColumns: ["id"]
           },
         ]
