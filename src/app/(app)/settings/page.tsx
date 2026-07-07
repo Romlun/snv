@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { KeyRound, Loader2, Plus, Trash2, Users } from "lucide-react";
 import { addTeamMember, deleteTeamMember, resetTeamMemberPassword } from "./actions";
 import { createClient } from "@/lib/supabase/client";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input, Select } from "@/components/ui/Input";
 
 type TeamMemberRole = 'Admin' | 'Staff' | 'Volunteer';
 type NewUserRole = 'Staff' | 'Volunteer';
@@ -249,25 +253,29 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-gutter">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-          <p className="text-zinc-500">Manage team members and access roles.</p>
+          <h1 className="font-headline text-headline-lg font-semibold text-on-surface">
+            Settings
+          </h1>
+          <p className="mt-2 text-sm text-on-surface-variant">
+            Manage team members and access roles.
+          </p>
         </div>
+
         {isAdmin ? (
-          <button
+          <Button
             type="button"
+            icon={Plus}
             onClick={() => {
               setShowAddUser(value => !value);
               setFormMessage(null);
               setError(null);
             }}
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            <Plus className="h-4 w-4" />
             Add User
-          </button>
+          </Button>
         ) : null}
       </div>
 
@@ -289,281 +297,308 @@ export default function SettingsPage() {
         </div>
       ) : null}
 
-      <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-        <div className="mb-4 flex items-center gap-2">
-          <KeyRound className="h-4 w-4 text-zinc-400" />
-          <h2 className="font-semibold">Change Password</h2>
-        </div>
-        <form onSubmit={handleChangePassword} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">New Password</label>
-            <input
-              required
-              type="password"
-              minLength={6}
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-              value={passwordForm.newPassword}
-              onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Confirm New Password</label>
-            <input
-              required
-              type="password"
-              minLength={6}
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-              value={passwordForm.confirmPassword}
-              onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-            />
-          </div>
-          <div className="md:col-span-2">
-            <button
-              type="submit"
-              disabled={changingPassword}
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
-            >
-              {changingPassword ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+      <Card padding="lg" className="relative overflow-hidden">
+        <div className="absolute inset-y-0 left-0 w-1.5 bg-primary-container" />
+        <div className="pl-2">
+          <div className="mb-6 flex items-center gap-2">
+            <KeyRound className="h-4 w-4 text-primary" />
+            <h2 className="font-headline text-headline-md text-on-surface">
               Change Password
-            </button>
+            </h2>
           </div>
-        </form>
-      </section>
-
-      {showAddUser && isAdmin ? (
-        <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
-          <h2 className="font-semibold mb-4">Add Team Member</h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleChangePassword} className="grid grid-cols-1 gap-gutter md:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Email</label>
-              <input
-                required
-                type="email"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.email}
-                onChange={e => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Full Name</label>
-              <input
-                required
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.full_name}
-                onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Temporary Password</label>
-              <input
+              <label className="text-sm font-semibold text-on-surface">
+                New Password
+              </label>
+              <Input
                 required
                 type="password"
                 minLength={6}
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.password}
-                onChange={e => setFormData({ ...formData, password: e.target.value })}
+                variant="box"
+                value={passwordForm.newPassword}
+                onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Role</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.role}
-                onChange={e => setFormData({ ...formData, role: e.target.value as NewUserRole })}
-              >
-                <option value="Staff">Staff</option>
-                <option value="Volunteer">Volunteer</option>
-              </select>
+              <label className="text-sm font-semibold text-on-surface">
+                Confirm New Password
+              </label>
+              <Input
+                required
+                type="password"
+                minLength={6}
+                variant="box"
+                value={passwordForm.confirmPassword}
+                onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+              />
             </div>
-            <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
-              >
-                {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                Create User
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddUser(false);
-                  setFormData(initialFormData);
-                }}
-                className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
-              >
-                Cancel
-              </button>
+            <div className="md:col-span-2">
+              <Button type="submit" disabled={changingPassword}>
+                {changingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                Change Password
+              </Button>
             </div>
           </form>
-        </section>
+        </div>
+      </Card>
+
+      {showAddUser && isAdmin ? (
+        <Card padding="lg" className="relative overflow-hidden">
+          <div className="absolute inset-y-0 left-0 w-1.5 bg-primary-container" />
+          <div className="pl-2">
+            <div className="mb-6 flex items-center gap-2">
+              <Plus className="h-4 w-4 text-primary" />
+              <h2 className="font-headline text-headline-md text-on-surface">
+                Add Team Member
+              </h2>
+            </div>
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-gutter md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">
+                  Email
+                </label>
+                <Input
+                  required
+                  type="email"
+                  variant="box"
+                  value={formData.email}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">
+                  Full Name
+                </label>
+                <Input
+                  required
+                  variant="box"
+                  value={formData.full_name}
+                  onChange={e => setFormData({ ...formData, full_name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">
+                  Temporary Password
+                </label>
+                <Input
+                  required
+                  type="password"
+                  minLength={6}
+                  variant="box"
+                  value={formData.password}
+                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">
+                  Role
+                </label>
+                <Select
+                  variant="box"
+                  value={formData.role}
+                  onChange={e => setFormData({ ...formData, role: e.target.value as NewUserRole })}
+                >
+                  <option value="Staff">Staff</option>
+                  <option value="Volunteer">Volunteer</option>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-3 md:col-span-2 sm:flex-row">
+                <Button type="submit" disabled={submitting}>
+                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  Create User
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setShowAddUser(false);
+                    setFormData(initialFormData);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </div>
+        </Card>
       ) : null}
 
-      <section className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800">
-        <div className="p-4 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800 flex items-center gap-2">
-          <Users className="h-4 w-4 text-zinc-400" />
-          <h2 className="font-semibold">Team Members</h2>
+      <Card padding="none" className="overflow-hidden">
+        <div className="flex items-center gap-2 border-b border-outline-variant/15 bg-surface-container/50 px-6 py-4">
+          <Users className="h-4 w-4 text-primary" />
+          <h2 className="font-headline text-headline-md text-on-surface">
+            Team Members
+          </h2>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-            <p className="mt-4 text-zinc-500">Loading team members...</p>
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="mt-4 text-on-surface-variant">Loading team members...</p>
           </div>
         ) : teamError ? (
-          <div className="p-8 text-center bg-red-50">
+          <div className="bg-red-50 p-8 text-center">
             <p className="text-red-600">Error loading settings: {teamError}</p>
             <button onClick={fetchTeamMembers} className="mt-4 text-sm font-bold text-red-700 underline">Try again</button>
           </div>
         ) : teamMembers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Users className="h-8 w-8 text-zinc-300" />
-            <p className="mt-4 text-zinc-500">No team members found.</p>
+            <Users className="h-8 w-8 text-on-surface-variant/50" />
+            <p className="mt-4 text-on-surface-variant">No team members found.</p>
           </div>
         ) : (
-          <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-50 border-b dark:bg-zinc-800/50 dark:border-zinc-800 text-zinc-500 font-medium">
-              <tr>
-                <th className="px-6 py-3">Name</th>
-                <th className="px-6 py-3">Email</th>
-                <th className="px-6 py-3 text-right">Role</th>
-                {isAdmin ? <th className="px-6 py-3 text-right">Action</th> : null}
-              </tr>
-            </thead>
-            <tbody className="divide-y dark:divide-zinc-800">
-              {teamMembers.map(member => {
-                const isCurrentUser = member.id === currentUserId;
-                const isSavingRole = savingRoleId === member.id;
-                const isDeletingMember = deletingMemberId === member.id;
-
-                return (
-                  <tr key={member.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                    <td className="px-6 py-4 font-semibold text-zinc-900 dark:text-zinc-50">
-                      {getDisplayName(member)}
-                      {isCurrentUser ? <span className="ml-2 text-xs font-medium text-zinc-500">(You)</span> : null}
-                    </td>
-                    <td className="px-6 py-4 text-zinc-600 dark:text-zinc-400">{member.email}</td>
-                    <td className="px-6 py-4 text-right">
-                      {isAdmin && !isCurrentUser ? (
-                        <div className="inline-flex items-center gap-2">
-                          {isSavingRole ? <Loader2 className="h-4 w-4 animate-spin text-blue-600" /> : null}
-                          <select
-                            className="px-3 py-1.5 border rounded-lg text-sm dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                            value={member.role}
-                            disabled={isSavingRole}
-                            onChange={e => handleRoleChange(member, e.target.value as TeamMemberRole)}
-                          >
-                            {teamMemberRoles.map(role => (
-                              <option key={role} value={role}>{role}</option>
-                            ))}
-                          </select>
-                        </div>
-                      ) : (
-                        <span className="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                          {member.role}
-                        </span>
-                      )}
-                    </td>
-                    {isAdmin ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-outline-variant/15 bg-surface-container/40 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+                <tr>
+                  <th className="px-6 py-3">Name</th>
+                  <th className="px-6 py-3">Email</th>
+                  <th className="px-6 py-3 text-right">Role</th>
+                  {isAdmin ? <th className="px-6 py-3 text-right">Action</th> : null}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-outline-variant/15">
+                {teamMembers.map(member => {
+                  const isCurrentUser = member.id === currentUserId;
+                  const isSavingRole = savingRoleId === member.id;
+                  const isDeletingMember = deletingMemberId === member.id;
+                  return (
+                    <tr key={member.id} className="transition-colors hover:bg-primary-container/5">
+                      <td className="px-6 py-4 font-semibold text-on-surface">
+                        {getDisplayName(member)}
+                        {isCurrentUser ? <span className="ml-2 text-xs font-medium text-on-surface-variant">(You)</span> : null}
+                      </td>
+                      <td className="px-6 py-4 text-on-surface-variant">{member.email}</td>
                       <td className="px-6 py-4 text-right">
-                        {isCurrentUser ? (
-                          <span className="text-xs font-medium text-zinc-500">Protected</span>
-                        ) : (
+                        {isAdmin && !isCurrentUser ? (
                           <div className="inline-flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowResetPasswordId(member.id);
-                                setResetPasswordForm(initialPasswordFormData);
-                                setError(null);
-                                setFormMessage(null);
-                              }}
-                              className="inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
+                            {isSavingRole ? <Loader2 className="h-4 w-4 animate-spin text-primary" /> : null}
+                            <select
+                              className="focus-ring rounded-lg border border-outline-variant/20 bg-surface px-3 py-1.5 text-sm text-on-surface outline-none transition-colors disabled:opacity-50"
+                              value={member.role}
+                              disabled={isSavingRole}
+                              onChange={e => handleRoleChange(member, e.target.value as TeamMemberRole)}
                             >
-                              <KeyRound className="h-3.5 w-3.5" />
-                              Reset Password
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteMember(member)}
-                              disabled={isDeletingMember}
-                              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50 dark:border-red-900/50 dark:hover:bg-red-950/20"
-                            >
-                              {isDeletingMember ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                              Delete
-                            </button>
+                              {teamMemberRoles.map(role => (
+                                <option key={role} value={role}>{role}</option>
+                              ))}
+                            </select>
                           </div>
+                        ) : (
+                          <Badge variant="info">{member.role}</Badge>
                         )}
                       </td>
-                    ) : null}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      {isAdmin ? (
+                        <td className="px-6 py-4 text-right">
+                          {isCurrentUser ? (
+                            <span className="text-xs font-medium text-on-surface-variant">Protected</span>
+                          ) : (
+                            <div className="inline-flex items-center gap-2">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => {
+                                  setShowResetPasswordId(member.id);
+                                  setResetPasswordForm(initialPasswordFormData);
+                                  setError(null);
+                                  setFormMessage(null);
+                                }}
+                              >
+                                <KeyRound className="h-3.5 w-3.5" />
+                                Reset Password
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleDeleteMember(member)}
+                                disabled={isDeletingMember}
+                              >
+                                {isDeletingMember ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                                Delete
+                              </Button>
+                            </div>
+                          )}
+                        </td>
+                      ) : null}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
-      </section>
+      </Card>
+
       {isAdmin && showResetPasswordId ? (
-        <section className="bg-white border rounded-xl p-6 dark:bg-zinc-900 dark:border-zinc-800">
+        <Card padding="lg" className="relative overflow-hidden">
+          <div className="absolute inset-y-0 left-0 w-1.5 bg-primary-container" />
           {(() => {
             const member = teamMembers.find(item => item.id === showResetPasswordId);
             if (!member) return null;
 
             return (
-              <div className="space-y-4">
+              <div className="space-y-6 pl-2">
                 <div className="flex items-center gap-2">
-                  <KeyRound className="h-4 w-4 text-zinc-400" />
-                  <h2 className="font-semibold">Reset Password for {getDisplayName(member)}</h2>
+                  <KeyRound className="h-4 w-4 text-primary" />
+                  <h2 className="font-headline text-headline-md text-on-surface">
+                    Reset Password for {getDisplayName(member)}
+                  </h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">New Password</label>
-                    <input
+                    <label className="text-sm font-semibold text-on-surface">
+                      New Password
+                    </label>
+                    <Input
                       required
                       type="password"
                       minLength={6}
-                      className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                      variant="box"
                       value={resetPasswordForm.newPassword}
                       onChange={e => setResetPasswordForm({ ...resetPasswordForm, newPassword: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Confirm New Password</label>
-                    <input
+                    <label className="text-sm font-semibold text-on-surface">
+                      Confirm New Password
+                    </label>
+                    <Input
                       required
                       type="password"
                       minLength={6}
-                      className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
+                      variant="box"
                       value={resetPasswordForm.confirmPassword}
                       onChange={e => setResetPasswordForm({ ...resetPasswordForm, confirmPassword: e.target.value })}
                     />
                   </div>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button
                     type="button"
                     disabled={resettingPasswordId === member.id}
                     onClick={() => handleResetPassword(member)}
-                    className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
                   >
-                    {resettingPasswordId === member.id ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                    {resettingPasswordId === member.id ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                     Save Password
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="secondary"
                     onClick={() => {
                       setShowResetPasswordId(null);
                       setResetPasswordForm(initialPasswordFormData);
                     }}
-                    className="inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </div>
             );
           })()}
-        </section>
+        </Card>
       ) : null}
     </div>
   );
