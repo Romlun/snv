@@ -318,18 +318,6 @@ export default function LanguageSchoolDetailPage({ params }: { params: Promise<{
               </div>
               <div>
                 <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
-                  Organization ID
-                </p>
-                <p className="break-all text-sm font-semibold text-on-surface">{school.org_id}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
-                  School ID
-                </p>
-                <p className="break-all text-sm font-semibold text-on-surface">{school.id}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
                   Created
                 </p>
                 <p className="text-sm font-semibold text-on-surface">

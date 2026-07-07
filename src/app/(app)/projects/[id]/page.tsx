@@ -541,18 +541,6 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             <div className="space-y-5">
               <div>
                 <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
-                  Organization ID
-                </p>
-                <p className="break-all text-sm font-semibold text-on-surface">{project.org_id}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
-                  Project ID
-                </p>
-                <p className="break-all text-sm font-semibold text-on-surface">{project.id}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
                   Created
                 </p>
                 <p className="text-sm font-semibold text-on-surface">
