@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v3.8 All forms complete, Calendar/Settings next`
+`snv Mission CRM — v3.9 Calendar live, Settings is the last page`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,36 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 39): Calendar page SHIPPED and LIVE. Code Agent
+  restyled src/app/(app)/calendar/page.tsx only (commit `bc7254d`) --
+  Director proactively directed the day-detail modal to be wrapped in the
+  existing Portal component BEFORE dispatching, since the mock's calendar
+  grid container uses .glass-card and this exact class of bug (fixed
+  modal trapped by a backdrop-filter ancestor) had already bitten this
+  project twice (Church/DonorEngagementScore). Confirmed done correctly
+  in the diff. All 4 real event types (task/church_visit/project/
+  contact_log) and their real data preserved; correctly kept all 4 in the
+  legend rather than the mock's 3; correctly omitted the mock's decorative
+  "New Event" button and search bar (no real functionality behind
+  either). Ran `npm run build` -- clean.
+  **PROCESS NOTE (recurring pattern, 2nd time): same stale-PROJECT_STATE.md
+  checkpoint issue as session 36, this time reverting 79 lines. Director
+  caught it the same way -- diffed branch tips before merging, confirmed
+  main's actual committed copy was unaffected via `git show main:...`,
+  then verified again after the real 3-way merge that it self-resolved
+  correctly (grepped for the session 38 entry and v3.8 title, both
+  intact). This is clearly a systemic pattern with how the Code Agent's
+  local branch gets checked out relative to main, not a one-off -- worth
+  the Code Agent syncing/rebasing from main before starting future work,
+  though Director's catch-before-merge habit has fully covered it both
+  times so far.** Merged to main (`723ef89`), pushed. Vercel's
+  alias-endpoint lookup (get_deployment by URL) showed a stale SHA at
+  first check -- Director cross-checked with list_deployments (the
+  authoritative source) rather than trusting the first result, confirmed
+  READY on the exact merge SHA (dpl_ASoGYhELSGBboUuTMTHRK87JU3wk), live on
+  snv-zeta.vercel.app. Only Settings remains in the full design rollout --
+  no dedicated Stitch mock exists for it, will need extrapolation from the
+  established system.**
 - **UPDATE (session 38): Inventory New/Edit forms SHIPPED and LIVE --
   FORMS PHASE COMPLETE (all 6 entities x New+Edit + Budget's new-entry
   form, 13 files total across sessions 34-38). Code Agent restyled both
