@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v4.1 Phase 0 hygiene in progress`
+`snv Mission CRM — v4.2 Phase 0 complete, choosing next phase`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -556,6 +556,38 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 41 cont'd): Phase 0 hygiene pass COMPLETE — all 4 items
+  shipped and verified live.** Code Agent (Codex) delivered items 3+4 as one
+  commit on the feature branch (`39dd431`) — did NOT push it themselves (per
+  established practice); Director found it as a local-only commit ahead of
+  origin, read the full diff before doing anything else (never trusted the
+  bare "done" report). Diff scope was exactly the 10 files directed, nothing
+  extra touched:
+  - Churches' Log Visit now correctly updates `churches.next_step` +
+    `next_visit_date` after the contact_logs insert (matches the directive
+    exactly, correctly omits `last_contact_date` since churches has no such
+    column).
+  - Donors' Log Interaction now also syncs `next_step` alongside the
+    pre-existing `last_contact_date`/`next_follow_up_date` update.
+  - All 17 null-safety errors fixed with sensible, consistent defaults
+    (`?? "Steady"` / `?? "New contact"` for status/stage selects and typed
+    unions, `?? 0` for engagement scores, `?? false` for is_recurring, a
+    null-guarded date format with an "Not recorded" fallback for
+    churches.created_at/updated_at) — no scope creep, no logic changes
+    beyond what the directive asked for.
+  Director verified directly: `npx tsc --noEmit` clean (0 errors, down from
+  17), `npm run build` clean. Pushed the branch (`39dd431`), merged to main
+  (`2d11f49`), pushed, confirmed READY on the exact merge SHA
+  (dpl_2ZMM1pXB1aSuYknXi8oNYq5VFmV1) via list_deployments, live on
+  snv-zeta.vercel.app. (The feature branch's own preview build errored on
+  this same commit — consistent with this project's established pattern of
+  preview-only build noise that doesn't reflect production; main's build,
+  both local and on Vercel, was clean.)
+  **Phase 0 is now fully closed: card_expiry dropped, test data + orphans
+  removed, both next_step sync gaps fixed, types regenerated.** Next up per
+  the roadmap: Phase 1 (real-time team chat) needs a design/scoping pass
+  before any code, or Phase 2 (reporting/AI) needs scoping first — operator's
+  call which to open next.
 - **UPDATE (session 41): Phase 0 hygiene pass — 2 of 4 items closed,
   verified live.** Clean Director swap at the top of this session (all
   facts inherited verbatim from session 40's milestone, per a clean-swap
