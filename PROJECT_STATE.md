@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v3.5 Donor forms live, Churches/LangSchools next`
+`snv Mission CRM — v3.6 Church/LangSchool forms live, Projects/Tasks next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,31 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 36): Church + Language School New/Edit forms SHIPPED and
+  LIVE (forms batch 2 of ~4, 4 files). Code Agent restyled all 4 correctly
+  (commit `05ae756`), plus a real, operator-approved fix: Churches' New
+  AND Edit forms never set assigned_staff_id despite the column existing
+  and the profile page already displaying it -- both now fetch profiles,
+  default to the current user on New, include it in insert/update, same
+  pattern as Donor/Language School. Language Schools needed no such fix
+  (already captured assigned staff correctly), just restyled.
+  **PROCESS NOTE, worth remembering: the Code Agent's checkpoint commit
+  included a STALE copy of PROJECT_STATE.md (reverted to the pre-session-35
+  version -- old title, missing the whole session 35 log entry), almost
+  certainly because its local branch was checked out before that state
+  update landed on main. Director caught this via the two-dot diff
+  (`git diff ab3ec04..05ae756`) BEFORE merging, flagged it explicitly
+  rather than merging blindly. On the actual 3-way `git merge`, this
+  self-resolved correctly -- git recognized PROJECT_STATE.md wasn't
+  independently changed on the feature branch relative to the true merge
+  base, so main's newer version won automatically. Director verified this
+  directly after merging (grepped for the session 35 entry and the v3.5
+  title) rather than assuming the merge was clean just because it applied
+  without conflict markers.** Ran `npm run build` -- clean. Merged to
+  main (`694cc8e`), pushed, Vercel confirmed READY on the exact merge SHA
+  (dpl_AY8KMJqiumQdX7MTJxL4BmVqxXnn), live on snv-zeta.vercel.app. Next:
+  Projects + Tasks New/Edit forms (batch 3), then Inventory (batch 4),
+  then Settings/Calendar.**
 - **UPDATE (session 35): Donor New + Edit forms SHIPPED and LIVE (forms
   batch 1 of ~4). Code Agent restyled both files only (commit `612fce5`)
   -- Director verified both already had real birthday/address fields from
