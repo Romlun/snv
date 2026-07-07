@@ -7,8 +7,11 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { SchoolStatus } from "@/components/SchoolStatusSelect";
 import { Database } from "@/types/database";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input, Select, Textarea } from "@/components/ui/Input";
 
-type Profile = Database['public']['Tables']['profiles']['Row'];
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface FormData {
   name: string;
@@ -48,15 +51,16 @@ export default function NewLanguageSchoolPage() {
 
   useEffect(() => {
     async function fetchStaff() {
-      const { data: staffData } = await supabase.from('profiles').select('*');
+      const { data: staffData } = await supabase.from("profiles").select("*");
       setStaff(staffData || []);
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         setFormData(prev => ({ ...prev, assigned_staff_id: user.id }));
       }
     }
-
     fetchStaff();
   }, [supabase]);
 
@@ -65,7 +69,7 @@ export default function NewLanguageSchoolPage() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.from('language_schools').insert({
+      const { error } = await supabase.from("language_schools").insert({
         name: formData.name,
         city: formData.city || null,
         state: formData.state || null,
@@ -92,137 +96,245 @@ export default function NewLanguageSchoolPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <Link href="/language-schools" className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50">
+    <div className="mx-auto max-w-2xl space-y-gutter">
+      <Link
+        href="/language-schools"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-on-surface-variant transition-colors hover:text-primary"
+      >
         <ArrowLeft className="h-4 w-4" />
         Back to Language Schools
       </Link>
 
-      <div className="bg-white border rounded-xl p-8 dark:bg-zinc-900 dark:border-zinc-800">
-        <h1 className="text-2xl font-bold mb-6">Add New Language School</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">School Name</label>
-              <input
-                required
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.name}
-                onChange={e => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Contact Person</label>
-              <input
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.contact_person}
-                onChange={e => setFormData({ ...formData, contact_person: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Email</label>
-              <input
-                type="email"
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.email}
-                onChange={e => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Phone</label>
-              <input
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.phone}
-                onChange={e => setFormData({ ...formData, phone: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">City</label>
-              <input
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.city}
-                onChange={e => setFormData({ ...formData, city: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">State</label>
-              <input
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.state}
-                onChange={e => setFormData({ ...formData, state: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Source</label>
-              <input
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.source}
-                onChange={e => setFormData({ ...formData, source: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.status}
-                onChange={e => setFormData({ ...formData, status: e.target.value as SchoolStatus })}
+      <Card padding="lg" className="relative overflow-hidden">
+        <div className="absolute inset-y-0 left-0 w-1.5 bg-primary-container" />
+        <div className="pl-2">
+          <div className="mb-8">
+            <h1 className="font-headline text-headline-lg font-semibold text-on-surface">
+              Add New Language School
+            </h1>
+            <p className="mt-2 text-sm text-on-surface-variant">
+              Capture school contact details and outreach context.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <section className="space-y-4">
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">
+                  Contact Details
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    School Name
+                  </label>
+                  <Input
+                    required
+                    variant="box"
+                    value={formData.name}
+                    onChange={e =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Contact Person
+                  </label>
+                  <Input
+                    variant="box"
+                    value={formData.contact_person}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        contact_person: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Email
+                  </label>
+                  <Input
+                    type="email"
+                    variant="box"
+                    value={formData.email}
+                    onChange={e =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Phone
+                  </label>
+                  <Input
+                    variant="box"
+                    value={formData.phone}
+                    onChange={e =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    City
+                  </label>
+                  <Input
+                    variant="box"
+                    value={formData.city}
+                    onChange={e =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    State
+                  </label>
+                  <Input
+                    variant="box"
+                    value={formData.state}
+                    onChange={e =>
+                      setFormData({ ...formData, state: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Website
+                  </label>
+                  <Input
+                    variant="box"
+                    value={formData.website}
+                    onChange={e =>
+                      setFormData({ ...formData, website: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section className="space-y-4">
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">
+                  Outreach
+                </h2>
+                <p className="mt-1 text-sm text-on-surface-variant">
+                  Track source, status, ownership, and next step.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-gutter md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Source
+                  </label>
+                  <Input
+                    variant="box"
+                    value={formData.source}
+                    onChange={e =>
+                      setFormData({ ...formData, source: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Status
+                  </label>
+                  <Select
+                    variant="box"
+                    value={formData.status}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        status: e.target.value as SchoolStatus,
+                      })
+                    }
+                  >
+                    <option value="New">New</option>
+                    <option value="Contacted">Contacted</option>
+                    <option value="No Answer">No Answer</option>
+                    <option value="Interested">Interested</option>
+                    <option value="Follow-up">Follow-up</option>
+                    <option value="Connected">Connected</option>
+                    <option value="Declined">Declined</option>
+                  </Select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Assigned Staff
+                  </label>
+                  <Select
+                    variant="box"
+                    value={formData.assigned_staff_id}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        assigned_staff_id: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Unassigned</option>
+                    {staff.map(row => (
+                      <option key={row.id} value={row.id}>
+                        {row.full_name || row.email}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Next Step
+                  </label>
+                  <Input
+                    variant="box"
+                    value={formData.next_step}
+                    onChange={e =>
+                      setFormData({ ...formData, next_step: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section className="space-y-4">
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">
+                  Notes
+                </h2>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-on-surface">
+                  Notes
+                </label>
+                <Textarea
+                  variant="box"
+                  value={formData.notes}
+                  onChange={e =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
+                />
+              </div>
+            </section>
+
+            <div className="flex flex-col items-center gap-4 border-t border-outline-variant/20 pt-6">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full md:w-auto md:min-w-60"
               >
-                <option value="New">New</option>
-                <option value="Contacted">Contacted</option>
-                <option value="No Answer">No Answer</option>
-                <option value="Interested">Interested</option>
-                <option value="Follow-up">Follow-up</option>
-                <option value="Connected">Connected</option>
-                <option value="Declined">Declined</option>
-              </select>
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  "Create Language School"
+                )}
+              </Button>
             </div>
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium">Assigned Staff</label>
-              <select
-                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.assigned_staff_id}
-                onChange={e => setFormData({ ...formData, assigned_staff_id: e.target.value })}
-              >
-                <option value="">Unassigned</option>
-                {staff.map(row => (
-                  <option key={row.id} value={row.id}>{row.full_name || row.email}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Website</label>
-            <input
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.website}
-              onChange={e => setFormData({ ...formData, website: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Next Step</label>
-            <input
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.next_step}
-              onChange={e => setFormData({ ...formData, next_step: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Notes</label>
-            <textarea
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-950 dark:border-zinc-800 outline-none focus:ring-2 focus:ring-blue-500 h-24"
-              value={formData.notes}
-              onChange={e => setFormData({ ...formData, notes: e.target.value })}
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center"
-          >
-            {loading ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : "Create Language School"}
-          </button>
-        </form>
-      </div>
+          </form>
+        </div>
+      </Card>
     </div>
   );
 }
