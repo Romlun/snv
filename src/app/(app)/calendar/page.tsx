@@ -17,6 +17,8 @@ import {
 } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/Card";
+import { Portal } from "@/components/ui/Portal";
 
 type CalendarEventType = "task" | "church_visit" | "project" | "contact_log";
 
@@ -61,10 +63,26 @@ interface ContactLogRow {
 }
 
 const EVENT_STYLES: Record<CalendarEventType, { dot: string; chip: string; legend: string }> = {
-  task: { dot: "bg-blue-500", chip: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", legend: "Task" },
-  church_visit: { dot: "bg-purple-500", chip: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400", legend: "Church Visit" },
-  project: { dot: "bg-green-500", chip: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400", legend: "Project Milestone" },
-  contact_log: { dot: "bg-zinc-400", chip: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400", legend: "Past Contact" },
+  task: {
+    dot: "bg-blue-500",
+    chip: "border-l-2 border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+    legend: "Task",
+  },
+  church_visit: {
+    dot: "bg-purple-500",
+    chip: "border-l-2 border-purple-500 bg-purple-500/10 text-purple-700 dark:text-purple-400",
+    legend: "Church Visit",
+  },
+  project: {
+    dot: "bg-green-500",
+    chip: "border-l-2 border-green-500 bg-green-500/10 text-green-700 dark:text-green-400",
+    legend: "Project Milestone",
+  },
+  contact_log: {
+    dot: "bg-zinc-400",
+    chip: "border-l-2 border-zinc-400 bg-zinc-400/10 text-zinc-600 dark:text-zinc-400",
+    legend: "Past Contact",
+  },
 };
 
 function relatedName(rel: { name: string } | { name: string }[] | null): string | null {
@@ -208,60 +226,81 @@ export default function CalendarPage() {
   const selectedEvents = selectedDate ? eventsByDate.get(selectedDate) ?? [] : [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Calendar</h1>
-          <p className="text-zinc-500">Tasks, church visits, project milestones, and contact history in one view.</p>
+    <div className="space-y-stack-lg">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-2">
+          <p className="text-label-sm font-semibold uppercase tracking-wider text-primary">
+            Scheduling
+          </p>
+          <div>
+            <h1 className="font-headline text-headline-lg font-semibold text-on-surface">
+              Calendar
+            </h1>
+            <p className="text-body-md text-on-surface-variant">
+              Tasks, church visits, project milestones, and contact history in one view.
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex items-center gap-1 rounded-full border border-outline-variant/20 bg-surface p-1.5 shadow-sm">
           <button
+            type="button"
             onClick={() => setCurrentMonth((m) => subMonths(m, 1))}
-            className="p-2 border rounded-lg hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:bg-zinc-800 transition-colors"
+            className="focus-ring rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
             aria-label="Previous month"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
+          <span className="min-w-[9rem] px-2 text-center font-headline text-headline-md text-on-surface">
+            {format(currentMonth, "MMMM yyyy")}
+          </span>
           <button
-            onClick={() => setCurrentMonth(startOfMonth(new Date()))}
-            className="px-4 py-2 border rounded-lg hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:bg-zinc-800 transition-colors text-sm font-medium"
-          >
-            Today
-          </button>
-          <button
+            type="button"
             onClick={() => setCurrentMonth((m) => addMonths(m, 1))}
-            className="p-2 border rounded-lg hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:hover:bg-zinc-800 transition-colors"
+            className="focus-ring rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
             aria-label="Next month"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
-          <span className="ml-2 font-semibold min-w-[9rem] text-center">{format(currentMonth, "MMMM yyyy")}</span>
+          <div className="mx-1 h-6 w-px bg-outline-variant/30" />
+          <button
+            type="button"
+            onClick={() => setCurrentMonth(startOfMonth(new Date()))}
+            className="focus-ring rounded-full px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary-container/5"
+          >
+            Today
+          </button>
         </div>
-      </div>
+      </section>
 
-      <div className="flex flex-wrap gap-4 text-xs text-zinc-500">
+      <section className="flex flex-wrap gap-3">
         {(Object.keys(EVENT_STYLES) as CalendarEventType[]).map((t) => (
-          <div key={t} className="flex items-center gap-1.5">
-            <span className={cn("h-2 w-2 rounded-full", EVENT_STYLES[t].dot)} />
-            {EVENT_STYLES[t].legend}
+          <div
+            key={t}
+            className="flex items-center gap-2 rounded-full border border-outline-variant/20 bg-surface px-3 py-1 shadow-sm"
+          >
+            <span className={cn("h-2.5 w-2.5 rounded-full", EVENT_STYLES[t].dot)} />
+            <span className="text-xs font-semibold text-on-surface-variant">
+              {EVENT_STYLES[t].legend}
+            </span>
           </div>
         ))}
-      </div>
+      </section>
 
       {error ? (
-        <div className="p-8 text-center bg-red-50 border border-red-100 rounded-xl">
+        <Card className="border-red-100 bg-red-50 p-8 text-center">
           <p className="text-red-600">Error loading calendar: {error}</p>
-        </div>
+        </Card>
       ) : (
-        <div className="bg-white border rounded-xl overflow-hidden dark:bg-zinc-900 dark:border-zinc-800 relative">
+        <Card padding="none" className="relative overflow-hidden">
           {loading && (
-            <div className="absolute inset-0 bg-white/60 dark:bg-zinc-900/60 flex items-center justify-center z-10">
-              <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface/60">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           )}
-          <div className="grid grid-cols-7 border-b bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-800 text-xs font-medium text-zinc-500">
+          <div className="grid grid-cols-7 border-b border-outline-variant/15 bg-surface-container-low text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-              <div key={d} className="px-3 py-2 text-center">
+              <div key={d} className="border-r border-outline-variant/10 px-3 py-3 text-center last:border-r-0">
                 {d}
               </div>
             ))}
@@ -280,16 +319,16 @@ export default function CalendarPage() {
                   type="button"
                   onClick={() => dayEvents.length > 0 && setSelectedDate(dateKey)}
                   className={cn(
-                    "min-h-[100px] border-b border-r p-2 text-left align-top dark:border-zinc-800 [&:nth-child(7n)]:border-r-0 transition-colors",
-                    inMonth ? "bg-white dark:bg-zinc-900" : "bg-zinc-50/50 dark:bg-zinc-950/40",
-                    dayEvents.length > 0 && "hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer"
+                    "min-h-[100px] border-b border-r border-outline-variant/10 p-2 text-left align-top transition-colors [&:nth-child(7n)]:border-r-0",
+                    inMonth ? "bg-surface" : "bg-surface-container-low/40",
+                    dayEvents.length > 0 && "cursor-pointer hover:bg-primary-container/5"
                   )}
                 >
                   <span
                     className={cn(
-                      "inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium",
-                      inMonth ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400 dark:text-zinc-600",
-                      isToday(day) && "bg-blue-600 text-white"
+                      "inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold",
+                      inMonth ? "text-on-surface" : "text-on-surface-variant/50",
+                      isToday(day) && "bg-primary text-on-primary"
                     )}
                   >
                     {format(day, "d")}
@@ -298,61 +337,71 @@ export default function CalendarPage() {
                     {visibleEvents.map((event) => (
                       <div
                         key={event.id}
-                        className={cn("truncate rounded px-1.5 py-0.5 text-[11px] font-medium", EVENT_STYLES[event.type].chip)}
+                        className={cn("truncate rounded-sm px-1.5 py-1 text-[11px] font-semibold", EVENT_STYLES[event.type].chip)}
                       >
                         {event.title}
                       </div>
                     ))}
-                    {extraCount > 0 && <div className="text-[11px] font-medium text-zinc-500 px-1.5">+{extraCount} more</div>}
+                    {extraCount > 0 && (
+                      <div className="px-1.5 text-[11px] font-semibold text-on-surface-variant">
+                        +{extraCount} more
+                      </div>
+                    )}
                   </div>
                 </button>
               );
             })}
           </div>
-        </div>
+        </Card>
       )}
 
       {selectedDate && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          onClick={() => setSelectedDate(null)}
-        >
+        <Portal>
           <div
-            className="w-full max-w-md bg-white border rounded-xl dark:bg-zinc-900 dark:border-zinc-800 max-h-[80vh] overflow-hidden flex flex-col"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-on-surface/40 p-4"
+            onClick={() => setSelectedDate(null)}
+            role="dialog"
+            aria-modal="true"
           >
-            <div className="p-4 border-b dark:border-zinc-800 flex items-center justify-between">
-              <h2 className="font-semibold">{format(new Date(`${selectedDate}T00:00:00`), "EEEE, MMMM d, yyyy")}</h2>
-              <button
-                type="button"
-                onClick={() => setSelectedDate(null)}
-                className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="divide-y dark:divide-zinc-800 overflow-y-auto">
-              {selectedEvents.length === 0 ? (
-                <p className="p-4 text-sm text-zinc-500">Nothing scheduled.</p>
-              ) : (
-                selectedEvents.map((event) => (
-                  <Link
-                    key={event.id}
-                    href={event.href}
-                    className="p-4 flex items-start gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
-                  >
-                    <span className={cn("mt-1.5 h-2 w-2 rounded-full shrink-0", EVENT_STYLES[event.type].dot)} />
-                    <div>
-                      <p className="font-medium hover:underline">{event.title}</p>
-                      <p className="text-xs text-zinc-500">{event.subtitle}</p>
-                    </div>
-                  </Link>
-                ))
-              )}
+            <div
+              className="flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-outline-variant/20 bg-surface shadow-xl max-h-[80vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between border-b border-outline-variant/15 p-4">
+                <h2 className="font-headline text-headline-md text-on-surface">
+                  {format(new Date(`${selectedDate}T00:00:00`), "EEEE, MMMM d, yyyy")}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDate(null)}
+                  className="focus-ring rounded-full p-1 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="divide-y divide-outline-variant/10 overflow-y-auto">
+                {selectedEvents.length === 0 ? (
+                  <p className="p-4 text-sm text-on-surface-variant">Nothing scheduled.</p>
+                ) : (
+                  selectedEvents.map((event) => (
+                    <Link
+                      key={event.id}
+                      href={event.href}
+                      className="flex items-start gap-3 p-4 transition-colors hover:bg-primary-container/5"
+                    >
+                      <span className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", EVENT_STYLES[event.type].dot)} />
+                      <div>
+                        <p className="font-semibold text-on-surface hover:underline">{event.title}</p>
+                        <p className="text-xs text-on-surface-variant">{event.subtitle}</p>
+                      </div>
+                    </Link>
+                  ))
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </Portal>
       )}
     </div>
   );
