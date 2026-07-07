@@ -12,7 +12,7 @@ import { Input, Select } from "@/components/ui/Input";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type RelationshipStatus =
-  Database["public"]["Tables"]["churches"]["Row"]["relationship_status"];
+  NonNullable<Database["public"]["Tables"]["churches"]["Row"]["relationship_status"]>;
 
 interface FormData {
   name: string;
@@ -68,7 +68,7 @@ export default function EditChurchPage({
             phone: church.phone || "",
             email: church.email || "",
             denomination: church.denomination || "",
-            relationship_status: church.relationship_status,
+            relationship_status: church.relationship_status ?? "Steady",
             assigned_staff_id: church.assigned_staff_id || "",
           });
         }

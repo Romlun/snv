@@ -73,8 +73,9 @@ export default function LogInteractionPage({ params }: { params: Promise<{ id: s
       if (logError) throw logError;
 
       // 2. Update Donor's last contact and next follow-up
-      const updateData: Record<string, string> = {
+      const updateData: Record<string, string | null> = {
         last_contact_date: new Date().toISOString().split('T')[0],
+        next_step: formData.next_step || null,
       };
 
       if (nextFollowUpDate) {

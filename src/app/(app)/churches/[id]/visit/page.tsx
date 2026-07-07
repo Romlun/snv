@@ -85,6 +85,11 @@ export default function LogChurchVisitPage({ params }: { params: Promise<{ id: s
 
       if (logError) throw logError;
 
+      await supabase.from('churches').update({
+        next_step: formData.next_step || null,
+        next_visit_date: nextFollowUpDate,
+      }).eq('id', id);
+
       if (formData.next_step && nextFollowUpDate) {
         await supabase.from('tasks').insert({
           title: `Follow up: ${formData.next_step}`,

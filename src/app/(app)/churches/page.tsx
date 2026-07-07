@@ -211,7 +211,7 @@ export default function ChurchesPage() {
                       <RelationshipStatusSelect
                         id={church.id}
                         table="churches"
-                        value={church.relationship_status}
+                        value={church.relationship_status ?? "Steady"}
                         onSaved={(relationship_status) =>
                           setChurches((prev) =>
                             prev.map((row) =>
@@ -226,7 +226,7 @@ export default function ChurchesPage() {
                     <td className="px-6 py-4 text-center">
                       <ChurchEngagementScore
                         churchId={church.id}
-                        score={church.engagement_score}
+                        score={church.engagement_score ?? 0}
                       />
                     </td>
                     <td className="px-6 py-4 text-on-surface">

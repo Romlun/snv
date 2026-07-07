@@ -12,7 +12,7 @@ import { Input, Select, Textarea } from "@/components/ui/Input";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type RelationshipStatus =
-  Database["public"]["Tables"]["churches"]["Row"]["relationship_status"];
+  NonNullable<Database["public"]["Tables"]["churches"]["Row"]["relationship_status"]>;
 
 interface FormData {
   name: string;

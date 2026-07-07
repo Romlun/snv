@@ -12,8 +12,8 @@ import { Input, Select, Textarea } from "@/components/ui/Input";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Church = Database['public']['Tables']['churches']['Row'];
-type DonorStage = Database['public']['Tables']['donors']['Row']['stage'];
-type RelationshipStatus = Database['public']['Tables']['donors']['Row']['relationship_status'];
+type DonorStage = NonNullable<Database['public']['Tables']['donors']['Row']['stage']>;
+type RelationshipStatus = NonNullable<Database['public']['Tables']['donors']['Row']['relationship_status']>;
 type RecurringCadence = 'monthly' | 'quarterly';
 
 interface FormData {
