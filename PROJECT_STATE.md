@@ -579,6 +579,38 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **NEW (session 41 cont'd x6): Planner refinements — default-to-Today,
+  optional time-of-day, universal complete-checkbox.** Operator feedback
+  on the freshly-shipped Planner: default view should be Today, not Week;
+  wants to schedule at a specific time ("call at 3pm"); wants a one-click
+  complete toggle on task items, explicitly "applied to all tasks" (i.e.
+  everywhere a task appears as a list item across the app, not just
+  Planner). One sentence in the request was ambiguous ("we don't need to
+  move tasks in the planner to have all tasks... personal planning of work
+  plus tasks from projects, donors, etc.") — Director read this as
+  re-confirming the existing scope (own tasks + own assigned donor/church/
+  school follow-ups, not literally every task in the org), not as a change
+  request, and said so explicitly rather than silently guessing.
+  Schema: added `tasks.due_time` (nullable `time`, verified live) — a
+  deliberately SEPARATE column from `due_date` rather than combining a
+  time-of-day into due_date's existing timestamptz value. Reasoning banked
+  here since it's a real design choice, not just an implementation detail:
+  due_date's no-time entries are anchored to UTC midnight (an existing,
+  unrelated quirk — `new Date("YYYY-MM-DD").toISOString()` parses date-only
+  strings as UTC per JS spec), so combining a LOCAL time input into that
+  same timestamp would produce two different anchoring conventions in one
+  column depending on whether a time was set, which is a real latent bug
+  risk. A separate nullable column sidesteps this cleanly with zero risk to
+  any existing due_date logic anywhere else in the app. `database.ts`
+  regenerated and committed to the feature branch (`d45b0ae`) as its own
+  clean commit, same established pattern.
+  Two directives dispatched (kept separate, not bundled): (1) due_time
+  entry on Task New/Edit + Planner quick-add, display wherever a task's due
+  date already shows, Planner defaults to "day" view; (2) a new shared
+  `TaskCompleteToggle` component wired into every task-list rendering spot
+  (Planner, Tasks list, Dashboard's two task sections, Project Phases
+  action items) reusing the exact status/completed_date logic already
+  established in the Task detail page's status handler — not a new pattern.
 - **UPDATE (session 41 cont'd x5): Dashboard 7-day bound + new Planner
   page SHIPPED and verified live — but landed differently than usual.**
   Both commits (`af79047` bound-Upcoming-to-7-days, `88084a2` new Planner
