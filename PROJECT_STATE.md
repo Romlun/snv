@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v3.6 Church/LangSchool forms live, Projects/Tasks next`
+`snv Mission CRM — v3.7 Project/Task forms live, Inventory forms next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,28 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 37): Project + Task New/Edit forms SHIPPED and LIVE
+  (forms batch 3 of ~4, 4 files). Code Agent completed all 4 files
+  correctly but could not commit or run a full build itself due to its own
+  sandbox limits (no network access to fetch Google Fonts, and a commit
+  approval-limit rejection) -- reported this honestly rather than claiming
+  false completion, left the work uncommitted in the working tree.
+  Director verified full content of all 4 files directly, confirmed
+  everything was genuinely complete (nothing to actually hand to another
+  agent), ran a real `npm run build` with real network access -- clean --
+  and committed it personally (`a74704c`). Real feature added (operator-
+  approved): Projects' New/Edit forms gain an Assigned Staff multi-select
+  backed by project_staff (previously had zero UI despite schema support)
+  -- New creates rows after project insert, Edit loads existing selections
+  and does delete-then-reinsert on save; confirmed the shared Select
+  primitive passes through native `multiple`/array-value props correctly
+  before trusting the approach. Task forms restyled with zero logic
+  changes (single assigned_to, cascading related-record selects,
+  completed_date-on-status-change all preserved). Merged to main
+  (`db3c671`), pushed, Vercel confirmed READY on the exact merge SHA
+  (dpl_3XX86tJKJPp9bsq8N7623ZkygHPE), live on snv-zeta.vercel.app. Next:
+  Inventory New/Edit forms (batch 4, last form batch), then Settings/
+  Calendar.**
 - **UPDATE (session 36): Church + Language School New/Edit forms SHIPPED and
   LIVE (forms batch 2 of ~4, 4 files). Code Agent restyled all 4 correctly
   (commit `05ae756`), plus a real, operator-approved fix: Churches' New
