@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v3.7 Project/Task forms live, Inventory forms next`
+`snv Mission CRM — v3.8 All forms complete, Calendar/Settings next`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -555,6 +555,21 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 38): Inventory New/Edit forms SHIPPED and LIVE --
+  FORMS PHASE COMPLETE (all 6 entities x New+Edit + Budget's new-entry
+  form, 13 files total across sessions 34-38). Code Agent restyled both
+  files only (commit `d182971`) -- Director verified Quantity Sold/Given
+  correctly stayed read-only (same deliberate pattern as Budget's Raised
+  field), Delete button correctly kept with its confirm dialog, and
+  confirmed Button's `destructive` variant genuinely existed already
+  (unused until now) rather than being silently invented. Ran
+  `npm run build` -- clean. Merged to main (`7d5f247`), pushed, Vercel
+  confirmed READY on the exact merge SHA
+  (dpl_6uj3zjn9S4Keo7XQUiLrF4YcXwEn), live on snv-zeta.vercel.app.
+  **FORMS PHASE OF THE DESIGN ROLLOUT IS COMPLETE.** Per DESIGN_SPEC.md
+  rollout order, next up: Login/Settings/Calendar (Login already done in
+  an earlier bug-fix session; Settings and Calendar remain, no dedicated
+  Stitch mocks for Settings -- extrapolate; Calendar DOES have a mock).**
 - **UPDATE (session 37): Project + Task New/Edit forms SHIPPED and LIVE
   (forms batch 3 of ~4, 4 files). Code Agent completed all 4 files
   correctly but could not commit or run a full build itself due to its own
