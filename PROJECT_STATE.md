@@ -576,20 +576,29 @@ effective gate. Continue this pattern.
      rows and 0 orphans remain. Committed the script fix to `main`
      (`979c827`) so the checked-in version is correct for any future reuse.
   3. **Churches' "Log Visit" next_step/next_visit_date gap — CONFIRMED,
-     not yet fixed.** Read `src/app/(app)/churches/[id]/visit/page.tsx`
+     directive dispatched.** Read `src/app/(app)/churches/[id]/visit/page.tsx`
      directly: confirmed it writes `contact_logs` + creates the follow-up
      task, but never touches `churches.next_step`/`next_visit_date` on the
      parent row, unlike NotesLog. Both columns confirmed live on `churches`
-     via schema query before concluding this (P10 habit). Queued for a Code
-     Agent directive next.
-  4. **Stale `src/types/database.ts` — CONFIRMED, not yet fixed.**
-     Regenerated fresh types from live schema and diffed by hand: missing
-     `task_checklist_items`, `project_staff`, and `donors.birthday`/
-     `address` entirely; now ALSO stale in a new direction post-drop (still
-     references the now-gone `card_expiry`). ~15+ null-safety errors
-     expected on regeneration, per the session-12 estimate. Queued for the
-     same Code Agent directive as item 3, since both are routine,
-     already-scoped fixes with no open product decision behind them.
+     via schema query before concluding this (P10 habit). While verifying
+     the reference pattern (language_schools' Log Contact, which does this
+     correctly), found the SAME bug also exists on donors' older "Log
+     Interaction" form (`src/app/(app)/donors/[id]/log/page.tsx`) — it syncs
+     `last_contact_date`/`next_follow_up_date` but never `next_step`, even
+     though `donors.next_step` exists. Not previously flagged in this file;
+     bundled into the same directive since it's the identical bug.
+  4. **Stale `src/types/database.ts` — FIXED (schema half), directive
+     dispatched (code half).** Regenerated fresh types directly via Supabase
+     MCP against live schema, diffed by hand against the checked-in version:
+     confirmed missing `task_checklist_items`, `project_staff`, and
+     `donors.birthday`/`address`, and still referencing the just-dropped
+     `card_expiry`. Committed the fresh file to the feature branch
+     (`e7a69fd`) as its own clean commit — pure schema reflection, no logic.
+     Ran `npx tsc --noEmit` against it: 17 pre-existing null-safety errors
+     surface (relationship_status/donor_stage/engagement_score/is_recurring
+     were previously mistyped non-nullable), listed in the dispatched
+     directive. Left for the Code Agent to fix so the branch never sits on
+     a broken intermediate build.
 - **UPDATE (session 40): Settings page SHIPPED and LIVE --
   ENTIRE DESIGN ROLLOUT COMPLETE.** Code Agent restyled
   src/app/(app)/settings/page.tsx only (commit `f0d9206`) -- Director gave
