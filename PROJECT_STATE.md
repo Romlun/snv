@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v4.4 Building project phases + action items`
+`snv Mission CRM — v4.5 Project phases + action items shipped`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -579,6 +579,32 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 41 cont'd x4): Project profile rebuild SHIPPED and
+  verified live.** Code Agent delivered all 3 files as one commit
+  (`19239f3` on the feature branch, again found as a local unpushed commit
+  before trusting the bare "it's done"). Diff was exactly the 3 files
+  directed — 652 insertions, 0 deletions, nothing else touched. Read the
+  full 559-line Project-page diff by hand: phases card correctly placed
+  first in `main`, edit/delete phase working off the same phaseForm state,
+  action items grouped by phase_id via a client-side Map, unphased tasks in
+  a separate read-only "No Phase" bucket, assignee dropdown on the inline
+  Add Action Item form correctly scoped to the project's own
+  `assignedStaff` (not full org staff) per the directive. One minor
+  non-blocking nit: the "No Phase" block is duplicated across two render
+  branches instead of extracted into a shared variable — cosmetic, not a
+  bug, not worth a re-dispatch.
+  `npx tsc --noEmit` and `npm run build` both clean. Went further than a
+  static read given this is real functional logic, not just JSX: ran a full
+  disposable insert cycle (test project, 2 phases, a phased task, an
+  unphased task) and executed the EXACT queries the page code uses to
+  confirm the phase_id grouping would actually produce the right buckets
+  before merging — not just that the code compiled. Cleaned up all
+  disposable rows after (note: this MCP connection bypasses RLS, so it
+  verifies query/grouping correctness, not authenticated-session behavior —
+  an operator click-through as Admin/Staff is still worth doing on the real
+  thing when convenient, though not blocking since the logic itself is now
+  double-verified). Merged to main (`e44d661`), confirmed READY on that
+  exact SHA (dpl_8ngbMyHh3f64hzAeCCfu7mnTWWgN) via Vercel.
 - **NEW (session 41 cont'd x3): Project profile rebuild — phases + action
   items.** Operator wants the Project profile genuinely useful for planning
   and implementation, not just funding tracking. Director read the full
@@ -600,7 +626,7 @@ effective gate. Continue this pattern.
   as its own clean commit (`870a6b8`) — same pattern as Phase 0: schema
   reflection separate from the UI commit that will build on it, so the
   branch never sits on a broken intermediate build.
-  **UI directive dispatched, not yet built**: adds a "Phases & Action
+  **UI directive dispatched and now SHIPPED (see the entry above)**: adds a "Phases & Action
   Items" section to the Project detail page (phase cards with status/dates,
   each listing its tasks, inline "+ Add Phase" and "+ Add Action Item"
   mini-forms mirroring the existing "Add Funds" toggle pattern already on
