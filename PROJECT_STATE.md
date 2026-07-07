@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v4.0 Design rollout complete, ready for next phase`
+`snv Mission CRM — v4.1 Phase 0 hygiene in progress`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -395,14 +395,15 @@ Auth via Supabase Auth. Every table with PII has RLS ON from creation.
 ---
 
 ## 8. ACTIVE CONSTRAINTS / HAZARDS
-- ⚠️ **UNVERIFIED: donors.card_expiry (discovered session 24).** A text
-  column exists on donors that isn't referenced anywhere in the app code or
-  in this file's history. Nobody currently knows if it's ever populated with
-  real card data. If it is, storing raw card info in plaintext on a table
-  with no PCI scoping would be a real compliance/security issue. NOT yet
-  investigated or acted on -- operator needs to check whether this column
-  has real data and decide what to do (drop it if unused, or handle properly
-  if it's live). Flag this as open until resolved.
+- ✅ **RESOLVED (session 41): donors.card_expiry.** Investigated directly
+  before acting: queried live data, 0 of 7 donor rows had anything populated
+  in this column (6 of those 7 were TEST DONOR rows, since deleted — see
+  below). No real card data ever existed in it. Confirmed via grep that
+  nothing in app code referenced it (only the stale generated types file and
+  the original creation migration did). Operator approved dropping it;
+  column dropped via migration `drop_unused_donor_card_expiry_column`,
+  verified gone from `information_schema.columns` afterward. Closed for
+  good — no PCI/compliance exposure existed in practice.
 - ⚠️ Next 16 is non-standard — see P1.
 - ⚠️ Donor + church + gift + contact-log records are PII/financial. RLS before
   exposure, always. Volunteers must never gain access to these.
@@ -555,6 +556,40 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 41): Phase 0 hygiene pass — 2 of 4 items closed,
+  verified live.** Clean Director swap at the top of this session (all
+  facts inherited verbatim from session 40's milestone, per a clean-swap
+  handoff — nothing re-litigated). Roadmap organized into phases; operator
+  chose Phase 0 (hygiene/hazard closure) first.
+  1. **donors.card_expiry — RESOLVED.** See §8. 0/7 rows populated, no app
+     code referenced it, operator approved the drop, migration applied and
+     verified.
+  2. **Test data — REMOVED.** Live counts matched the state file exactly (6
+     TEST DONOR, 5 TEST CHURCH). Before running the checked-in
+     `supabase/cleanup-test-data.sql`, verified it would have left orphans
+     behind: it only ever cleared `gifts` + `contact_logs`, but 6 `notes`
+     rows (donor-linked) and 1 `tasks` row (church-linked) also pointed at
+     these records via the polymorphic entity_id/related_to_id columns and
+     would have been silently orphaned. Extended the script (tasks + notes
+     deletes added, correct child-before-parent order), ran the corrected
+     version directly against production via Supabase MCP, verified 0 test
+     rows and 0 orphans remain. Committed the script fix to `main`
+     (`979c827`) so the checked-in version is correct for any future reuse.
+  3. **Churches' "Log Visit" next_step/next_visit_date gap — CONFIRMED,
+     not yet fixed.** Read `src/app/(app)/churches/[id]/visit/page.tsx`
+     directly: confirmed it writes `contact_logs` + creates the follow-up
+     task, but never touches `churches.next_step`/`next_visit_date` on the
+     parent row, unlike NotesLog. Both columns confirmed live on `churches`
+     via schema query before concluding this (P10 habit). Queued for a Code
+     Agent directive next.
+  4. **Stale `src/types/database.ts` — CONFIRMED, not yet fixed.**
+     Regenerated fresh types from live schema and diffed by hand: missing
+     `task_checklist_items`, `project_staff`, and `donors.birthday`/
+     `address` entirely; now ALSO stale in a new direction post-drop (still
+     references the now-gone `card_expiry`). ~15+ null-safety errors
+     expected on regeneration, per the session-12 estimate. Queued for the
+     same Code Agent directive as item 3, since both are routine,
+     already-scoped fixes with no open product decision behind them.
 - **UPDATE (session 40): Settings page SHIPPED and LIVE --
   ENTIRE DESIGN ROLLOUT COMPLETE.** Code Agent restyled
   src/app/(app)/settings/page.tsx only (commit `f0d9206`) -- Director gave
@@ -1115,12 +1150,17 @@ effective gate. Continue this pattern.
 - **STILL OPEN, LOWER PRIORITY (unrelated to design, don't let these block
   it):**
   - stale `src/types/database.ts` + the ~15 null-safety errors regeneration
-    surfaces (discovered session 12, not yet dispatched)
+    surfaces (discovered session 12, not yet dispatched) — now WORSE by one:
+    also still references the just-dropped `card_expiry` column (session 41),
+    on top of missing `task_checklist_items`, `project_staff`, and
+    `donors.birthday`/`address` entirely. Next to dispatch to Code Agent.
   - churches' older "Log Visit" form doesn't sync church.next_step/
     next_visit_date, unlike the donor/language-school equivalents and unlike
-    NotesLog (discovered session 13, not urgent)
-  - 6 TEST DONOR / 5 TEST CHURCH records still in production, need a
-    conscious removal decision before real end users see them
+    NotesLog (discovered session 13, not urgent) — confirmed still true by
+    reading `src/app/(app)/churches/[id]/visit/page.tsx` directly session 41.
+    Next to dispatch to Code Agent.
+  - ~~6 TEST DONOR / 5 TEST CHURCH records still in production~~ — REMOVED
+    session 41, see in-flight log.
 - **ROADMAP (not started, see §4):** real-time team chat, decided direction
   but deferred to next phase; reporting/AI features, not yet scoped.
 
