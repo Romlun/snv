@@ -1036,6 +1036,7 @@ export type Database = {
           created_at: string | null
           description: string | null
           due_date: string | null
+          due_time: string | null
           id: string
           org_id: string | null
           phase_id: string | null
@@ -1052,6 +1053,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           due_date?: string | null
+          due_time?: string | null
           id?: string
           org_id?: string | null
           phase_id?: string | null
@@ -1068,6 +1070,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           due_date?: string | null
+          due_time?: string | null
           id?: string
           org_id?: string | null
           phase_id?: string | null

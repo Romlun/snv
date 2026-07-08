@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
+import DashboardTaskToggle from "@/components/DashboardTaskToggle";
 import { Card } from "@/components/ui/Card";
 import { StatCard } from "@/components/ui/StatCard";
 import { getTransactionDateRange } from "@/lib/date-ranges";
@@ -29,6 +30,14 @@ function formatMoney(value: number) {
 function formatDate(value: string | null) {
   if (!value) return "—";
   return new Date(value).toLocaleDateString();
+}
+
+function formatDueTime(due_time: string | null): string {
+  if (!due_time) return "";
+  const [h, m] = due_time.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return ` at ${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
 
 function getInitials(name: string) {
@@ -82,7 +91,7 @@ export default async function Dashboard() {
       .limit(10),
     supabase
       .from("tasks")
-      .select("id, title, due_date, priority, status")
+      .select("id, title, due_date, due_time, priority, status")
       .neq("status", "Completed")
       .neq("status", "Cancelled")
       .gt("due_date", today)
@@ -103,7 +112,7 @@ export default async function Dashboard() {
   ] = await Promise.all([
     supabase
       .from("tasks")
-      .select("id, title, due_date, priority")
+      .select("id, title, due_date, due_time, priority, status")
       .lte("due_date", today)
       .neq("status", "Completed")
       .neq("status", "Cancelled"),
@@ -175,6 +184,7 @@ export default async function Dashboard() {
     id: string;
     title: string;
     due_date: string | null;
+    due_time: string | null;
     priority: string;
     status: string;
   };
@@ -186,6 +196,8 @@ export default async function Dashboard() {
     label: string;
     dueDate: string;
     href: string;
+    dueTime?: string | null;
+    status?: string;
   };
 
   const reminderTypeConfig: Record<
@@ -222,7 +234,9 @@ export default async function Dashboard() {
     id: string;
     title: string;
     due_date: string;
+    due_time: string | null;
     priority: string;
+    status: string;
   }[];
   const reminderDonors = (remindersDonorsResult.data ?? []) as {
     id: string;
@@ -248,6 +262,8 @@ export default async function Dashboard() {
       label: task.title,
       dueDate: task.due_date,
       href: `/tasks/${task.id}`,
+      dueTime: task.due_time,
+      status: task.status,
     })),
     ...reminderDonors.map((donor) => ({
       type: "donor" as const,
@@ -372,6 +388,12 @@ export default async function Dashboard() {
                             className="grid grid-cols-[1.5fr_1.2fr_1fr_0.8fr] items-center border-t border-outline-variant/10 px-6 py-4 transition-colors hover:bg-primary-container/5"
                           >
                             <div className="flex items-center gap-3">
+                              {reminder.type === "task" ? (
+                                <DashboardTaskToggle
+                                  taskId={reminder.id}
+                                  status={reminder.status ?? "Not started"}
+                                />
+                              ) : null}
                               <span
                                 className={cn(
                                   "flex h-9 w-9 items-center justify-center rounded-lg border",
@@ -404,6 +426,7 @@ export default async function Dashboard() {
                             <div className="flex flex-col">
                               <span className="text-sm font-medium text-on-surface">
                                 {formatDate(reminder.dueDate)}
+                                {formatDueTime(reminder.dueTime ?? null)}
                               </span>
                               <span className="text-[10px] font-bold uppercase tracking-wider text-red-600">
                                 {reminderDueLabel(reminder.dueDate)}
@@ -431,16 +454,22 @@ export default async function Dashboard() {
                           key={task.id}
                           className="grid grid-cols-[1.5fr_1.2fr_1fr_0.8fr] items-center border-t border-outline-variant/10 px-6 py-4 transition-colors hover:bg-primary-container/5"
                         >
-                          <div className="min-w-0">
-                            <Link
-                              href={`/tasks/${task.id}`}
-                              className="font-bold text-on-surface hover:text-primary"
-                            >
-                              {task.title}
-                            </Link>
-                            <p className="text-xs text-on-surface-variant">
-                              Task
-                            </p>
+                          <div className="flex items-center gap-3">
+                            <DashboardTaskToggle
+                              taskId={task.id}
+                              status={task.status}
+                            />
+                            <div className="min-w-0">
+                              <Link
+                                href={`/tasks/${task.id}`}
+                                className="font-bold text-on-surface hover:text-primary"
+                              >
+                                {task.title}
+                              </Link>
+                              <p className="text-xs text-on-surface-variant">
+                                Task
+                              </p>
+                            </div>
                           </div>
                           <p className="text-sm text-on-surface-variant">
                             Task scheduled
@@ -454,6 +483,7 @@ export default async function Dashboard() {
                           <div className="flex flex-col items-start gap-1">
                             <span className="text-sm font-medium text-on-surface">
                               {formatDate(task.due_date)}
+                              {formatDueTime(task.due_time)}
                             </span>
                             <Badge
                               variant={

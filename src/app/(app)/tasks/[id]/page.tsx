@@ -42,6 +42,7 @@ interface TaskRow {
   related_to_id: string | null;
   related_to_type: RelatedType | null;
   due_date: string | null;
+  due_time: string | null;
   priority: TaskPriority;
   status: TaskStatus;
   completed_date: string | null;
@@ -78,6 +79,14 @@ function getInitials(name: string) {
 
 function formatDate(value: string | null) {
   return value ? new Date(value).toLocaleDateString() : "Not set";
+}
+
+function formatDueTime(due_time: string | null): string {
+  if (!due_time) return "";
+  const [h, m] = due_time.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return ` at ${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
 
 function getStatusVariant(status: TaskStatus): BadgeVariant {
@@ -306,6 +315,7 @@ export default function TaskDetailPage({ params }: { params: Promise<{ id: strin
               <span className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-primary-container" />
                 Due {formatDate(task.due_date)}
+                {formatDueTime(task.due_time)}
               </span>
               <span className="flex items-center gap-2">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-container/15 text-[10px] font-semibold text-primary">
@@ -345,7 +355,11 @@ export default function TaskDetailPage({ params }: { params: Promise<{ id: strin
               Task Details
             </h2>
             <div className="space-y-4">
-              <DetailRow icon={Calendar} label="Due Date" value={formatDate(task.due_date)} />
+              <DetailRow
+                icon={Calendar}
+                label="Due Date"
+                value={`${formatDate(task.due_date)}${formatDueTime(task.due_time)}`}
+              />
               <DetailRow icon={UserIcon} label="Assigned To" value={assigneeName} />
               <div>
                 <p className="mb-1 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">

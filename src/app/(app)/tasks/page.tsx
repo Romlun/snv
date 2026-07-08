@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import TaskCompleteToggle from "@/components/TaskCompleteToggle";
 
 type TaskStatus =
   | "Not started"
@@ -37,6 +38,7 @@ interface TaskRow {
   related_to_id: string | null;
   related_to_type: "donor" | "church" | "project" | null;
   due_date: string | null;
+  due_time: string | null;
   priority: TaskPriority;
   status: TaskStatus;
   completed_date: string | null;
@@ -69,6 +71,14 @@ function formatDate(value: string | null) {
   return value ? new Date(value).toLocaleDateString() : "No due date";
 }
 
+function formatDueTime(due_time: string | null): string {
+  if (!due_time) return "";
+  const [h, m] = due_time.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return ` at ${hour12}:${String(m).padStart(2, "0")} ${period}`;
+}
+
 function getStatusVariant(status: TaskStatus) {
   if (status === "Completed") return "success";
   if (status === "Cancelled") return "error";
@@ -92,26 +102,27 @@ export default function TasksPage() {
 
   const supabase = createClient();
 
-  useEffect(() => {
-    async function fetchTasks() {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("tasks")
-          .select("*, profiles(full_name, email)")
-          .order("due_date", { ascending: true, nullsFirst: false });
+  async function fetchTasks() {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("tasks")
+        .select("*, profiles(full_name, email)")
+        .order("due_date", { ascending: true, nullsFirst: false });
 
-        if (error) throw error;
-        setTasks((data || []) as TaskRow[]);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
-      } finally {
-        setLoading(false);
-      }
+      if (error) throw error;
+      setTasks((data || []) as TaskRow[]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
     fetchTasks();
-  }, [supabase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const visibleTasks = tasks
     .filter((task) => statusFilter === "All" || task.status === statusFilter)
@@ -292,17 +303,26 @@ export default function TasksPage() {
                       }
                     >
                       <td className="px-6 py-4">
-                        <Link
-                          href={`/tasks/${task.id}`}
-                          className="font-bold text-on-surface hover:text-primary"
-                        >
-                          {task.title}
-                        </Link>
-                        {task.description ? (
-                          <p className="line-clamp-1 text-xs text-on-surface-variant">
-                            {task.description}
-                          </p>
-                        ) : null}
+                        <div className="flex items-start gap-3">
+                          <TaskCompleteToggle
+                            taskId={task.id}
+                            status={task.status}
+                            onToggled={fetchTasks}
+                          />
+                          <div className="min-w-0">
+                            <Link
+                              href={`/tasks/${task.id}`}
+                              className="font-bold text-on-surface hover:text-primary"
+                            >
+                              {task.title}
+                            </Link>
+                            {task.description ? (
+                              <p className="line-clamp-1 text-xs text-on-surface-variant">
+                                {task.description}
+                              </p>
+                            ) : null}
+                          </div>
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <Badge
@@ -328,6 +348,7 @@ export default function TasksPage() {
                         <span className="inline-flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-on-surface-variant/70" />
                           {formatDate(task.due_date)}
+                          {formatDueTime(task.due_time)}
                         </span>
                       </td>
                       <td className="px-6 py-4">

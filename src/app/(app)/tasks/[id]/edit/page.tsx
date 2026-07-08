@@ -43,6 +43,7 @@ interface FormData {
   description: string;
   assigned_to: string;
   due_date: string;
+  due_time: string;
   priority: TaskPriority;
   status: TaskStatus;
   related_to_type: RelatedType | "";
@@ -80,6 +81,10 @@ function toDateInputValue(value: string | null) {
   return value?.match(DATE_RE)?.[0] || "";
 }
 
+function toTimeInputValue(value: string | null) {
+  return value ? value.slice(0, 5) : "";
+}
+
 export default function EditTaskPage({
   params,
 }: {
@@ -98,6 +103,7 @@ export default function EditTaskPage({
     description: "",
     assigned_to: "",
     due_date: "",
+    due_time: "",
     priority: "Medium",
     status: "Not started",
     related_to_type: "",
@@ -147,6 +153,7 @@ export default function EditTaskPage({
             description: taskData.description || "",
             assigned_to: taskData.assigned_to || "",
             due_date: toDateInputValue(taskData.due_date),
+            due_time: toTimeInputValue(taskData.due_time),
             priority: taskData.priority || "Medium",
             status: taskData.status || "Not started",
             related_to_type: taskData.related_to_type || "",
@@ -192,6 +199,7 @@ export default function EditTaskPage({
               ? formData.phase_id || null
               : null,
           due_date: dueDateIsoOrNull(formData.due_date),
+          due_time: formData.due_time || null,
           priority: formData.priority,
           status: formData.status,
           completed_date:
@@ -286,6 +294,19 @@ export default function EditTaskPage({
                   value={formData.due_date}
                   onChange={val => setFormData({ ...formData, due_date: val })}
                 />
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-on-surface">
+                    Due Time
+                  </label>
+                  <Input
+                    type="time"
+                    variant="box"
+                    value={formData.due_time}
+                    onChange={e =>
+                      setFormData({ ...formData, due_time: e.target.value })
+                    }
+                  />
+                </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-on-surface">
                     Priority
