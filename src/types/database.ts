@@ -1034,6 +1034,7 @@ export type Database = {
           assigned_to: string | null
           completed_date: string | null
           created_at: string | null
+          created_from_planner: boolean
           description: string | null
           due_date: string | null
           due_time: string | null
@@ -1051,6 +1052,7 @@ export type Database = {
           assigned_to?: string | null
           completed_date?: string | null
           created_at?: string | null
+          created_from_planner?: boolean
           description?: string | null
           due_date?: string | null
           due_time?: string | null
@@ -1068,6 +1070,7 @@ export type Database = {
           assigned_to?: string | null
           completed_date?: string | null
           created_at?: string | null
+          created_from_planner?: boolean
           description?: string | null
           due_date?: string | null
           due_time?: string | null
