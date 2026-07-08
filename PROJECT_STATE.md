@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v4.8 Tasks list defaults to Active view`
+`snv Mission CRM — v4.9 Planner tasks separated from Tasks list`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -579,6 +579,30 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 41 cont'd x9): Planner-only tasks SHIPPED and verified
+  live.** Operator caught a real gap: Planner quick-add tasks were
+  indistinguishable from regular tasks, so they leaked into the Tasks list.
+  First directive over-scoped it (also hid them from the Dashboard) --
+  operator corrected same-turn: Dashboard should keep showing them, only
+  the Tasks list should hide them. Corrected directive dispatched, delivered
+  as commit `b30457f` -- exact minimal diff, 2 lines across the 2 files
+  needed (Planner's insert sets `created_from_planner: true`; Tasks list
+  query adds `.eq("created_from_planner", false)`), Dashboard and Planner's
+  own fetch untouched as directed. `npx tsc --noEmit` and `npm run build`
+  both clean. Verified the actual filter behavior with a disposable insert
+  (flagged row correctly excluded by the filtered query, correctly present
+  without it), cleaned up after. Merged to main (fast-forward, `b30457f`),
+  confirmed READY on that exact SHA (dpl_HFQv51doU6bPzTbR8uQxdpHcBpdL) via
+  Vercel.
+  Schema: `tasks.created_from_planner` (boolean, default false, verified
+  live) -- the only place that should ever set this true is the Planner's
+  own quick-add insert.
+  **STILL OPEN**: an existing task ("speak with Roman", due today 4pm, no
+  relation) was created via the Planner before this column existed, so it
+  won't be retroactively flagged and still shows on the Tasks list.
+  Director offered twice to flag it manually; operator hasn't answered
+  either time. Don't silently do it -- keep asking or let it drop, it's a
+  one-off, not a real backlog item.
 - **NOTE (session 41 cont'd x8): operator alternates between Codex and a
   separate Claude Code agent when Codex hits usage limits — explains the
   earlier mix-up where a report described an already-shipped commit
