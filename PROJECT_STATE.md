@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v4.9 Planner tasks separated from Tasks list`
+`snv Mission CRM — v5.0 Scoping prayer partners + prayer requests`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -250,16 +250,51 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
   mention it doesn't have).
 
 **What's NOT built yet, in priority order:**
-1. **Reporting, AI features (REORDERED to front, session 41)** — operator
-   explicitly postponed real-time chat and chose to scope this first
-   instead, then PAUSED the scoping conversation itself (same session):
-   operator is waiting on input from the team/workers on what reporting
-   they actually need before deciding anything further. Director asked two
-   grounded scoping questions (which reports matter, what "AI" should mean)
-   but got no answer to either — operator wants to gather real input first.
-   Do NOT re-raise or re-ask these scoping questions next session; wait for
-   the operator to bring back what the team said.
-2. **Real-time team communication (session 16, new roadmap item)** —
+1. **Prayer partners + prayer requests (session 42, NEW, operator's top
+   pick)** — Director researched what dedicated missionary/faith-based CRM
+   tools (DonorElf, TnTMPD, Denari, DonorDirect) build that generic
+   nonprofit CRMs don't, presented several options grounded in that
+   research. Operator's response, decision by decision:
+   - **Prayer partners + prayer requests: enthusiastic yes, build now.**
+     "We can pray for people and track their requests... improve our
+     relationships with them."
+   - **Daily prayer list (surface ~10 donors/day for the team to pray
+     through, rotating) — explicitly FUTURE, not now.** Operator's own
+     words: "It can be for future." Don't build the rotation/surfacing
+     logic yet — just don't design the data model in a way that blocks it
+     later (e.g. don't make it awkward to later query "who hasn't been
+     prayed for recently").
+   - **Per-staff support-raising % tracking — REJECTED, not applicable.**
+     "The staff doesn't raise their salary" — Light in the East's staff
+     model isn't personal-support-raising missionaries. Don't re-propose
+     this.
+   - **Sending/home church relationship — REJECTED, not applicable.** "We
+     don't have our churches" — the sending-church concept from the
+     research doesn't map onto this org. Don't re-propose this.
+   - **Volunteers — real, but FUTURE.** "We have volunteers. And we can
+     track for the future how many people we have." Not scoped or
+     started; just a count/roster need, revisit later. Note: this is
+     EXTERNAL volunteers (people who help with things), not the internal
+     `user_role` enum's "Volunteer" (an internal staff-account permission
+     tier) — don't conflate the two when this gets picked up.
+   - **Mission trips — no new feature, use existing Projects.** "Missions
+     trips can be as a projects now." Confirmed: Projects (with phases +
+     action items, already shipped) is the right model for this; don't
+     build a separate events/trips module.
+   Prayer partners + requests scoping (schema, UI placement) is in
+   progress — see in-flight log for the live architecture conversation.
+2. **Reporting + AI features — UNPAUSED (session 42).** Operator: "Reporting
+   are good. We can add it to the scope." Also explicitly confirmed
+   **annual donor giving statements** as wanted ("Giving statements good
+   too") — a concrete, well-scoped answer to part of the old "what should
+   reporting show" question: gift history exists already (`gifts` table),
+   this is mostly an export/formatting problem, not new data. Ministry-
+   impact reporting (baptisms, people reached, church plants, etc. for
+   board reports/newsletters) was also raised as a good fit but is NOT yet
+   scoped in schema detail — do a real scoping pass (grounded in actual
+   data available) before building, same discipline as everything else.
+   Real-time team chat stays postponed (see below), unaffected by this.
+3. **Real-time team communication (session 16, new roadmap item)** —
    POSTPONED (session 41, operator's explicit choice, not a mistake/stuck
    situation — don't second-guess this later without asking). Direction
    was already decided before the postponement: real-time chat (not just a
@@ -272,8 +307,9 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
    genuinely different piece of infrastructure than anything built so far
    in this request/response app — needs its own design pass before
    building, not a quick directive. Don't build this reactively.
-3. **Deferred polish/design pass** — after functional work settles. Candidate tool:
+4. **Deferred polish/design pass** — after functional work settles. Candidate tool:
    Stitch (Google AI UI-design MCP) — see §9 for the security caveat on its key.
+
 
 ---
 
