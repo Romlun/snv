@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v4.6 Planner shipped, dashboard attention window fixed`
+`snv Mission CRM — v4.7 Planner refinements shipped (time, complete toggle)`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -579,6 +579,26 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 41 cont'd x7): Planner refinements SHIPPED and verified
+  live.** Code Agent delivered all 3 commits on the feature branch (default
+  view, due_time, TaskCompleteToggle) — correctly pushed there this time,
+  not directly to main. Read every diff in full before trusting the "done":
+  default-view change was a clean one-liner; due_time correctly threaded
+  through all 6 touch points including catching that the "Overdue / Due
+  Today" query's SELECT never had `status` in its list either (needed for
+  the toggle, added correctly); TaskCompleteToggle built as a genuinely
+  shared, reused component (not copy-pasted 5 times) plus a thin
+  DashboardTaskToggle client wrapper for the Server Component page, exactly
+  the architecture directed. `npx tsc --noEmit` and `npm run build` both
+  clean. Ran a live disposable round-trip beyond static review: inserted a
+  real task with due_time '15:00', confirmed it stored correctly, toggled
+  status Completed → confirmed completed_date set, toggled back →
+  confirmed completed_date cleared to null, cleaned up after. Merged to
+  main (`7ac977a`), confirmed READY on that exact SHA
+  (dpl_AhidD8kCWiYmbUEgRdaGAyRpeBdQ) via Vercel. Same known pattern as
+  before: the feature branch's own preview builds errored on these commits
+  while main's build (local and Vercel) stayed clean — consistent noise,
+  not a regression.
 - **NEW (session 41 cont'd x6): Planner refinements — default-to-Today,
   optional time-of-day, universal complete-checkbox.** Operator feedback
   on the freshly-shipped Planner: default view should be Today, not Week;
