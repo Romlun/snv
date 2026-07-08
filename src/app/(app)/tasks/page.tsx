@@ -45,8 +45,9 @@ interface TaskRow {
   profiles: ProfileJoin | ProfileJoin[] | null;
 }
 
-const taskStatuses: Array<TaskStatus | "All"> = [
+const taskStatuses: Array<TaskStatus | "All" | "Active"> = [
   "All",
+  "Active",
   "Not started",
   "In progress",
   "Waiting",
@@ -95,7 +96,9 @@ function getPriorityVariant(priority: TaskPriority) {
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<TaskRow[]>([]);
-  const [statusFilter, setStatusFilter] = useState<TaskStatus | "All">("All");
+  const [statusFilter, setStatusFilter] = useState<TaskStatus | "All" | "Active">(
+    "Active",
+  );
   const [sortMode, setSortMode] = useState<SortMode>("due_date");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -125,7 +128,11 @@ export default function TasksPage() {
   }, []);
 
   const visibleTasks = tasks
-    .filter((task) => statusFilter === "All" || task.status === statusFilter)
+    .filter((task) => {
+      if (statusFilter === "All") return true;
+      if (statusFilter === "Active") return activeStatuses.includes(task.status);
+      return task.status === statusFilter;
+    })
     .sort((a, b) => {
       if (sortMode === "status") {
         return (
@@ -235,7 +242,7 @@ export default function TasksPage() {
             className="focus-ring rounded-lg border border-outline-variant/20 bg-surface px-3 py-2.5 text-sm text-on-surface outline-none transition-colors focus-visible:border-primary"
             value={statusFilter}
             onChange={(event) =>
-              setStatusFilter(event.target.value as TaskStatus | "All")
+              setStatusFilter(event.target.value as TaskStatus | "All" | "Active")
             }
           >
             {taskStatuses.map((status) => (
