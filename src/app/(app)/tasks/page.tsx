@@ -111,6 +111,7 @@ export default function TasksPage() {
       const { data, error } = await supabase
         .from("tasks")
         .select("*, profiles(full_name, email)")
+        .eq("created_from_planner", false)
         .order("due_date", { ascending: true, nullsFirst: false });
 
       if (error) throw error;

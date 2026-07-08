@@ -350,6 +350,7 @@ export default function PlannerPage() {
         assigned_to: user.id,
         status: "Not started",
         priority: quickAddForm.priority,
+        created_from_planner: true,
       });
 
       if (error) throw error;
