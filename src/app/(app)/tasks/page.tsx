@@ -37,6 +37,7 @@ interface TaskRow {
   related_to_id: string | null;
   related_to_type: "donor" | "church" | "project" | null;
   due_date: string | null;
+  due_time: string | null;
   priority: TaskPriority;
   status: TaskStatus;
   completed_date: string | null;
@@ -67,6 +68,14 @@ function isOverdue(task: TaskRow) {
 
 function formatDate(value: string | null) {
   return value ? new Date(value).toLocaleDateString() : "No due date";
+}
+
+function formatDueTime(due_time: string | null): string {
+  if (!due_time) return "";
+  const [h, m] = due_time.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return ` at ${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
 
 function getStatusVariant(status: TaskStatus) {
@@ -328,6 +337,7 @@ export default function TasksPage() {
                         <span className="inline-flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-on-surface-variant/70" />
                           {formatDate(task.due_date)}
+                          {formatDueTime(task.due_time)}
                         </span>
                       </td>
                       <td className="px-6 py-4">

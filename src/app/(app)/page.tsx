@@ -31,6 +31,14 @@ function formatDate(value: string | null) {
   return new Date(value).toLocaleDateString();
 }
 
+function formatDueTime(due_time: string | null): string {
+  if (!due_time) return "";
+  const [h, m] = due_time.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return ` at ${hour12}:${String(m).padStart(2, "0")} ${period}`;
+}
+
 function getInitials(name: string) {
   return name
     .split(" ")
@@ -82,7 +90,7 @@ export default async function Dashboard() {
       .limit(10),
     supabase
       .from("tasks")
-      .select("id, title, due_date, priority, status")
+      .select("id, title, due_date, due_time, priority, status")
       .neq("status", "Completed")
       .neq("status", "Cancelled")
       .gt("due_date", today)
@@ -103,7 +111,7 @@ export default async function Dashboard() {
   ] = await Promise.all([
     supabase
       .from("tasks")
-      .select("id, title, due_date, priority")
+      .select("id, title, due_date, due_time, priority")
       .lte("due_date", today)
       .neq("status", "Completed")
       .neq("status", "Cancelled"),
@@ -175,6 +183,7 @@ export default async function Dashboard() {
     id: string;
     title: string;
     due_date: string | null;
+    due_time: string | null;
     priority: string;
     status: string;
   };
@@ -186,6 +195,7 @@ export default async function Dashboard() {
     label: string;
     dueDate: string;
     href: string;
+    dueTime?: string | null;
   };
 
   const reminderTypeConfig: Record<
@@ -222,6 +232,7 @@ export default async function Dashboard() {
     id: string;
     title: string;
     due_date: string;
+    due_time: string | null;
     priority: string;
   }[];
   const reminderDonors = (remindersDonorsResult.data ?? []) as {
@@ -248,6 +259,7 @@ export default async function Dashboard() {
       label: task.title,
       dueDate: task.due_date,
       href: `/tasks/${task.id}`,
+      dueTime: task.due_time,
     })),
     ...reminderDonors.map((donor) => ({
       type: "donor" as const,
@@ -404,6 +416,7 @@ export default async function Dashboard() {
                             <div className="flex flex-col">
                               <span className="text-sm font-medium text-on-surface">
                                 {formatDate(reminder.dueDate)}
+                                {formatDueTime(reminder.dueTime ?? null)}
                               </span>
                               <span className="text-[10px] font-bold uppercase tracking-wider text-red-600">
                                 {reminderDueLabel(reminder.dueDate)}
@@ -454,6 +467,7 @@ export default async function Dashboard() {
                           <div className="flex flex-col items-start gap-1">
                             <span className="text-sm font-medium text-on-surface">
                               {formatDate(task.due_date)}
+                              {formatDueTime(task.due_time)}
                             </span>
                             <Badge
                               variant={

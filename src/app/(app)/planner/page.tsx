@@ -49,12 +49,14 @@ interface PlannerItem {
   date: string;
   href: string;
   priority?: string;
+  due_time?: string | null;
 }
 
 interface TaskRow {
   id: string;
   title: string;
   due_date: string | null;
+  due_time: string | null;
   status: string;
   priority: string;
 }
@@ -67,6 +69,7 @@ interface RelatedRow {
 interface QuickAddForm {
   title: string;
   due_date: string;
+  due_time: string;
   priority: TaskPriority;
 }
 
@@ -116,6 +119,14 @@ const emptyStateCopy: Record<ViewMode, string> = {
 
 function normalizeDate(value: string): string {
   return value.slice(0, 10);
+}
+
+function formatDueTime(due_time: string | null): string {
+  if (!due_time) return "";
+  const [h, m] = due_time.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return ` at ${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
 
 function todayIso() {
@@ -190,6 +201,7 @@ export default function PlannerPage() {
   const [quickAddForm, setQuickAddForm] = useState<QuickAddForm>({
     title: "",
     due_date: todayIso(),
+    due_time: "",
     priority: "Medium",
   });
 
@@ -208,7 +220,7 @@ export default function PlannerPage() {
         await Promise.all([
           supabase
             .from("tasks")
-            .select("id, title, due_date, status, priority")
+            .select("id, title, due_date, due_time, status, priority")
             .eq("assigned_to", user.id)
             .neq("status", "Completed")
             .neq("status", "Cancelled"),
@@ -250,6 +262,7 @@ export default function PlannerPage() {
             date: normalizeDate(task.due_date as string),
             href: `/tasks/${task.id}`,
             priority: task.priority,
+            due_time: task.due_time,
           })),
         ...donors.map((donor) => ({
           type: "donor" as const,
@@ -305,7 +318,14 @@ export default function PlannerPage() {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, dateItems]) => ({
         date,
-        items: dateItems.sort((a, b) => a.label.localeCompare(b.label)),
+        items: dateItems.sort((a, b) => {
+          const aTime = a.due_time ?? null;
+          const bTime = b.due_time ?? null;
+          if (aTime && bTime) return aTime.localeCompare(bTime);
+          if (aTime && !bTime) return -1;
+          if (!aTime && bTime) return 1;
+          return a.label.localeCompare(b.label);
+        }),
       }));
   }, [items, range]);
 
@@ -323,6 +343,7 @@ export default function PlannerPage() {
       const { error } = await supabase.from("tasks").insert({
         title: quickAddForm.title,
         due_date: dueDate ? new Date(dueDate).toISOString() : null,
+        due_time: quickAddForm.due_time || null,
         assigned_to: user.id,
         status: "Not started",
         priority: quickAddForm.priority,
@@ -334,6 +355,7 @@ export default function PlannerPage() {
       setQuickAddForm({
         title: "",
         due_date: defaultDueDate(view, anchorDate),
+        due_time: "",
         priority: "Medium",
       });
       setShowQuickAdd(false);
@@ -370,6 +392,7 @@ export default function PlannerPage() {
             setQuickAddForm({
               title: "",
               due_date: defaultDueDate(view, anchorDate),
+              due_time: "",
               priority: "Medium",
             });
           }}
@@ -439,7 +462,7 @@ export default function PlannerPage() {
           </h2>
           <form
             onSubmit={handleQuickAdd}
-            className="grid grid-cols-1 gap-4 md:grid-cols-3"
+            className="grid grid-cols-1 gap-4 md:grid-cols-4"
           >
             <div className="space-y-2">
               <label className="text-sm font-semibold text-on-surface">
@@ -463,6 +486,19 @@ export default function PlannerPage() {
             />
             <div className="space-y-2">
               <label className="text-sm font-semibold text-on-surface">
+                Due Time
+              </label>
+              <Input
+                type="time"
+                variant="box"
+                value={quickAddForm.due_time}
+                onChange={(e) =>
+                  setQuickAddForm({ ...quickAddForm, due_time: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-on-surface">
                 Priority
               </label>
               <Select
@@ -482,7 +518,7 @@ export default function PlannerPage() {
                 ))}
               </Select>
             </div>
-            <div className="flex flex-col gap-3 md:col-span-3 sm:flex-row">
+            <div className="flex flex-col gap-3 md:col-span-4 sm:flex-row">
               <Button type="submit" disabled={savingTask}>
                 {savingTask ? "Adding..." : "Save Task"}
               </Button>
@@ -547,6 +583,9 @@ export default function PlannerPage() {
                             </Link>
                             <p className="text-xs text-on-surface-variant">
                               {config.label}
+                              {item.type === "task"
+                                ? formatDueTime(item.due_time ?? null)
+                                : ""}
                             </p>
                           </div>
                         </div>
