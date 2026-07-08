@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import TaskCompleteToggle from "@/components/TaskCompleteToggle";
 
 type TaskStatus =
   | "Not started"
@@ -101,26 +102,27 @@ export default function TasksPage() {
 
   const supabase = createClient();
 
-  useEffect(() => {
-    async function fetchTasks() {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("tasks")
-          .select("*, profiles(full_name, email)")
-          .order("due_date", { ascending: true, nullsFirst: false });
+  async function fetchTasks() {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("tasks")
+        .select("*, profiles(full_name, email)")
+        .order("due_date", { ascending: true, nullsFirst: false });
 
-        if (error) throw error;
-        setTasks((data || []) as TaskRow[]);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
-      } finally {
-        setLoading(false);
-      }
+      if (error) throw error;
+      setTasks((data || []) as TaskRow[]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
     fetchTasks();
-  }, [supabase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const visibleTasks = tasks
     .filter((task) => statusFilter === "All" || task.status === statusFilter)
@@ -301,17 +303,26 @@ export default function TasksPage() {
                       }
                     >
                       <td className="px-6 py-4">
-                        <Link
-                          href={`/tasks/${task.id}`}
-                          className="font-bold text-on-surface hover:text-primary"
-                        >
-                          {task.title}
-                        </Link>
-                        {task.description ? (
-                          <p className="line-clamp-1 text-xs text-on-surface-variant">
-                            {task.description}
-                          </p>
-                        ) : null}
+                        <div className="flex items-start gap-3">
+                          <TaskCompleteToggle
+                            taskId={task.id}
+                            status={task.status}
+                            onToggled={fetchTasks}
+                          />
+                          <div className="min-w-0">
+                            <Link
+                              href={`/tasks/${task.id}`}
+                              className="font-bold text-on-surface hover:text-primary"
+                            >
+                              {task.title}
+                            </Link>
+                            {task.description ? (
+                              <p className="line-clamp-1 text-xs text-on-surface-variant">
+                                {task.description}
+                              </p>
+                            ) : null}
+                          </div>
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <Badge

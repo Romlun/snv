@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import DateField from "@/components/DateField";
+import TaskCompleteToggle from "@/components/TaskCompleteToggle";
 import {
   ArrowLeft,
   Calendar,
@@ -958,17 +959,24 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                                     key={task.id}
                                     className="flex flex-col gap-3 rounded-lg border border-outline-variant/10 bg-white/45 p-3 transition-colors hover:bg-primary-container/5 sm:flex-row sm:items-start sm:justify-between"
                                   >
-                                    <div>
-                                      <Link
-                                        href={`/tasks/${task.id}`}
-                                        className="font-semibold text-on-surface hover:text-primary"
-                                      >
-                                        {task.title}
-                                      </Link>
-                                      <p className="mt-1 text-xs text-on-surface-variant">
-                                        {getAssigneeName(task.assigned_to) || "Unassigned"}
-                                        {task.due_date ? ` • Due ${formatDate(task.due_date)}` : ""}
-                                      </p>
+                                    <div className="flex items-start gap-3">
+                                      <TaskCompleteToggle
+                                        taskId={task.id}
+                                        status={task.status || "Not started"}
+                                        onToggled={() => fetchProjectData()}
+                                      />
+                                      <div>
+                                        <Link
+                                          href={`/tasks/${task.id}`}
+                                          className="font-semibold text-on-surface hover:text-primary"
+                                        >
+                                          {task.title}
+                                        </Link>
+                                        <p className="mt-1 text-xs text-on-surface-variant">
+                                          {getAssigneeName(task.assigned_to) || "Unassigned"}
+                                          {task.due_date ? ` • Due ${formatDate(task.due_date)}` : ""}
+                                        </p>
+                                      </div>
                                     </div>
                                     <Badge variant={PHASE_STATUS_BADGE_VARIANT[task.status || "Not started"]}>
                                       {task.status || "Not started"}
@@ -1060,17 +1068,24 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                             key={task.id}
                             className="flex flex-col gap-3 rounded-lg border border-outline-variant/10 bg-white/45 p-3 sm:flex-row sm:items-start sm:justify-between"
                           >
-                            <div>
-                              <Link
-                                href={`/tasks/${task.id}`}
-                                className="font-semibold text-on-surface hover:text-primary"
-                              >
-                                {task.title}
-                              </Link>
-                              <p className="mt-1 text-xs text-on-surface-variant">
-                                {getAssigneeName(task.assigned_to) || "Unassigned"}
-                                {task.due_date ? ` • Due ${formatDate(task.due_date)}` : ""}
-                              </p>
+                            <div className="flex items-start gap-3">
+                              <TaskCompleteToggle
+                                taskId={task.id}
+                                status={task.status || "Not started"}
+                                onToggled={() => fetchProjectData()}
+                              />
+                              <div>
+                                <Link
+                                  href={`/tasks/${task.id}`}
+                                  className="font-semibold text-on-surface hover:text-primary"
+                                >
+                                  {task.title}
+                                </Link>
+                                <p className="mt-1 text-xs text-on-surface-variant">
+                                  {getAssigneeName(task.assigned_to) || "Unassigned"}
+                                  {task.due_date ? ` • Due ${formatDate(task.due_date)}` : ""}
+                                </p>
+                              </div>
                             </div>
                             <Badge variant={PHASE_STATUS_BADGE_VARIANT[task.status || "Not started"]}>
                               {task.status || "Not started"}
@@ -1092,17 +1107,24 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                         key={task.id}
                         className="flex flex-col gap-3 rounded-lg border border-outline-variant/10 bg-white/45 p-3 sm:flex-row sm:items-start sm:justify-between"
                       >
-                        <div>
-                          <Link
-                            href={`/tasks/${task.id}`}
-                            className="font-semibold text-on-surface hover:text-primary"
-                          >
-                            {task.title}
-                          </Link>
-                          <p className="mt-1 text-xs text-on-surface-variant">
-                            {getAssigneeName(task.assigned_to) || "Unassigned"}
-                            {task.due_date ? ` • Due ${formatDate(task.due_date)}` : ""}
-                          </p>
+                        <div className="flex items-start gap-3">
+                          <TaskCompleteToggle
+                            taskId={task.id}
+                            status={task.status || "Not started"}
+                            onToggled={() => fetchProjectData()}
+                          />
+                          <div>
+                            <Link
+                              href={`/tasks/${task.id}`}
+                              className="font-semibold text-on-surface hover:text-primary"
+                            >
+                              {task.title}
+                            </Link>
+                            <p className="mt-1 text-xs text-on-surface-variant">
+                              {getAssigneeName(task.assigned_to) || "Unassigned"}
+                              {task.due_date ? ` • Due ${formatDate(task.due_date)}` : ""}
+                            </p>
+                          </div>
                         </div>
                         <Badge variant={PHASE_STATUS_BADGE_VARIANT[task.status || "Not started"]}>
                           {task.status || "Not started"}

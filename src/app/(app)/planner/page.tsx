@@ -37,6 +37,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Input";
 import DateField from "@/components/DateField";
+import TaskCompleteToggle from "@/components/TaskCompleteToggle";
 
 type ViewMode = "day" | "week" | "month" | "quarter";
 type PlannerItemType = "task" | "donor" | "church" | "language_school";
@@ -50,6 +51,7 @@ interface PlannerItem {
   href: string;
   priority?: string;
   due_time?: string | null;
+  status?: string;
 }
 
 interface TaskRow {
@@ -263,6 +265,7 @@ export default function PlannerPage() {
             href: `/tasks/${task.id}`,
             priority: task.priority,
             due_time: task.due_time,
+            status: task.status,
           })),
         ...donors.map((donor) => ({
           type: "donor" as const,
@@ -566,6 +569,13 @@ export default function PlannerPage() {
                         className="flex items-center justify-between gap-4 border-t border-outline-variant/10 px-6 py-4 transition-colors hover:bg-primary-container/5"
                       >
                         <div className="flex min-w-0 items-center gap-3">
+                          {item.type === "task" ? (
+                            <TaskCompleteToggle
+                              taskId={item.id}
+                              status={item.status ?? "Not started"}
+                              onToggled={fetchPlannerData}
+                            />
+                          ) : null}
                           <span
                             className={cn(
                               "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border",
