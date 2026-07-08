@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v4.7 Planner refinements shipped (time, complete toggle)`
+`snv Mission CRM — v4.8 Tasks list defaults to Active view`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -579,6 +579,28 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **NOTE (session 41 cont'd x8): operator alternates between Codex and a
+  separate Claude Code agent when Codex hits usage limits — explains the
+  earlier mix-up where a report described an already-shipped commit
+  (`af79047`) instead of the outstanding one. Not a data-integrity concern,
+  just a heads-up that "the agent" may mean either tool session to session;
+  Director verifies the actual diff either way, so this doesn't change
+  anything about the verification process itself.**
+- **UPDATE (session 41 cont'd x8): Tasks list default-to-Active filter
+  SHIPPED and verified live.** Delivered as commit `b72871b` on the
+  feature branch — exact match to the directive, single file, wired the
+  pre-existing (previously stats-card-only) `activeStatuses` constant into
+  `statusFilter` as a new default bucket, added "Active" to the dropdown
+  right after "All". `npx tsc --noEmit` and `npm run build` both clean.
+  Confirmed real effect before merging: live data has 4 active tasks
+  (3 Not started + 1 Waiting) and 4 Completed sitting mixed together today
+  — the filter genuinely hides half the list by default now, not a no-op
+  on empty data. Merged to main (`0288c62`), confirmed READY on that exact
+  SHA (dpl_4a6LmcvjHvKXhhxTTTe8Dn7x6KLR) via Vercel.
+  Project Phases' action-item lists deliberately do NOT get this same
+  hide-by-default treatment (operator's explicit choice) — completed
+  action items stay visible there with the Completed badge/checkmark as a
+  phase-progress indicator. Don't re-propose hiding them there later.
 - **UPDATE (session 41 cont'd x7): Planner refinements SHIPPED and verified
   live.** Code Agent delivered all 3 commits on the feature branch (default
   view, due_time, TaskCompleteToggle) — correctly pushed there this time,
