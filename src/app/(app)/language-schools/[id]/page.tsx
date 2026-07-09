@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import NotesLog from "@/components/NotesLog";
+import PrayerRequestsLog from "@/components/PrayerRequestsLog";
 import {
   ArrowLeft,
   ChevronRight,
@@ -349,6 +350,8 @@ export default function LanguageSchoolDetailPage({ params }: { params: Promise<{
               onFollowUpDateSaved={next_follow_up_date => setSchool(prev => prev ? { ...prev, next_follow_up_date } : prev)}
             />
           </Card>
+
+          <PrayerRequestsLog entityType="language_school" entityId={school.id} />
 
           <Card padding="none" className="overflow-hidden">
             <Card.Header>

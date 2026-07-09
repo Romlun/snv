@@ -11,16 +11,30 @@ import { Database } from "@/types/database";
 import { Check, Filter, HeartHandshake, Loader2 } from "lucide-react";
 
 type PrayerRequest = Database["public"]["Tables"]["prayer_requests"]["Row"];
+type EntityType = "donor" | "church" | "language_school";
 
-interface DonorRef {
+interface EntityRef {
   id: string;
   name: string;
-  is_prayer_partner: boolean;
+  type: EntityType;
+  is_prayer_partner?: boolean;
 }
 
 type StatusFilter = "Active" | "Answered" | "All";
 
 const statusFilters: StatusFilter[] = ["Active", "Answered", "All"];
+
+const entityTypeLabel: Record<EntityType, string> = {
+  donor: "Donor",
+  church: "Church",
+  language_school: "Language School",
+};
+
+function entityHref(type: string, id: string) {
+  if (type === "church") return `/churches/${id}`;
+  if (type === "language_school") return `/language-schools/${id}`;
+  return `/donors/${id}`;
+}
 
 function formatRequestDate(value: string | null) {
   if (!value) return "Date unavailable";
@@ -35,7 +49,7 @@ function formatRequestDate(value: string | null) {
 export default function PrayersPage() {
   const supabase = useMemo(() => createClient(), []);
   const [requests, setRequests] = useState<PrayerRequest[]>([]);
-  const [donorsById, setDonorsById] = useState<Map<string, DonorRef>>(
+  const [entitiesById, setEntitiesById] = useState<Map<string, EntityRef>>(
     new Map(),
   );
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("Active");
@@ -49,20 +63,61 @@ export default function PrayersPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const [requestsResult, donorsResult] = await Promise.all([
-        supabase
-          .from("prayer_requests")
-          .select("*")
-          .eq("entity_type", "donor")
-          .order("created_at", { ascending: false }),
-        supabase.from("donors").select("id, name, is_prayer_partner"),
-      ]);
+      const [requestsResult, donorsResult, churchesResult, schoolsResult] =
+        await Promise.all([
+          supabase
+            .from("prayer_requests")
+            .select("*")
+            .order("created_at", { ascending: false }),
+          supabase.from("donors").select("id, name, is_prayer_partner"),
+          supabase.from("churches").select("id, name"),
+          supabase.from("language_schools").select("id, name"),
+        ]);
 
       if (requestsResult.error) throw requestsResult.error;
       if (donorsResult.error) throw donorsResult.error;
+      if (churchesResult.error) throw churchesResult.error;
+      if (schoolsResult.error) throw schoolsResult.error;
 
-      const donors = (donorsResult.data || []) as DonorRef[];
-      setDonorsById(new Map(donors.map((donor) => [donor.id, donor])));
+      const donors = (donorsResult.data || []) as {
+        id: string;
+        name: string;
+        is_prayer_partner: boolean;
+      }[];
+      const churches = (churchesResult.data || []) as {
+        id: string;
+        name: string;
+      }[];
+      const schools = (schoolsResult.data || []) as {
+        id: string;
+        name: string;
+      }[];
+
+      const entities = new Map<string, EntityRef>();
+      donors.forEach((donor) =>
+        entities.set(donor.id, {
+          id: donor.id,
+          name: donor.name,
+          type: "donor",
+          is_prayer_partner: donor.is_prayer_partner,
+        }),
+      );
+      churches.forEach((church) =>
+        entities.set(church.id, {
+          id: church.id,
+          name: church.name,
+          type: "church",
+        }),
+      );
+      schools.forEach((school) =>
+        entities.set(school.id, {
+          id: school.id,
+          name: school.name,
+          type: "language_school",
+        }),
+      );
+
+      setEntitiesById(entities);
       setRequests((requestsResult.data || []) as PrayerRequest[]);
       setError(null);
     } catch (err) {
@@ -110,8 +165,8 @@ export default function PrayersPage() {
   const visibleRequests = requests.filter((request) => {
     if (statusFilter === "Active" && request.is_answered) return false;
     if (statusFilter === "Answered" && !request.is_answered) return false;
-    if (prayerPartnersOnly) {
-      const donor = donorsById.get(request.entity_id);
+    if (prayerPartnersOnly && request.entity_type === "donor") {
+      const donor = entitiesById.get(request.entity_id);
       if (!donor?.is_prayer_partner) return false;
     }
     return true;
@@ -135,7 +190,7 @@ export default function PrayersPage() {
             Prayers
           </h1>
           <p className="text-body-md text-on-surface-variant">
-            Every donor prayer request in one list, ready to pray through.
+            Every prayer request in one list, ready to pray through.
           </p>
         </div>
       </section>
@@ -189,7 +244,7 @@ export default function PrayersPage() {
       ) : (
         <div className="space-y-3">
           {visibleRequests.map((request) => {
-            const donor = donorsById.get(request.entity_id);
+            const entity = entitiesById.get(request.entity_id);
 
             return (
               <Card
@@ -211,11 +266,21 @@ export default function PrayersPage() {
                           <Badge variant="neutral">Praying</Badge>
                         )}
                         <Link
-                          href={`/donors/${request.entity_id}`}
+                          href={entityHref(
+                            request.entity_type,
+                            request.entity_id,
+                          )}
                           className="font-bold text-on-surface hover:text-primary"
                         >
-                          {donor?.name ?? "Unknown donor"}
+                          {entity?.name ?? "Unknown"}
                         </Link>
+                        {request.entity_type !== "donor" ? (
+                          <Badge variant="info">
+                            {entityTypeLabel[
+                              request.entity_type as EntityType
+                            ] ?? request.entity_type}
+                          </Badge>
+                        ) : null}
                         <time
                           dateTime={request.created_at || undefined}
                           className="text-xs text-on-surface-variant"

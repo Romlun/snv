@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import { ChurchEngagementScore } from "@/components/ChurchEngagementScore";
 import DateField from "@/components/DateField";
 import NotesLog from "@/components/NotesLog";
+import PrayerRequestsLog from "@/components/PrayerRequestsLog";
 import { RelationshipStatusSelect } from "@/components/RelationshipStatusSelect";
 import {
   ArrowLeft,
@@ -652,6 +653,8 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
               onFollowUpDateSaved={next_visit_date => setChurch(prev => prev ? { ...prev, next_visit_date } : prev)}
             />
           </Card>
+
+          <PrayerRequestsLog entityType="church" entityId={church.id} />
 
           <div className="flex justify-end">
             <Button type="button" icon={Plus} onClick={() => setShowAddGift(value => !value)}>
