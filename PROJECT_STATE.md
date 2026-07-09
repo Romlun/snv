@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v5.1 Prayer partners + requests shipped (donors)`
+`snv Mission CRM — v5.2 Prayers list page shipped`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -615,6 +615,26 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 42 cont'd x2): Prayers list page SHIPPED and verified
+  live.** Operator flagged that "Prayer Partner" had no visible effect
+  anywhere yet, and asked whether a dedicated Prayers view made sense —
+  Director recommended a flat "pray through the list in one sitting" page
+  (not the smart daily-rotation feature, still future work) and it also
+  gives the Prayer Partner flag its first real use (a filter). This time
+  the operator noted they'd relay it to Claude Code specifically ("JFI")
+  — noted for context only, doesn't change how Director verifies (same
+  process regardless of which agent produces the diff). Delivered as a
+  direct commit to `main` (`0cee91d`, co-authored-by tag present) — exact
+  2-file match to the directive (new prayers/page.tsx, Sidebar +2 lines),
+  filters (Active/Answered/All + prayer-partners-only) and mark-answered
+  flow correctly mirror PrayerRequestsLog. `npx tsc --noEmit` and
+  `npm run build` both clean. Verified the join logic with a disposable
+  insert + real data already present from the operator's own testing
+  (confirmed a real donor is now genuinely flagged as a prayer partner
+  with one already-answered request, which the join resolved correctly);
+  cleaned up only the disposable test row, left the operator's real data
+  untouched. Confirmed READY on the exact SHA
+  (dpl_Gt1pHBzwTJzNrTw5qV27yH6FHk8P) via Vercel.
 - **UPDATE (session 42 cont'd): Prayer partners + prayer requests SHIPPED
   and verified live.** This round landed differently than every prior one
   — not as a local commit, not pushed to a branch, just left as
