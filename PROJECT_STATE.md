@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v5.5 Giving statements shipped (donors + churches)`
+`snv Mission CRM — v5.6 Reports foundation shipped`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -618,6 +618,29 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 42 cont'd x6): Reports foundation SHIPPED and verified
+  live.** Operator wants a base now, more detail later — built exactly
+  that: three sections (People & Partners, Giving, Field Activity) from
+  data that already exists, nothing fabricated. Delivered as commit
+  `80e2bc6` on `main` — exact 2-file match. Correctly did NOT invent a
+  "trips" metric — Director checked first and found only 2 real projects,
+  neither tagged, neither actually a trip by name (print/publishing
+  projects) — so the code shows "Total Projects" honestly labeled, with
+  an explanatory note directly in the UI (not just a code comment) that
+  trips aren't distinguishable from other projects yet. `npx tsc --noEmit`
+  and `npm run build` both clean. Verified every single number against
+  real data by hand before merging (not just spot-checked): 1 donor,
+  1 church, 3 language schools, 2 projects, $1,500 total giving all-time
+  and this-year (all gifts happen to be from 2026), 4 gifts recorded,
+  2 church-visit logs across 1 distinct church — all matched exactly what
+  the shipped code would compute. Confirmed READY on the exact SHA
+  (dpl_5ZZn5Ta9ynEV9kEqTdDDfXroc4Qb) via Vercel.
+  **Ministry-impact reporting is still the one open piece of the Reporting
+  roadmap item** — baptisms, people reached, church plants, etc. Waiting
+  on the operator to bring back more specifics on what to track, per their
+  own framing this session ("I can give more details later"). Extend this
+  same /reports page when that comes in rather than starting a separate
+  page — Director already told the operator this explicitly.
 - **UPDATE (session 42 cont'd x5): Giving Statements SHIPPED and verified
   live — the concrete half of the Reporting roadmap item.** No schema
   needed, pure read of existing gifts/donors/churches/organizations data.
