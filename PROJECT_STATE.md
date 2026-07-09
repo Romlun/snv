@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v5.6 Reports foundation shipped`
+`snv Mission CRM — v5.7 Volunteers roster shipped`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -618,6 +618,29 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 42 cont'd x7): Volunteers roster SHIPPED and verified
+  live — closes the last explicitly-deferred backlog item picked up this
+  session.** Scoped with 2 grounded questions before building (detail
+  level, Project linking) — both recommended options confirmed: name +
+  contact + what they help with, standalone list (no Project linking).
+  Delivered as commit `f1556de` on the feature branch, exact 5-file match
+  to the directive. Correctly kept this genuinely lightweight, not modeled
+  like Donors/Churches — no engagement score, no assigned staff, no
+  contact logs/notes log, matching the explicit "just a roster" framing
+  from when this was first deferred. List defaults to Active (same
+  hide-by-default pattern as the Tasks list), Edit page is the only place
+  is_active changes, Delete has a confirm dialog. Reports' People &
+  Partners section gained Total/Active Volunteers counts, directly
+  answering the original ask that started this whole feature ("how many
+  people we have"). `npx tsc --noEmit` and `npm run build` both clean.
+  Verified the full lifecycle with a real insert/update/delete cycle: a
+  real volunteer correctly appeared under Active, correctly moved out of
+  Active and into Inactive after the toggle (total stayed at 1, active
+  count dropped to 0 — confirmed against the exact query shapes the list
+  page and Reports page use), then cleaned up. Confirmed READY on the
+  exact SHA (dpl_EoGzXqbvA7ZWqGuwPzQRiT9XGm11) via Vercel.
+  Schema: `volunteers` table (name, email, phone, helps_with, is_active,
+  notes), RLS mirrors the existing Admin/Staff-only pattern.
 - **UPDATE (session 42 cont'd x6): Reports foundation SHIPPED and verified
   live.** Operator wants a base now, more detail later — built exactly
   that: three sections (People & Partners, Giving, Field Activity) from
