@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v5.2 Prayers list page shipped`
+`snv Mission CRM — v5.3 Prayer Requests complete (donors/churches/schools)`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -615,6 +615,30 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 42 cont'd x3): Prayer Requests feature COMPLETE across
+  all three entity types — SHIPPED and verified live.** Extended from
+  Donors-only to also cover Churches and Language Schools, closing out
+  what was deliberately deferred when the feature first shipped. Delivered
+  as commit `7fd44ed` on `main` — exact 3-file match to the directive
+  (PrayerRequestsLog wired into both remaining detail pages, Prayers list
+  page unified to fetch/join all three entity types with a single lookup
+  map). Correctly kept "Prayer partners only" scoped to donor-type requests
+  only (`request.entity_type === "donor"` guard) — church/language-school
+  requests always show regardless of that toggle, since the concept
+  doesn't apply to them; added a small type badge for non-donor requests
+  as a nice touch beyond what was strictly asked. `npx tsc --noEmit` and
+  `npm run build` both clean. Verified against the real church ("Spring of
+  Life") and real language school ("Bright Kids ESL") records with
+  disposable prayer requests: confirmed both resolve to the correct name
+  via the unified lookup (mirroring the exact join the code performs),
+  cleaned up after. Confirmed READY on the exact SHA
+  (dpl_4x5mCQ3dJtLC5UBc6Ffjv4vKS45Y) via Vercel.
+  **Prayer Requests is now fully rolled out** — Donors, Churches, and
+  Language Schools all support logging/tracking/answering requests from
+  their own detail page, and the /prayers list surfaces all three
+  together. The only prayer-related item still on the roadmap is the
+  daily-rotation "10 people to pray for today" feature, explicitly deferred
+  to the future by the operator when this was first scoped.
 - **UPDATE (session 42 cont'd x2): Prayers list page SHIPPED and verified
   live.** Operator flagged that "Prayer Partner" had no visible effect
   anywhere yet, and asked whether a dedicated Prayers view made sense —
