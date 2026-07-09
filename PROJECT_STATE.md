@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v5.0 Scoping prayer partners + prayer requests`
+`snv Mission CRM — v5.1 Prayer partners + requests shipped (donors)`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -615,6 +615,35 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 42 cont'd): Prayer partners + prayer requests SHIPPED
+  and verified live.** This round landed differently than every prior one
+  — not as a local commit, not pushed to a branch, just left as
+  uncommitted working-tree changes (modified donor page + a new untracked
+  PrayerRequestsLog.tsx). Found it via `git status`, reviewed the actual
+  diffs before doing anything else, same as always. Implementation matched
+  the directive closely and made good independent calls: the prayer
+  partner toggle correctly mirrors RelationshipStatusSelect's optimistic-
+  update-with-rollback pattern using the existing Button component;
+  PrayerRequestsLog built with current design-system primitives (Card/
+  Button/Badge/Input), not NotesLog's older raw-Tailwind styling, exactly
+  as directed; answered requests stay visible with a distinct badge +
+  answer note rather than disappearing, per the explicit requirement.
+  `npx tsc --noEmit` and `npm run build` both clean. Verified live against
+  the real donor record (not disposable data, since there's only one real
+  donor): toggled is_prayer_partner true then back to false, confirmed
+  both directions persist; inserted a real prayer request, marked it
+  answered with a note, confirmed the exact shape the component's query
+  would retrieve, then cleaned up the test request (left the toggle in its
+  original false state). Since this arrived uncommitted, Director committed
+  it directly (`c8ee8f0`) before pushing/merging — code authorship is still
+  the Code Agent's, Director just formalized it into git history after
+  verification, consistent with never authoring app logic directly.
+  Merged to main (fast-forward, `c8ee8f0`), confirmed READY on that exact
+  SHA (dpl_5ienYuLt6UhurKFej8k2QwAdTfZt) via Vercel.
+  Scope shipped: Donor detail page only, as chosen. Churches and Language
+  Schools do NOT have this UI yet even though prayer_requests' schema
+  already supports them (entity_type check constraint) — that's future
+  work, not a gap in this round.
 - **UPDATE (session 41 cont'd x9): Planner-only tasks SHIPPED and verified
   live.** Operator caught a real gap: Planner quick-add tasks were
   indistinguishable from regular tasks, so they leaked into the Tasks list.
