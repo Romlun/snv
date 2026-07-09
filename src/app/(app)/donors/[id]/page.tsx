@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { DonorEngagementScore } from "@/components/DonorEngagementScore";
 import DateField from "@/components/DateField";
 import NotesLog from "@/components/NotesLog";
+import PrayerRequestsLog from "@/components/PrayerRequestsLog";
 import { RelationshipStatusSelect } from "@/components/RelationshipStatusSelect";
 import {
   ArrowLeft,
@@ -179,6 +180,7 @@ export default function DonorDetailPage({
   const [giftHistory, setGiftHistory] = useState<GiftHistoryItem[]>([]);
   const [showAddGift, setShowAddGift] = useState(false);
   const [addingGift, setAddingGift] = useState(false);
+  const [savingPrayerPartner, setSavingPrayerPartner] = useState(false);
   const [giftForm, setGiftForm] = useState<AddGiftFormData>({
     amount: "",
     project_id: "",
@@ -317,6 +319,32 @@ export default function DonorDetailPage({
     }
   };
 
+  async function handlePrayerPartnerToggle() {
+    if (!donor || savingPrayerPartner) return;
+
+    const previousValue = donor.is_prayer_partner;
+    const newValue = !previousValue;
+    setDonor((prev) =>
+      prev ? { ...prev, is_prayer_partner: newValue } : prev,
+    );
+    setSavingPrayerPartner(true);
+
+    const { error } = await supabase
+      .from("donors")
+      .update({ is_prayer_partner: newValue })
+      .eq("id", donor.id);
+
+    setSavingPrayerPartner(false);
+
+    if (error) {
+      console.error(error);
+      setDonor((prev) =>
+        prev ? { ...prev, is_prayer_partner: previousValue } : prev,
+      );
+      alert("Error updating prayer partner status");
+    }
+  }
+
   if (loading) {
     return (
       <Card className="flex flex-col items-center justify-center py-20">
@@ -384,6 +412,17 @@ export default function DonorDetailPage({
                       )
                     }
                   />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={donor.is_prayer_partner ? "primary" : "secondary"}
+                    icon={HeartHandshake}
+                    aria-pressed={donor.is_prayer_partner}
+                    disabled={savingPrayerPartner}
+                    onClick={() => void handlePrayerPartnerToggle()}
+                  >
+                    Prayer Partner
+                  </Button>
                 </div>
                 <h1 className="font-headline text-headline-lg font-semibold text-on-surface">
                   {donor.name}
@@ -654,6 +693,8 @@ export default function DonorDetailPage({
               }
             />
           </Card>
+
+          <PrayerRequestsLog entityType="donor" entityId={donor.id} />
 
           <div className="flex justify-end">
             <Button
