@@ -7,6 +7,7 @@ import {
   Church as ChurchIcon,
   Coins,
   GraduationCap,
+  HandHeart,
   Landmark,
   Loader2,
   MapPinned,
@@ -22,6 +23,8 @@ interface ReportStats {
   totalChurches: number;
   totalLanguageSchools: number;
   totalProjects: number;
+  totalVolunteers: number;
+  activeVolunteers: number;
   totalGivingAllTime: number;
   totalGivingThisYear: number;
   totalGiftsRecorded: number;
@@ -58,6 +61,8 @@ export default function ReportsPage() {
           churchesResult,
           languageSchoolsResult,
           projectsResult,
+          volunteersResult,
+          activeVolunteersResult,
           giftsResult,
           churchVisitsResult,
         ] = await Promise.all([
@@ -67,6 +72,13 @@ export default function ReportsPage() {
             .from("language_schools")
             .select("*", { count: "exact", head: true }),
           supabase.from("projects").select("*", { count: "exact", head: true }),
+          supabase
+            .from("volunteers")
+            .select("*", { count: "exact", head: true }),
+          supabase
+            .from("volunteers")
+            .select("*", { count: "exact", head: true })
+            .eq("is_active", true),
           supabase.from("gifts").select("amount, gift_date"),
           supabase
             .from("contact_logs")
@@ -100,6 +112,8 @@ export default function ReportsPage() {
           totalChurches: churchesResult.count ?? 0,
           totalLanguageSchools: languageSchoolsResult.count ?? 0,
           totalProjects: projectsResult.count ?? 0,
+          totalVolunteers: volunteersResult.count ?? 0,
+          activeVolunteers: activeVolunteersResult.count ?? 0,
           totalGivingAllTime,
           totalGivingThisYear,
           totalGiftsRecorded: gifts.length,
@@ -167,6 +181,16 @@ export default function ReportsPage() {
             label="Total Projects"
             value={formatCount(stats.totalProjects)}
             icon={Briefcase}
+          />
+          <StatCard
+            label="Total Volunteers"
+            value={formatCount(stats.totalVolunteers)}
+            icon={HandHeart}
+          />
+          <StatCard
+            label="Active Volunteers"
+            value={formatCount(stats.activeVolunteers)}
+            icon={HandHeart}
           />
         </div>
       </section>
