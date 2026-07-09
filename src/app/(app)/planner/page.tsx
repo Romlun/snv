@@ -224,7 +224,6 @@ export default function PlannerPage() {
             .from("tasks")
             .select("id, title, due_date, due_time, status, priority")
             .eq("assigned_to", user.id)
-            .neq("status", "Completed")
             .neq("status", "Cancelled"),
           supabase
             .from("donors")
@@ -306,9 +305,13 @@ export default function PlannerPage() {
   const range = useMemo(() => getRange(view, anchorDate), [view, anchorDate]);
 
   const groupedItems = useMemo(() => {
-    const filtered = items.filter((item) =>
-      isWithinInterval(parse(item.date, "yyyy-MM-dd", new Date()), range),
-    );
+    const filtered = items.filter((item) => {
+      if (!isWithinInterval(parse(item.date, "yyyy-MM-dd", new Date()), range))
+        return false;
+      if (item.type === "task" && item.status === "Completed" && view !== "day")
+        return false;
+      return true;
+    });
 
     const groups = new Map<string, PlannerItem[]>();
     filtered.forEach((item) => {
@@ -322,6 +325,9 @@ export default function PlannerPage() {
       .map(([date, dateItems]) => ({
         date,
         items: dateItems.sort((a, b) => {
+          const aCompleted = a.type === "task" && a.status === "Completed";
+          const bCompleted = b.type === "task" && b.status === "Completed";
+          if (aCompleted !== bCompleted) return aCompleted ? 1 : -1;
           const aTime = a.due_time ?? null;
           const bTime = b.due_time ?? null;
           if (aTime && bTime) return aTime.localeCompare(bTime);
@@ -330,7 +336,7 @@ export default function PlannerPage() {
           return a.label.localeCompare(b.label);
         }),
       }));
-  }, [items, range]);
+  }, [items, range, view]);
 
   const handleQuickAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -563,11 +569,16 @@ export default function PlannerPage() {
                 <div>
                   {group.items.map((item) => {
                     const config = plannerTypeConfig[item.type];
+                    const isCompletedTask =
+                      item.type === "task" && item.status === "Completed";
 
                     return (
                       <div
                         key={`${item.type}-${item.id}`}
-                        className="flex items-center justify-between gap-4 border-t border-outline-variant/10 px-6 py-4 transition-colors hover:bg-primary-container/5"
+                        className={cn(
+                          "flex items-center justify-between gap-4 border-t border-outline-variant/10 px-6 py-4 transition-colors hover:bg-primary-container/5",
+                          isCompletedTask && "opacity-60",
+                        )}
                       >
                         <div className="flex min-w-0 items-center gap-3">
                           {item.type === "task" ? (
@@ -588,7 +599,11 @@ export default function PlannerPage() {
                           <div className="min-w-0">
                             <Link
                               href={item.href}
-                              className="font-bold text-on-surface hover:text-primary"
+                              className={cn(
+                                "font-bold text-on-surface hover:text-primary",
+                                isCompletedTask &&
+                                  "text-on-surface-variant line-through",
+                              )}
                             >
                               {item.label}
                             </Link>
