@@ -281,8 +281,11 @@ wired to the live Supabase database (no mock data remaining anywhere), enforces 
      trips can be as a projects now." Confirmed: Projects (with phases +
      action items, already shipped) is the right model for this; don't
      build a separate events/trips module.
-   Prayer partners + requests scoping (schema, UI placement) is in
-   progress — see in-flight log for the live architecture conversation.
+   **Prayer partners + prayer requests: COMPLETE (session 42), see §12 for
+   the full build/verification history.** Shipped and verified across all
+   three entity types (Donors, Churches, Language Schools) — the flag,
+   the requests log, and the standalone /prayers list. Not "in progress"
+   anymore; only the explicitly-future daily-rotation piece remains open.
 2. **Reporting + AI features — UNPAUSED (session 42).** Operator: "Reporting
    are good. We can add it to the scope." Also explicitly confirmed
    **annual donor giving statements** as wanted ("Giving statements good
