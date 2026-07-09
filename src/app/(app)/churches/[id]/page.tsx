@@ -17,6 +17,7 @@ import {
   CalendarCheck,
   CalendarPlus,
   Clock,
+  FileText,
   Gift as GiftIcon,
   Landmark,
   Loader2,
@@ -656,7 +657,17 @@ export default function ChurchDetailPage({ params }: { params: Promise<{ id: str
 
           <PrayerRequestsLog entityType="church" entityId={church.id} />
 
-          <div className="flex justify-end">
+          <div className="flex flex-wrap justify-end gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              icon={FileText}
+              onClick={() => {
+                window.location.href = `/churches/${church.id}/statement`;
+              }}
+            >
+              Giving Statement
+            </Button>
             <Button type="button" icon={Plus} onClick={() => setShowAddGift(value => !value)}>
               Add Gift
             </Button>

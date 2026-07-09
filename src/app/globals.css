@@ -108,3 +108,10 @@ body {
     transform: none;
   }
 }
+
+@media print {
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+}

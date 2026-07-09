@@ -90,7 +90,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="hidden h-screen w-72 shrink-0 flex-col border-r border-outline-variant/15 bg-paper-neutral lg:flex">
+    <aside className="hidden h-screen w-72 shrink-0 flex-col border-r border-outline-variant/15 bg-paper-neutral lg:flex print:hidden">
       <div className="border-b border-outline-variant/15 px-5 py-5">
         <LogoLockup />
       </div>
@@ -147,7 +147,7 @@ export function MobileBottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-outline-variant/15 bg-surface/90 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_-16px_rgba(17,28,45,0.24)] backdrop-blur-md lg:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-outline-variant/15 bg-surface/90 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_-16px_rgba(17,28,45,0.24)] backdrop-blur-md lg:hidden print:hidden">
       <div className="grid grid-cols-4 gap-1">
         {mobileNavigation.map((item) => {
           const isActive = isActivePath(pathname, item.href);

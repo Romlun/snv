@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   Calendar,
   Clock,
+  FileText,
   Gift,
   HeartHandshake,
   Loader2,
@@ -696,7 +697,17 @@ export default function DonorDetailPage({
 
           <PrayerRequestsLog entityType="donor" entityId={donor.id} />
 
-          <div className="flex justify-end">
+          <div className="flex flex-wrap justify-end gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              icon={FileText}
+              onClick={() => {
+                window.location.href = `/donors/${donor.id}/statement`;
+              }}
+            >
+              Giving Statement
+            </Button>
             <Button
               type="button"
               icon={Plus}
