@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v5.4 Planner Day view keeps completed tasks visible`
+`snv Mission CRM — v5.5 Giving statements shipped (donors + churches)`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -618,6 +618,37 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 42 cont'd x5): Giving Statements SHIPPED and verified
+  live — the concrete half of the Reporting roadmap item.** No schema
+  needed, pure read of existing gifts/donors/churches/organizations data.
+  Delivered as commit `307f513` on `main` — broader file footprint than
+  explicitly directed (8 files, not 4), but every extra file was a
+  necessary, correct implementation of "clean print output, no chrome": the
+  shared app layout, globals.css, and Sidebar all needed print:hidden /
+  print resets since that chrome lives outside the new component itself,
+  not scope creep. GivingStatementView is a genuinely shared component
+  (org name fetched dynamically, not hardcoded, in case multi-org ever
+  happens); Donor and Church statement routes are exact structural
+  parallels (donor_id vs church_id, otherwise identical); year filtering
+  done via a string-prefix check on the plain `gift_date` (YYYY-MM-DD),
+  a smart choice that sidesteps any date-parsing timezone risk entirely.
+  `npx tsc --noEmit` and `npm run build` both clean. Verified against real
+  gift data (not disposable): the real donor's 3 gifts total $500 for
+  2026, the real church's 1 gift is $1,000 — confirmed both would compute
+  correctly through the exact query/filter the code uses, so this isn't
+  an empty-state-only verification. Confirmed READY on the exact SHA
+  (dpl_5oozwgQTTzZbFRvDsnP1VWFc52HT) via Vercel.
+  **Compliance caveat flagged to the operator, not yet confirmed
+  resolved**: the "no goods or services" disclaimer is standard phrasing,
+  not a guarantee of legal correctness for tax-deduction purposes —
+  recommended the operator have their own accountant/compliance person
+  glance at the actual wording before these are sent to real donors for
+  tax purposes. Don't treat this feature as fully "compliance-signed-off"
+  until that happens, even though it's technically shipped and correct.
+  **Remaining piece of the Reporting roadmap item**: ministry-impact
+  reporting (baptisms, people reached, church plants, etc. for board
+  reports/newsletters) — still NOT scoped in schema detail, needs its own
+  grounded scoping pass before building, same as everything else.
 - **UPDATE (session 42 cont'd x4): Planner Day-view completed-tasks
   behavior SHIPPED and verified live.** Operator wanted to see progress
   during the day rather than have completed tasks vanish immediately, but
