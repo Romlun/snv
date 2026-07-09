@@ -297,6 +297,7 @@ export type Database = {
           engagement_score: number | null
           id: string
           interests: string[] | null
+          is_prayer_partner: boolean
           is_recurring: boolean | null
           last_contact_date: string | null
           lifetime_giving: number | null
@@ -327,6 +328,7 @@ export type Database = {
           engagement_score?: number | null
           id?: string
           interests?: string[] | null
+          is_prayer_partner?: boolean
           is_recurring?: boolean | null
           last_contact_date?: string | null
           lifetime_giving?: number | null
@@ -357,6 +359,7 @@ export type Database = {
           engagement_score?: number | null
           id?: string
           interests?: string[] | null
+          is_prayer_partner?: boolean
           is_recurring?: boolean | null
           last_contact_date?: string | null
           lifetime_giving?: number | null
@@ -636,6 +639,60 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      prayer_requests: {
+        Row: {
+          answered_at: string | null
+          answered_note: string | null
+          created_at: string | null
+          created_by: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          is_answered: boolean
+          org_id: string | null
+          request_text: string
+        }
+        Insert: {
+          answered_at?: string | null
+          answered_note?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          is_answered?: boolean
+          org_id?: string | null
+          request_text: string
+        }
+        Update: {
+          answered_at?: string | null
+          answered_note?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          is_answered?: boolean
+          org_id?: string | null
+          request_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prayer_requests_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prayer_requests_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
