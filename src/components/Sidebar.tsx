@@ -17,6 +17,7 @@ import {
   Settings,
   LogOut,
   HeartHandshake,
+  BarChart3,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,7 @@ const navigation: NavigationItem[] = [
   { name: "Tasks", href: "/tasks", icon: CheckSquare },
   { name: "Planner", href: "/planner", icon: ClipboardList },
   { name: "Prayers", href: "/prayers", icon: HeartHandshake },
+  { name: "Reports", href: "/reports", icon: BarChart3 },
   { name: "Inventory", href: "/inventory", icon: BookOpen },
   { name: "Budget", href: "/budget", icon: Wallet },
   { name: "Calendar", href: "/calendar", icon: Calendar },
