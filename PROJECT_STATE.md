@@ -10,7 +10,7 @@
 
 ## 0. CHAT NAMING
 Current title:
-`snv Mission CRM — v5.3 Prayer Requests complete (donors/churches/schools)`
+`snv Mission CRM — v5.4 Planner Day view keeps completed tasks visible`
 On phase change, the Director gives a new title and bumps this line the same turn.
 
 ---
@@ -615,6 +615,29 @@ effective gate. Continue this pattern.
 ---
 
 ## 12. IN-FLIGHT WORK
+- **UPDATE (session 42 cont'd x4): Planner Day-view completed-tasks
+  behavior SHIPPED and verified live.** Operator wanted to see progress
+  during the day rather than have completed tasks vanish immediately, but
+  asked for my opinion between "always show" vs. "hide + reveal" — advised
+  always-show (crossed out, sorted to bottom), reasoning that a
+  hide-by-default toggle would work against the stated goal of seeing
+  progress at a glance, and that Day view's list is naturally small so
+  clutter isn't a real concern the way it is on the full Tasks list.
+  Explicitly scoped to Day view only (Week/Month/Quarter keep hiding
+  completed tasks as before) and Completed-only (Cancelled tasks stay
+  hidden everywhere, including Day — not "progress"). Delivered as commit
+  `ee2d93c` on `main` — exact match: fetch no longer excludes Completed
+  (still excludes Cancelled), view-conditional filter added, sort-to-
+  bottom implemented while preserving due_time order within both the
+  active and completed groups, strikethrough + muted styling, and
+  correctly added `view` to the relevant useMemo's dependency array
+  (avoids a stale-closure bug that wasn't explicitly asked for but
+  matters). `npx tsc --noEmit` and `npm run build` both clean. Verified
+  with a disposable real-shaped insert (a genuinely Completed task due
+  today, assigned to a real profile) that the updated query correctly
+  includes it; confirmed real current data (7 Completed / 3 Not started
+  tasks org-wide) so this isn't a no-op change. Confirmed READY on the
+  exact SHA (dpl_4oomd3fyLdBEB7Hex91YxqEFuAKE) via Vercel.
 - **UPDATE (session 42 cont'd x3): Prayer Requests feature COMPLETE across
   all three entity types — SHIPPED and verified live.** Extended from
   Donors-only to also cover Churches and Language Schools, closing out
